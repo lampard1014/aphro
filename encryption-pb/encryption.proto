@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package EncryptionService.Pb;
+
+service EncryptionService {
+
+		rpc base64Encode(EncryptionBase64EncodeRequest) returns (EncryptionBase64EncodeResponse) {
+			option (google.api.http) = {
+				post: "/encryption/base64Encode"
+				body:"*"
+			};
+		}
+
+		rpc base64Decode(EncryptionBase64DecodeRequest) returns (EncryptionBase64DecodeResponse) {
+			option (google.api.http) = {
+				post: "/encryption/base64Decode"
+				body:"*"
+			};
+		}
+		
+		rpc xxteaEncryption(EncryptionXXTEARequest) returns (EncryptionXXTEAResponse) {
+			option (google.api.http) = {
+				post: "/encryption/xxtea"
+				body:"*"
+			};
+		}
+
+		rpc xxteaDecryption(DecryptionXXTEARequest) returns (DecryptionXXTEAResponse) {
+			option (google.api.http) = {
+				post: "/decryption/xxtea"
+				body:"*"
+			};
+		}
+
+		rpc rsaEncryption(EncryptionRSARequest) returns (EncryptionRSAResponse) {
+			option (google.api.http) = {
+				post: "/encryption/rsa"
+				body:"*"
+			};
+		}
+
+		rpc rsaDecryption(DecryptionRSARequest) returns (DecryptionRSAResponse) {
+			option (google.api.http) = {
+				post: "/decryption/rsa"
+				body:"*"
+			};
+		}
+
+}
+/////////////////////base64 /////////////////////
+//base64 Decode Requset
+
+message EncryptionBase64DecodeRequest {
+	bytes  decodedStr = 1;
+}
+
+message EncryptionBase64DecodeResponse {
+	string  rawValue = 1;
+}
+
+
+message EncryptionBase64EncodeRequest {
+	string  rawValue = 1;
+}
+
+message EncryptionBase64EncodeResponse {
+	bytes  encodedStr = 1;
+}
+
+///////////////// XXTEA /////////////////////
+message EncryptionXXTEARequest{
+	 string key = 1;
+	 string rawValue = 2;
+}
+
+message EncryptionXXTEAResponse{
+	 string key = 1;
+	 bytes encryptedStr = 2;
+}
+
+message DecryptionXXTEARequest{
+	 string key = 1;
+	 bytes encryptedStr = 2;
+}
+
+message DecryptionXXTEAResponse{
+	 string key = 1;
+	 string rawValue = 2;
+}
+
+////////////////RSA //////////////////////
+message EncryptionRSARequest{
+	 string rawValue = 2;
+}
+
+message EncryptionRSAResponse{
+	 bytes encryptedStr = 1;
+}
+
+message DecryptionRSARequest{
+	 bytes encryptedStr = 2;
+}
+
+message DecryptionRSAResponse{
+	 string rawValue = 2;
+}
+
