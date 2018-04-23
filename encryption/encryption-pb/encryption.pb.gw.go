@@ -2,11 +2,11 @@
 // source: encryption.proto
 
 /*
-Package EncryptionService_Pb is a reverse proxy.
+Package Aphro_Encryption_pb is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package EncryptionService_Pb
+package Aphro_Encryption_pb
 
 import (
 	"io"

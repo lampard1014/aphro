@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 
-package EncryptionService.Pb;
+package Aphro.Encryption.pb;
 
 service EncryptionService {
 
@@ -53,20 +53,20 @@ service EncryptionService {
 //base64 Decode Requset
 
 message EncryptionBase64DecodeRequest {
-	bytes  decodedStr = 1;
+	string  decodedStr = 1;
 }
 
 message EncryptionBase64DecodeResponse {
-	string  rawValue = 1;
+	bytes  rawValue = 1;
 }
 
 
 message EncryptionBase64EncodeRequest {
-	string  rawValue = 1;
+	bytes  rawValue = 1;
 }
 
 message EncryptionBase64EncodeResponse {
-	bytes  encodedStr = 1;
+	string  encodedStr = 1;
 }
 
 ///////////////// XXTEA /////////////////////
@@ -92,7 +92,7 @@ message DecryptionXXTEAResponse{
 
 ////////////////RSA //////////////////////
 message EncryptionRSARequest{
-	 string rawValue = 2;
+	 bytes rawValue = 1;
 }
 
 message EncryptionRSAResponse{
@@ -100,10 +100,10 @@ message EncryptionRSAResponse{
 }
 
 message DecryptionRSARequest{
-	 bytes encryptedStr = 2;
+	 bytes encryptedStr = 1;
 }
 
 message DecryptionRSAResponse{
-	 string rawValue = 2;
+	 bytes rawValue = 1;
 }
 
