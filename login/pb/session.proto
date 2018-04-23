@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package Aphro.Session.pb;
+
+service SessionService {
+
+		//query create delete update SessionToken
+
+		rpc querySessionToken(SessionTokenQueryRequest) returns (SessionTokenQueryResponse) {
+			option (google.api.http) = {
+				post: "/session/token/query"
+				body:"*"
+			};
+		}
+
+		rpc createSessionToken(SessionTokenCreateRequest) returns (SessionTokenCreateResponse) {
+			option (google.api.http) = {
+				post: "/session/token/create"
+				body:"*"
+			};
+		}
+
+		rpc deleteSessionToken(DeleteSessionTokenRequest) returns (DeleteSessionTokenResponse) {
+			option (google.api.http) = {
+				post: "/session/token/delete"
+				body:"*"
+			};
+		}
+		
+		rpc renewSessionToken(RenewSessionTokenRequest) returns (RenewSessionTokenResponse) {
+			option (google.api.http) = {
+				post: "/session/token/renew"
+				body:"*"
+			};
+		}
+
+		//上层综合业务：验证码  登录 相关验证
+
+		//检查SessionToken是否过期
+		rpc isSessionTokenVailate(IsSessionTokenVailateRequest) returns (IsSessionTokenVailateResponse) {
+			option (google.api.http) = {
+				post: "/session/token/isSessionTokenVailate"
+				body:"*"
+			};
+		}
+
+		//短信验证码 验证接口
+		rpc merchantVerifyCode(MerchantVerifyCodeRequest) returns (MerchantVerifyCodeResponse) {
+			option (google.api.http) = {
+				post: "/merchant/verifyCode"
+				body:"*"
+			};
+		}
+
+		//短信验证码 验证接口
+		rpc merchantSendCode(MerchantSendCodeRequest) returns (MerchantSendCodeResponse) {
+			option (google.api.http) = {
+				post: "/merchant/sendCode"
+				body:"*"
+			};
+		}
+
+		//验证 注册用户手机号唯一性
+		rpc merchantCheckCellphoneIsUsed(MerchantCheckCellphoneIsUsedRequest) returns (MerchantCheckCellphoneIsUsedResponse) {
+			option (google.api.http) = {
+				post: "/merchant/checkCellphone"
+				body:"*"
+			};
+		}
+
+		//  商户app登陆
+		rpc merchantLogin(MerchantLoginRequest) returns (MerchantLoginResponse) {
+			option (google.api.http) = {
+				post: "/merchant/login"
+				body:"*"
+			};
+		}
+
+}
+
+message MerchantLoginRequest {
+	string key = 1;
+	string userAgent = 2;
+	string token = 3;
+}
+
+message MerchantLoginResponse {
+	string merchantID = 1;
+	string token = 2;
+}
+
+message MerchantCheckCellphoneIsUsedRequest {
+	string 	cellphone = 1;
+	string 	token	=	2;
+}
+message MerchantCheckCellphoneIsUsedResponse {
+	bool 	isUsed = 1;
+}
+
+message MerchantSendCodeRequest {
+	string 	cellphone = 1;
+	uint32	scence	=	2;
+	string 	token	=	3;
+}
+
+message MerchantSendCodeResponse {
+	bool 	successed = 1;
+}
+
+message MerchantVerifyCodeRequest {
+	string 	cellphone = 1;
+	uint32	scence	=	2;
+	string 	smsCode	=	3;
+}
+
+message MerchantVerifyCodeResponse {
+	bool 	successed = 1;
+}
+
+
+message IsSessionTokenVailateRequest {
+	string 	sessionToken = 1;
+}
+
+message IsSessionTokenVailateResponse {
+	bool 	successed = 1;
+}
+
+message SessionTokenQueryRequest {
+	string 	sessionToken = 1;
+}
+
+message SessionTokenQueryResponse {
+	string 	sessionToken = 1;
+	uint32 	ttl	=	2;
+	bool 	successed = 3;
+}
+
+
+message SessionTokenCreateRequest {
+	string  reverseStr = 1;
+}
+
+message SessionTokenCreateResponse {
+	string 	sessionToken = 1;
+	uint32 	ttl	=	2;
+	bool 	successed = 3;
+}
+
+message DeleteSessionTokenRequest {
+	string  sessionToken = 1;
+}
+
+message DeleteSessionTokenResponse {
+	bool successed = 1
+}
+
+message RenewSessionTokenRequest {
+	string  sessionToken = 1;
+}
+
+message RenewSessionTokenResponse {
+	uint32 	ttl	=	1;
+	bool 	successed = 2;
+}
+
+
+
+
