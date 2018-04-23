@@ -16,6 +16,16 @@ service RedisService {
 
 		rpc insert(insertRedisRequest) returns (insertRedisResponse) {}
 
+		rpc isExists(isExistsRequest) returns (isExistsResponse) {}
+
+}
+
+message isExistsRequest {
+	string key = 1;
+}
+
+message isExistsResponse {
+	bool isExists = 1;
 }
 
 message queryRedisRequest {
@@ -24,9 +34,7 @@ message queryRedisRequest {
 
 message queryRedisResponse {
 	bool successed = 1;
-	string key = 2;
-	string value = 3;
-	uint32	ttl =	4;
+	string value = 2;
 }
 
 message updateRedisRequest {
