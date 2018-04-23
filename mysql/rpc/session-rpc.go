@@ -6,27 +6,38 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
     "github.com/xxtea/xxtea-go/xxtea"
-	pb "github.com/lampard1014/aphro/encryption/encryption-pb"
-    "encoding/pem"
-    "encoding/base64"
-    "os"
-    "io/ioutil"
-    "crypto/rsa"
-    "crypto/x509"
-    "crypto/rand"
+	"github.com/lampard1014/aphro/session/pb"
     "fmt"
 )
 
 const (
-	port  = ":10087"
+	port  = ":10088"
 )
 
-type encryptionService struct{}
+type sessionService struct{}
 
-/*
-base64Encode
-base64Decode 
-*/
+
+func (s *sessionService) QuerySessionToken(ctx context.Context, in *SessionTokenQueryRequest) (*SessionTokenQueryResponse, error) {
+}
+
+func (s *sessionService) CreateSessionToken(ctx context.Context, in *SessionTokenCreateRequest) (*SessionTokenCreateResponse, error) {
+}
+
+func (s *sessionService) DeleteSessionToken(ctx context.Context, in *DeleteSessionTokenRequest) (*DeleteSessionTokenResponse, error) {
+}
+
+func (s *sessionService) RenewSessionToken(ctx context.Context, in *RenewSessionTokenRequest) (*RenewSessionTokenResponse, error) {
+}
+
+func (s *sessionService) IsSessionTokenVailate(ctx context.Context, in *IsSessionTokenVailateRequest) (*IsSessionTokenVailateResponse, error) {
+}
+
+func (s *sessionService) MerchantVerifyCode(ctx context.Context, in *MerchantVerifyCodeRequest) (*MerchantVerifyCodeResponse, error) {
+}
+
+func (s *sessionService) MerchantSendCode(ctx context.Context, in *MerchantSendCodeRequest) (*MerchantSendCodeResponse, error) {
+}
+
 
 func (s *encryptionService) Base64Encode(ctx context.Context, in *pb.EncryptionBase64EncodeRequest) (*pb.EncryptionBase64EncodeResponse, error) {
     str := base64.StdEncoding.EncodeToString(in.RawValue)
@@ -123,7 +134,7 @@ func main() {
     }
 
     s := grpc.NewServer()
-    pb.RegisterEncryptionServiceServer(s, new(encryptionService))
+    RegisterSessionServiceServer(s, new(sessionService))
     err = s.Serve(lis)
     if err != nil {
         log.Fatal(err)

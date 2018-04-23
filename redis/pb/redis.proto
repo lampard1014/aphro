@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package Aphro.Redis.pb;
+
+service RedisService {
+
+		//query create delete update Redis
+
+		rpc query(queryRedisRequest) returns (queryRedisResponse) {}
+
+		rpc update(updateRedisRequest) returns (updateRedisResponse) {}
+
+		rpc delete(deleteRedisRequest) returns (deleteRedisResponse) {}
+
+		rpc insert(insertRedisRequest) returns (insertRedisResponse) {}
+
+}
+
+message queryRedisRequest {
+	string key = 1;
+}
+
+message queryRedisResponse {
+	bool successed = 1;
+	string key = 2;
+	string value = 3;
+	uint32	ttl =	4;
+}
+
+message updateRedisRequest {
+	string key = 1;
+	string value = 2;
+	string ttl = 3;
+}
+
+message updateRedisResponse {
+	bool successed = 1;
+	string key = 2;
+	string value = 3;
+	uint32	ttl =	4;
+}
+
+message deleteRedisRequest {
+	string key = 1;
+}
+
+message deleteRedisResponse {
+	bool successed = 1;
+}
+
+message insertRedisRequest {
+	string key = 1;
+	string value = 2;
+	uint32	ttl =	3;
+}
+
+message insertRedisResponse {
+	bool successed = 1;
+	string key = 2;
+	string value = 3;
+	uint32	ttl =	4;
+}
+
+
+
+
