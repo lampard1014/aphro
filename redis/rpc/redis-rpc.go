@@ -24,27 +24,47 @@ func (s *redisService) Query(ctx context.Context, in *QueryRedisRequest) (*Query
         panic(err)
     }
     return &QueryRedisResponse{
-        Successed:1,
-        Key :in.Key,
+        Successed:err == nil,
         Value:val,
-        Ttl:
     }, err
 }
 
-func (s *redisService) Update(ctx context.Context, in *UpdateRedisRequest) (*UpdateRedisResponse, error) {
-    return nil,nil
+func (s *redisService) IsExists(ctx context.Context, in *IsExistsRequest) (*IsExistsResponse, error) {
+    cli := createClient()
+    isSuccess,err := cli.Exists(in.Key).Result()
+    if err != nil {
+        panic(err)
+    }
+    return &IsExistsResponse{IsExists:isSuccess == 1},err
 }
+
+func (s *redisService) ExpireAt(ctx context.Context, in *ExpireAtRequest) (*ExpireAtResponse, error) {
+    cli := createClient()
+    isSuccess,err := cli.ExpireAt(in.Key,time.Unix(in.Ttl,0)).Result()
+    if err != nil {
+        panic(err)
+    }
+    return &IsExistsResponse{Successed:isSuccess},err
+}
+
 
 func (s *redisService) Delete(ctx context.Context, in *DeleteRedisRequest) (*DeleteRedisResponse, error) {
-    return nil,nil
-
+    cli := createClient()
+    isSuccess,err := cli.Del(in.Key).Result()
+    if err != nil {
+        panic(err)
+    }
+    return &DeleteRedisResponse{Successed:isSuccess == 1},err
 }
 
-func (s *redisService) Insert(ctx context.Context, in *InsertRedisRequest) (*InsertRedisResponse, error) {
-    return nil,nil
-
+func (s *redisService) Set(ctx context.Context, in *SetRedisRequest) (*SetRedisResponse, error) {
+    cli := createClient()
+    isSuccess,err := cli.Set(in.Key,in.Value,in.Ttl).Result()
+    if err != nil {
+        panic(err)
+    }
+    return &SetRedisResponse{Successed:err == nil},err
 }
-
 
 
 var redisCli : *Client = nil

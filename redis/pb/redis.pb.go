@@ -8,14 +8,16 @@ It is generated from these files:
 	redis.proto
 
 It has these top-level messages:
+	ExpireAtRequest
+	ExpireAtResponse
+	IsExistsRequest
+	IsExistsResponse
 	QueryRedisRequest
 	QueryRedisResponse
-	UpdateRedisRequest
-	UpdateRedisResponse
 	DeleteRedisRequest
 	DeleteRedisResponse
-	InsertRedisRequest
-	InsertRedisResponse
+	SetRedisRequest
+	SetRedisResponse
 */
 package Aphro_Redis_pb
 
@@ -40,6 +42,78 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type ExpireAtRequest struct {
+	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Ttl uint64 `protobuf:"varint,2,opt,name=ttl" json:"ttl,omitempty"`
+}
+
+func (m *ExpireAtRequest) Reset()                    { *m = ExpireAtRequest{} }
+func (m *ExpireAtRequest) String() string            { return proto.CompactTextString(m) }
+func (*ExpireAtRequest) ProtoMessage()               {}
+func (*ExpireAtRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *ExpireAtRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *ExpireAtRequest) GetTtl() uint64 {
+	if m != nil {
+		return m.Ttl
+	}
+	return 0
+}
+
+type ExpireAtResponse struct {
+	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
+}
+
+func (m *ExpireAtResponse) Reset()                    { *m = ExpireAtResponse{} }
+func (m *ExpireAtResponse) String() string            { return proto.CompactTextString(m) }
+func (*ExpireAtResponse) ProtoMessage()               {}
+func (*ExpireAtResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *ExpireAtResponse) GetSuccessed() bool {
+	if m != nil {
+		return m.Successed
+	}
+	return false
+}
+
+type IsExistsRequest struct {
+	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+}
+
+func (m *IsExistsRequest) Reset()                    { *m = IsExistsRequest{} }
+func (m *IsExistsRequest) String() string            { return proto.CompactTextString(m) }
+func (*IsExistsRequest) ProtoMessage()               {}
+func (*IsExistsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *IsExistsRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+type IsExistsResponse struct {
+	IsExists bool `protobuf:"varint,1,opt,name=isExists" json:"isExists,omitempty"`
+}
+
+func (m *IsExistsResponse) Reset()                    { *m = IsExistsResponse{} }
+func (m *IsExistsResponse) String() string            { return proto.CompactTextString(m) }
+func (*IsExistsResponse) ProtoMessage()               {}
+func (*IsExistsResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *IsExistsResponse) GetIsExists() bool {
+	if m != nil {
+		return m.IsExists
+	}
+	return false
+}
+
 type QueryRedisRequest struct {
 	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 }
@@ -47,7 +121,7 @@ type QueryRedisRequest struct {
 func (m *QueryRedisRequest) Reset()                    { *m = QueryRedisRequest{} }
 func (m *QueryRedisRequest) String() string            { return proto.CompactTextString(m) }
 func (*QueryRedisRequest) ProtoMessage()               {}
-func (*QueryRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*QueryRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *QueryRedisRequest) GetKey() string {
 	if m != nil {
@@ -58,28 +132,19 @@ func (m *QueryRedisRequest) GetKey() string {
 
 type QueryRedisResponse struct {
 	Successed bool   `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-	Key       string `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`
-	Value     string `protobuf:"bytes,3,opt,name=value" json:"value,omitempty"`
-	Ttl       uint32 `protobuf:"varint,4,opt,name=ttl" json:"ttl,omitempty"`
+	Value     string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
 func (m *QueryRedisResponse) Reset()                    { *m = QueryRedisResponse{} }
 func (m *QueryRedisResponse) String() string            { return proto.CompactTextString(m) }
 func (*QueryRedisResponse) ProtoMessage()               {}
-func (*QueryRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*QueryRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *QueryRedisResponse) GetSuccessed() bool {
 	if m != nil {
 		return m.Successed
 	}
 	return false
-}
-
-func (m *QueryRedisResponse) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
 }
 
 func (m *QueryRedisResponse) GetValue() string {
@@ -89,85 +154,6 @@ func (m *QueryRedisResponse) GetValue() string {
 	return ""
 }
 
-func (m *QueryRedisResponse) GetTtl() uint32 {
-	if m != nil {
-		return m.Ttl
-	}
-	return 0
-}
-
-type UpdateRedisRequest struct {
-	Key   string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
-	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	Ttl   string `protobuf:"bytes,3,opt,name=ttl" json:"ttl,omitempty"`
-}
-
-func (m *UpdateRedisRequest) Reset()                    { *m = UpdateRedisRequest{} }
-func (m *UpdateRedisRequest) String() string            { return proto.CompactTextString(m) }
-func (*UpdateRedisRequest) ProtoMessage()               {}
-func (*UpdateRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *UpdateRedisRequest) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *UpdateRedisRequest) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-func (m *UpdateRedisRequest) GetTtl() string {
-	if m != nil {
-		return m.Ttl
-	}
-	return ""
-}
-
-type UpdateRedisResponse struct {
-	Successed bool   `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-	Key       string `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`
-	Value     string `protobuf:"bytes,3,opt,name=value" json:"value,omitempty"`
-	Ttl       uint32 `protobuf:"varint,4,opt,name=ttl" json:"ttl,omitempty"`
-}
-
-func (m *UpdateRedisResponse) Reset()                    { *m = UpdateRedisResponse{} }
-func (m *UpdateRedisResponse) String() string            { return proto.CompactTextString(m) }
-func (*UpdateRedisResponse) ProtoMessage()               {}
-func (*UpdateRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
-
-func (m *UpdateRedisResponse) GetSuccessed() bool {
-	if m != nil {
-		return m.Successed
-	}
-	return false
-}
-
-func (m *UpdateRedisResponse) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *UpdateRedisResponse) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-func (m *UpdateRedisResponse) GetTtl() uint32 {
-	if m != nil {
-		return m.Ttl
-	}
-	return 0
-}
-
 type DeleteRedisRequest struct {
 	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 }
@@ -175,7 +161,7 @@ type DeleteRedisRequest struct {
 func (m *DeleteRedisRequest) Reset()                    { *m = DeleteRedisRequest{} }
 func (m *DeleteRedisRequest) String() string            { return proto.CompactTextString(m) }
 func (*DeleteRedisRequest) ProtoMessage()               {}
-func (*DeleteRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*DeleteRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *DeleteRedisRequest) GetKey() string {
 	if m != nil {
@@ -191,7 +177,7 @@ type DeleteRedisResponse struct {
 func (m *DeleteRedisResponse) Reset()                    { *m = DeleteRedisResponse{} }
 func (m *DeleteRedisResponse) String() string            { return proto.CompactTextString(m) }
 func (*DeleteRedisResponse) ProtoMessage()               {}
-func (*DeleteRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*DeleteRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 func (m *DeleteRedisResponse) GetSuccessed() bool {
 	if m != nil {
@@ -200,87 +186,65 @@ func (m *DeleteRedisResponse) GetSuccessed() bool {
 	return false
 }
 
-type InsertRedisRequest struct {
+type SetRedisRequest struct {
 	Key   string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	Ttl   uint32 `protobuf:"varint,3,opt,name=ttl" json:"ttl,omitempty"`
+	Ttl   uint64 `protobuf:"varint,3,opt,name=ttl" json:"ttl,omitempty"`
 }
 
-func (m *InsertRedisRequest) Reset()                    { *m = InsertRedisRequest{} }
-func (m *InsertRedisRequest) String() string            { return proto.CompactTextString(m) }
-func (*InsertRedisRequest) ProtoMessage()               {}
-func (*InsertRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (m *SetRedisRequest) Reset()                    { *m = SetRedisRequest{} }
+func (m *SetRedisRequest) String() string            { return proto.CompactTextString(m) }
+func (*SetRedisRequest) ProtoMessage()               {}
+func (*SetRedisRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
-func (m *InsertRedisRequest) GetKey() string {
+func (m *SetRedisRequest) GetKey() string {
 	if m != nil {
 		return m.Key
 	}
 	return ""
 }
 
-func (m *InsertRedisRequest) GetValue() string {
+func (m *SetRedisRequest) GetValue() string {
 	if m != nil {
 		return m.Value
 	}
 	return ""
 }
 
-func (m *InsertRedisRequest) GetTtl() uint32 {
+func (m *SetRedisRequest) GetTtl() uint64 {
 	if m != nil {
 		return m.Ttl
 	}
 	return 0
 }
 
-type InsertRedisResponse struct {
-	Successed bool   `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-	Key       string `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`
-	Value     string `protobuf:"bytes,3,opt,name=value" json:"value,omitempty"`
-	Ttl       uint32 `protobuf:"varint,4,opt,name=ttl" json:"ttl,omitempty"`
+type SetRedisResponse struct {
+	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
 }
 
-func (m *InsertRedisResponse) Reset()                    { *m = InsertRedisResponse{} }
-func (m *InsertRedisResponse) String() string            { return proto.CompactTextString(m) }
-func (*InsertRedisResponse) ProtoMessage()               {}
-func (*InsertRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (m *SetRedisResponse) Reset()                    { *m = SetRedisResponse{} }
+func (m *SetRedisResponse) String() string            { return proto.CompactTextString(m) }
+func (*SetRedisResponse) ProtoMessage()               {}
+func (*SetRedisResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
-func (m *InsertRedisResponse) GetSuccessed() bool {
+func (m *SetRedisResponse) GetSuccessed() bool {
 	if m != nil {
 		return m.Successed
 	}
 	return false
 }
 
-func (m *InsertRedisResponse) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *InsertRedisResponse) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-func (m *InsertRedisResponse) GetTtl() uint32 {
-	if m != nil {
-		return m.Ttl
-	}
-	return 0
-}
-
 func init() {
+	proto.RegisterType((*ExpireAtRequest)(nil), "Aphro.Redis.pb.expireAtRequest")
+	proto.RegisterType((*ExpireAtResponse)(nil), "Aphro.Redis.pb.expireAtResponse")
+	proto.RegisterType((*IsExistsRequest)(nil), "Aphro.Redis.pb.isExistsRequest")
+	proto.RegisterType((*IsExistsResponse)(nil), "Aphro.Redis.pb.isExistsResponse")
 	proto.RegisterType((*QueryRedisRequest)(nil), "Aphro.Redis.pb.queryRedisRequest")
 	proto.RegisterType((*QueryRedisResponse)(nil), "Aphro.Redis.pb.queryRedisResponse")
-	proto.RegisterType((*UpdateRedisRequest)(nil), "Aphro.Redis.pb.updateRedisRequest")
-	proto.RegisterType((*UpdateRedisResponse)(nil), "Aphro.Redis.pb.updateRedisResponse")
 	proto.RegisterType((*DeleteRedisRequest)(nil), "Aphro.Redis.pb.deleteRedisRequest")
 	proto.RegisterType((*DeleteRedisResponse)(nil), "Aphro.Redis.pb.deleteRedisResponse")
-	proto.RegisterType((*InsertRedisRequest)(nil), "Aphro.Redis.pb.insertRedisRequest")
-	proto.RegisterType((*InsertRedisResponse)(nil), "Aphro.Redis.pb.insertRedisResponse")
+	proto.RegisterType((*SetRedisRequest)(nil), "Aphro.Redis.pb.setRedisRequest")
+	proto.RegisterType((*SetRedisResponse)(nil), "Aphro.Redis.pb.setRedisResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -294,10 +258,12 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for RedisService service
 
 type RedisServiceClient interface {
+	// query create delete update Redis
+	IsExists(ctx context.Context, in *IsExistsRequest, opts ...grpc.CallOption) (*IsExistsResponse, error)
+	ExpireAt(ctx context.Context, in *ExpireAtRequest, opts ...grpc.CallOption) (*ExpireAtResponse, error)
 	Query(ctx context.Context, in *QueryRedisRequest, opts ...grpc.CallOption) (*QueryRedisResponse, error)
-	Update(ctx context.Context, in *UpdateRedisRequest, opts ...grpc.CallOption) (*UpdateRedisResponse, error)
 	Delete(ctx context.Context, in *DeleteRedisRequest, opts ...grpc.CallOption) (*DeleteRedisResponse, error)
-	Insert(ctx context.Context, in *InsertRedisRequest, opts ...grpc.CallOption) (*InsertRedisResponse, error)
+	Set(ctx context.Context, in *SetRedisRequest, opts ...grpc.CallOption) (*SetRedisResponse, error)
 }
 
 type redisServiceClient struct {
@@ -308,18 +274,27 @@ func NewRedisServiceClient(cc *grpc.ClientConn) RedisServiceClient {
 	return &redisServiceClient{cc}
 }
 
-func (c *redisServiceClient) Query(ctx context.Context, in *QueryRedisRequest, opts ...grpc.CallOption) (*QueryRedisResponse, error) {
-	out := new(QueryRedisResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/query", in, out, c.cc, opts...)
+func (c *redisServiceClient) IsExists(ctx context.Context, in *IsExistsRequest, opts ...grpc.CallOption) (*IsExistsResponse, error) {
+	out := new(IsExistsResponse)
+	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/isExists", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *redisServiceClient) Update(ctx context.Context, in *UpdateRedisRequest, opts ...grpc.CallOption) (*UpdateRedisResponse, error) {
-	out := new(UpdateRedisResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/update", in, out, c.cc, opts...)
+func (c *redisServiceClient) ExpireAt(ctx context.Context, in *ExpireAtRequest, opts ...grpc.CallOption) (*ExpireAtResponse, error) {
+	out := new(ExpireAtResponse)
+	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/expireAt", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *redisServiceClient) Query(ctx context.Context, in *QueryRedisRequest, opts ...grpc.CallOption) (*QueryRedisResponse, error) {
+	out := new(QueryRedisResponse)
+	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/query", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -335,9 +310,9 @@ func (c *redisServiceClient) Delete(ctx context.Context, in *DeleteRedisRequest,
 	return out, nil
 }
 
-func (c *redisServiceClient) Insert(ctx context.Context, in *InsertRedisRequest, opts ...grpc.CallOption) (*InsertRedisResponse, error) {
-	out := new(InsertRedisResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/insert", in, out, c.cc, opts...)
+func (c *redisServiceClient) Set(ctx context.Context, in *SetRedisRequest, opts ...grpc.CallOption) (*SetRedisResponse, error) {
+	out := new(SetRedisResponse)
+	err := grpc.Invoke(ctx, "/Aphro.Redis.pb.RedisService/set", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -347,14 +322,52 @@ func (c *redisServiceClient) Insert(ctx context.Context, in *InsertRedisRequest,
 // Server API for RedisService service
 
 type RedisServiceServer interface {
+	// query create delete update Redis
+	IsExists(context.Context, *IsExistsRequest) (*IsExistsResponse, error)
+	ExpireAt(context.Context, *ExpireAtRequest) (*ExpireAtResponse, error)
 	Query(context.Context, *QueryRedisRequest) (*QueryRedisResponse, error)
-	Update(context.Context, *UpdateRedisRequest) (*UpdateRedisResponse, error)
 	Delete(context.Context, *DeleteRedisRequest) (*DeleteRedisResponse, error)
-	Insert(context.Context, *InsertRedisRequest) (*InsertRedisResponse, error)
+	Set(context.Context, *SetRedisRequest) (*SetRedisResponse, error)
 }
 
 func RegisterRedisServiceServer(s *grpc.Server, srv RedisServiceServer) {
 	s.RegisterService(&_RedisService_serviceDesc, srv)
+}
+
+func _RedisService_IsExists_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsExistsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RedisServiceServer).IsExists(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Redis.pb.RedisService/IsExists",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RedisServiceServer).IsExists(ctx, req.(*IsExistsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RedisService_ExpireAt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExpireAtRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RedisServiceServer).ExpireAt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Redis.pb.RedisService/ExpireAt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RedisServiceServer).ExpireAt(ctx, req.(*ExpireAtRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _RedisService_Query_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -371,24 +384,6 @@ func _RedisService_Query_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RedisServiceServer).Query(ctx, req.(*QueryRedisRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RedisService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRedisRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RedisServiceServer).Update(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Aphro.Redis.pb.RedisService/Update",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RedisServiceServer).Update(ctx, req.(*UpdateRedisRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -411,20 +406,20 @@ func _RedisService_Delete_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RedisService_Insert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InsertRedisRequest)
+func _RedisService_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRedisRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RedisServiceServer).Insert(ctx, in)
+		return srv.(RedisServiceServer).Set(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Redis.pb.RedisService/Insert",
+		FullMethod: "/Aphro.Redis.pb.RedisService/Set",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RedisServiceServer).Insert(ctx, req.(*InsertRedisRequest))
+		return srv.(RedisServiceServer).Set(ctx, req.(*SetRedisRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -434,20 +429,24 @@ var _RedisService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RedisServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "query",
-			Handler:    _RedisService_Query_Handler,
+			MethodName: "isExists",
+			Handler:    _RedisService_IsExists_Handler,
 		},
 		{
-			MethodName: "update",
-			Handler:    _RedisService_Update_Handler,
+			MethodName: "expireAt",
+			Handler:    _RedisService_ExpireAt_Handler,
+		},
+		{
+			MethodName: "query",
+			Handler:    _RedisService_Query_Handler,
 		},
 		{
 			MethodName: "delete",
 			Handler:    _RedisService_Delete_Handler,
 		},
 		{
-			MethodName: "insert",
-			Handler:    _RedisService_Insert_Handler,
+			MethodName: "set",
+			Handler:    _RedisService_Set_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -457,25 +456,28 @@ var _RedisService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("redis.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 317 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x93, 0xdd, 0x4e, 0xc2, 0x40,
-	0x10, 0x85, 0xa1, 0x08, 0x91, 0x51, 0x8c, 0x0e, 0x5e, 0x34, 0x0d, 0x17, 0xb8, 0x46, 0xc3, 0x55,
-	0x49, 0xe4, 0x09, 0x7c, 0x01, 0x63, 0xca, 0x13, 0x94, 0x76, 0x82, 0x8d, 0xb5, 0x5b, 0xf6, 0x87,
-	0x84, 0xa7, 0xf5, 0x55, 0x4c, 0x77, 0x15, 0x68, 0xb6, 0xa9, 0x26, 0x86, 0xbb, 0xed, 0xe4, 0xe4,
-	0x9b, 0x93, 0x73, 0xa6, 0x70, 0x21, 0x28, 0xcd, 0x64, 0x58, 0x0a, 0xae, 0x38, 0x5e, 0x3d, 0x97,
-	0x6f, 0x82, 0x87, 0x91, 0x1d, 0xad, 0x82, 0xc9, 0x9a, 0xf3, 0x75, 0x4e, 0xf3, 0xb8, 0xcc, 0xe6,
-	0x71, 0x51, 0x70, 0x15, 0xab, 0x8c, 0x17, 0xdf, 0x6a, 0xf6, 0x00, 0x37, 0x1b, 0x4d, 0x62, 0x67,
-	0xe4, 0x11, 0x6d, 0x34, 0x49, 0x85, 0xd7, 0xd0, 0x7b, 0xa7, 0x9d, 0xdf, 0x9d, 0x76, 0x67, 0xc3,
-	0xa8, 0x7a, 0xb2, 0x1c, 0xf0, 0x58, 0x26, 0x4b, 0x5e, 0x48, 0xc2, 0x09, 0x0c, 0xa5, 0x4e, 0x12,
-	0x92, 0x92, 0x52, 0xa3, 0x3e, 0x8f, 0x0e, 0x83, 0x1f, 0x8a, 0xb7, 0xa7, 0xe0, 0x2d, 0xf4, 0xb7,
-	0x71, 0xae, 0xc9, 0xef, 0x99, 0x99, 0xfd, 0xa8, 0x74, 0x4a, 0xe5, 0xfe, 0xd9, 0xb4, 0x3b, 0x1b,
-	0x45, 0xd5, 0x93, 0xbd, 0x00, 0xea, 0x32, 0x8d, 0x15, 0xb5, 0xbb, 0x3a, 0xf0, 0xbc, 0x06, 0x9e,
-	0xdd, 0x61, 0x78, 0x1f, 0x30, 0xae, 0xf1, 0x4e, 0x6c, 0xff, 0x11, 0x30, 0xa5, 0x9c, 0x7e, 0xb3,
-	0xcf, 0x16, 0x30, 0xae, 0xe9, 0xfe, 0x62, 0xab, 0xca, 0x26, 0x2b, 0x24, 0x09, 0xf5, 0xdf, 0x6c,
-	0x46, 0xfb, 0x6c, 0x6a, 0xbc, 0xd3, 0x66, 0xf3, 0xf4, 0xe9, 0xc1, 0xa5, 0xd9, 0xb4, 0x24, 0xb1,
-	0xcd, 0x12, 0xc2, 0x57, 0xe8, 0x9b, 0xcb, 0xc2, 0xbb, 0xb0, 0x7e, 0xb8, 0xa1, 0x73, 0x97, 0x01,
-	0x6b, 0x93, 0x58, 0xe3, 0xac, 0x83, 0x4b, 0x18, 0xd8, 0xb6, 0xd1, 0xd1, 0xbb, 0x57, 0x15, 0xdc,
-	0xb7, 0x6a, 0x8e, 0xa1, 0xb6, 0x2b, 0x17, 0xea, 0x76, 0xed, 0x42, 0x1b, 0x7a, 0xb6, 0x50, 0x9b,
-	0xbd, 0x0b, 0x75, 0x3b, 0x76, 0xa1, 0x0d, 0xbd, 0xb1, 0xce, 0x6a, 0x60, 0x7e, 0xec, 0xc5, 0x57,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0xc6, 0x2d, 0xd4, 0x21, 0x15, 0x04, 0x00, 0x00,
+	// 356 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xd1, 0x4e, 0xfa, 0x30,
+	0x14, 0xc6, 0xe1, 0xbf, 0x3f, 0x04, 0x8e, 0x46, 0xb0, 0x7a, 0x41, 0x16, 0x12, 0xb1, 0x44, 0xc3,
+	0xd5, 0x30, 0x12, 0x1f, 0x80, 0x0b, 0x13, 0xa3, 0x17, 0x9a, 0xf1, 0x04, 0x03, 0x4e, 0xb0, 0x71,
+	0x59, 0xc7, 0x4e, 0x47, 0xe0, 0x79, 0x7c, 0x51, 0xb3, 0x0e, 0x98, 0xb4, 0x80, 0xdc, 0xb5, 0x27,
+	0x5f, 0x7f, 0xa7, 0xa7, 0xdf, 0x57, 0x38, 0x4b, 0x70, 0x2a, 0xc8, 0x8b, 0x13, 0xa9, 0x24, 0xbb,
+	0x18, 0xc6, 0x9f, 0x89, 0xf4, 0xfc, 0xbc, 0x34, 0x76, 0xdb, 0x33, 0x29, 0x67, 0x21, 0xf6, 0x83,
+	0x58, 0xf4, 0x83, 0x28, 0x92, 0x2a, 0x50, 0x42, 0x46, 0x6b, 0x35, 0x7f, 0x82, 0x06, 0x2e, 0x63,
+	0x91, 0xe0, 0x50, 0xf9, 0x38, 0x4f, 0x91, 0x14, 0x6b, 0x82, 0xf3, 0x85, 0xab, 0x56, 0xb9, 0x53,
+	0xee, 0xd5, 0xfd, 0x6c, 0x99, 0x55, 0x94, 0x0a, 0x5b, 0xff, 0x3a, 0xe5, 0xde, 0x7f, 0x3f, 0x5b,
+	0xf2, 0x07, 0x68, 0x16, 0xc7, 0x28, 0x96, 0x11, 0x21, 0x6b, 0x43, 0x9d, 0xd2, 0xc9, 0x04, 0x89,
+	0x70, 0xaa, 0x4f, 0xd7, 0xfc, 0xa2, 0xc0, 0xbb, 0xd0, 0x10, 0xf4, 0xbc, 0x14, 0xa4, 0xe8, 0x60,
+	0x23, 0xee, 0x41, 0xb3, 0x10, 0xad, 0xb1, 0x2e, 0xd4, 0x36, 0xb5, 0x35, 0x75, 0xbb, 0xe7, 0x77,
+	0x70, 0x39, 0x4f, 0x31, 0x59, 0xe9, 0x61, 0x0f, 0x63, 0x5f, 0x80, 0xfd, 0x96, 0x9d, 0x72, 0x5f,
+	0x76, 0x0d, 0x95, 0x45, 0x10, 0xa6, 0xa8, 0xa7, 0xae, 0xfb, 0xf9, 0x86, 0xdf, 0x03, 0x9b, 0x62,
+	0x88, 0x0a, 0xff, 0xe8, 0x38, 0x80, 0xab, 0x1d, 0xdd, 0x49, 0x4f, 0xf4, 0x06, 0x0d, 0x42, 0x75,
+	0x9c, 0xbc, 0xff, 0x5e, 0x1b, 0x87, 0x9c, 0x1d, 0x87, 0x0a, 0xd8, 0x29, 0xed, 0x1f, 0xbf, 0x1d,
+	0x38, 0xd7, 0xfa, 0x11, 0x26, 0x0b, 0x31, 0x41, 0xf6, 0x5e, 0xbc, 0x3c, 0xbb, 0xf1, 0x76, 0x63,
+	0xe5, 0x19, 0x66, 0xba, 0x9d, 0xc3, 0x82, 0xbc, 0x3b, 0x2f, 0x65, 0xc0, 0x4d, 0x6a, 0x6c, 0xa0,
+	0x11, 0x43, 0x1b, 0x68, 0x06, 0x8e, 0x97, 0xd8, 0x07, 0x54, 0xb4, 0xb1, 0xec, 0xd6, 0x14, 0x5b,
+	0xb1, 0x70, 0xf9, 0x31, 0xc9, 0x96, 0x38, 0x82, 0x6a, 0x6e, 0x1c, 0xb3, 0xf4, 0xb6, 0xf1, 0x6e,
+	0xf7, 0xa8, 0x66, 0x0b, 0x7d, 0x05, 0x87, 0x70, 0xcf, 0xc8, 0x86, 0xdb, 0xf6, 0xc8, 0xa6, 0x83,
+	0xbc, 0x34, 0xae, 0xea, 0x7f, 0x3b, 0xf8, 0x09, 0x00, 0x00, 0xff, 0xff, 0xc0, 0xbc, 0x88, 0xd0,
+	0xf4, 0x03, 0x00, 0x00,
 }
