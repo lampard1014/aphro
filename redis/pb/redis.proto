@@ -7,17 +7,26 @@ package Aphro.Redis.pb;
 service RedisService {
 
 		//query create delete update Redis
+		rpc isExists(isExistsRequest) returns (isExistsResponse) {}
+
+		rpc expireAt(expireAtRequest) returns (expireAtResponse) {}
+
 
 		rpc query(queryRedisRequest) returns (queryRedisResponse) {}
 
-		rpc update(updateRedisRequest) returns (updateRedisResponse) {}
-
 		rpc delete(deleteRedisRequest) returns (deleteRedisResponse) {}
 
-		rpc insert(insertRedisRequest) returns (insertRedisResponse) {}
+		rpc set(setRedisRequest) returns (setRedisResponse) {}
 
-		rpc isExists(isExistsRequest) returns (isExistsResponse) {}
 
+}
+message expireAtRequest {
+	string key = 1;
+	uint64 ttl = 2;
+}
+
+message expireAtResponse {
+	bool  successed = 1;
 }
 
 message isExistsRequest {
@@ -37,19 +46,6 @@ message queryRedisResponse {
 	string value = 2;
 }
 
-message updateRedisRequest {
-	string key = 1;
-	string value = 2;
-	string ttl = 3;
-}
-
-message updateRedisResponse {
-	bool successed = 1;
-	string key = 2;
-	string value = 3;
-	uint32	ttl =	4;
-}
-
 message deleteRedisRequest {
 	string key = 1;
 }
@@ -58,17 +54,14 @@ message deleteRedisResponse {
 	bool successed = 1;
 }
 
-message insertRedisRequest {
+message setRedisRequest {
 	string key = 1;
 	string value = 2;
-	uint32	ttl =	3;
+	uint64	ttl =	3;
 }
 
-message insertRedisResponse {
+message setRedisResponse {
 	bool successed = 1;
-	string key = 2;
-	string value = 3;
-	uint32	ttl =	4;
 }
 
 
