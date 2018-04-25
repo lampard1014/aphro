@@ -1,0 +1,4 @@
+2018/04/24 17:09:55 listen tcp :10101: bind: address already in use
+exit status 1
+signal: terminated
+signal: terminated

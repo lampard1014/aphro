@@ -11,6 +11,7 @@ service RedisService {
 
 		rpc expireAt(expireAtRequest) returns (expireAtResponse) {}
 
+		rpc queryTtl(queryTtlRedisRequest) returns (queryTtlRedisResponse){}
 
 		rpc query(queryRedisRequest) returns (queryRedisResponse) {}
 
@@ -18,11 +19,19 @@ service RedisService {
 
 		rpc set(setRedisRequest) returns (setRedisResponse) {}
 
-
 }
+
+message queryTtlRedisRequest {
+	string key = 1;
+}
+
+message queryTtlRedisResponse {
+	int64 ttl = 1; //-2 不存在 -1没有ttl 
+}
+
 message expireAtRequest {
 	string key = 1;
-	uint64 ttl = 2;
+	int64 ttl = 2;
 }
 
 message expireAtResponse {

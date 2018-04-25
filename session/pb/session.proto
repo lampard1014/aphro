@@ -98,18 +98,18 @@ message SessionTokenQueryRequest {
 
 message SessionTokenQueryResponse {
 	string 	sessionToken = 1;
-	uint32 	ttl	=	2;
+	int64 	ttl	=	2;
 	bool 	successed = 3;
 }
 
 
 message SessionTokenCreateRequest {
-	string  reverseStr = 1;
+	string  sessionTokenRequestStr = 1;
 }
 
 message SessionTokenCreateResponse {
 	string 	sessionToken = 1;
-	uint32 	ttl	=	2;
+	int64 	ttl	=	2;
 	bool 	successed = 3;
 }
 
@@ -126,7 +126,7 @@ message RenewSessionTokenRequest {
 }
 
 message RenewSessionTokenResponse {
-	uint32 	ttl	=	1;
+	int64 	ttl	=	1;
 	bool 	successed = 2;
 }
 

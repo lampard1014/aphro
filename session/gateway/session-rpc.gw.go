@@ -7,11 +7,11 @@ import (
   "golang.org/x/net/context"
   "github.com/grpc-ecosystem/grpc-gateway/runtime"
   "google.golang.org/grpc"
-  gw "github.com/lampard1014/aphro/encryption-pb"
+  gw "github.com/lampard1014/aphro/session/pb"
 )
 
 var (
-  echoEndpoint = flag.String("echo_endpoint", "localhost:10087", "endpoint of YourService")
+  echoEndpoint = flag.String("echo_endpoint", "localhost:10088", "endpoint of YourService")
 )
 
 
@@ -20,10 +20,12 @@ func run() error {
   ctx, cancel := context.WithCancel(ctx)
   defer cancel()
 
-  mux := runtime.NewServeMux()
+  // mux := runtime.NewServeMux()
+  mux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}))
+
   opts := []grpc.DialOption{grpc.WithInsecure()}
 
-    err := gw.RegisterEncryptionServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
+    err := gw.RegisterSessionServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
     if err != nil {
         return  err
     }
