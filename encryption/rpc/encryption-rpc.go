@@ -34,8 +34,8 @@ func (s *encryptionService) Base64Encode(ctx context.Context, in *pb.EncryptionB
 }
 
 func (s *encryptionService) Base64Decode(ctx context.Context, in *pb.EncryptionBase64DecodeRequest) (*pb.EncryptionBase64DecodeResponse, error) {
-    decodeBytes , _ := base64.StdEncoding.DecodeString(in.DecodedStr)
-    return &pb.EncryptionBase64DecodeResponse{RawValue:decodeBytes},nil
+    decodeBytes , err := base64.StdEncoding.DecodeString(in.DecodedStr)
+    return &pb.EncryptionBase64DecodeResponse{RawValue:decodeBytes},err
 }
 
 func (s *encryptionService) XxteaEncryption(ctx context.Context, in *pb.EncryptionXXTEARequest) (*pb.EncryptionXXTEAResponse, error) {
@@ -49,13 +49,13 @@ func (s *encryptionService) XxteaDecryption(ctx context.Context, in *pb.Decrypti
 }
 
 func (s *encryptionService) RsaEncryption(ctx context.Context, in *pb.EncryptionRSARequest) (*pb.EncryptionRSAResponse, error) {
-   encrypedData := RsaEncrypt(in.RawValue)
-   return &pb.EncryptionRSAResponse{EncryptedStr:encrypedData},nil;
+   encrypedData,err := RsaEncrypt(in.RawValue)
+   return &pb.EncryptionRSAResponse{EncryptedStr:encrypedData},err;
 }
 
 func (s *encryptionService) RsaDecryption(ctx context.Context, in *pb.DecryptionRSARequest) (*pb.DecryptionRSAResponse, error) {
-    decryptdData := RsaDecrypt(in.EncryptedStr)
-    return &pb.DecryptionRSAResponse{RawValue:decryptdData},nil
+    decryptdData,err := RsaDecrypt(in.EncryptedStr)
+    return &pb.DecryptionRSAResponse{RawValue:decryptdData},err
 }
 
 var pemMap = map[string]string{"public": "../rsa/public.pem", "private": "../rsa/private.pem"}
@@ -78,7 +78,7 @@ func GetBlockFromPem(key string) []byte {
 }
 
 // 加密
-func RsaEncrypt(origData []byte) []byte {
+func RsaEncrypt(origData []byte) ([]byte ,error){
     publicPem := GetBlockFromPem("public") //获取公钥pem的block
     pubInterface, err := x509.ParsePKIXPublicKey(publicPem) //解析公钥
     if err != nil {
@@ -89,22 +89,22 @@ func RsaEncrypt(origData []byte) []byte {
     if err != nil {
         panic(err)
     }
-    return encypt
+    return encypt,err
 }
 
 // 解密
-func RsaDecrypt(encypt []byte) []byte {
+func RsaDecrypt(encypt []byte) ([]byte ,error){
     privatePem := GetBlockFromPem("private")
     priv, err := x509.ParsePKCS1PrivateKey(privatePem) //解析私钥
     if err != nil {
-    panic(err)
+        panic(err)
     }
     decypt, err := rsa.DecryptPKCS1v15(rand.Reader, priv, encypt)
 
     if err != nil {
-    panic(err)
+        panic(err)
     }
-    return decypt
+    return decypt,err
 }
 
 

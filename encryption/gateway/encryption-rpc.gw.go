@@ -19,8 +19,9 @@ func run() error {
   ctx := context.Background()
   ctx, cancel := context.WithCancel(ctx)
   defer cancel()
+  mux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}))
 
-  mux := runtime.NewServeMux()
+  // mux := runtime.NewServeMux()
   opts := []grpc.DialOption{grpc.WithInsecure()}
 
     err := gw.RegisterEncryptionServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
