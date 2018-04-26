@@ -6,8 +6,15 @@ package Aphro.Merchant.pb;
 
 service MerchantService {
 
+		//商户开户
+		rpc merchantOpen(merchantOpenRequest) returns (merchantOpenResponse) {
+			option (google.api.http) = {
+				post: "/session/merchant/open"
+				body:"*"
+			};
+		}
 	
-		//app用户注册
+		//商户用户注册
 		rpc merchantRegister(merchantRegisterRequest) returns (merchantRegisterResponse) {
 			option (google.api.http) = {
 				post: "/session/merchant/register"
@@ -15,7 +22,7 @@ service MerchantService {
 			};
 		}
 
-		//app用户修改密码
+		//商户用户修改密码
 		rpc merchantChangePsw(merchantChangePswRequest) returns (merchantChangePswResponse) {
 			option (google.api.http) = {
 				post: "/session/merchant/changePsw"
@@ -41,14 +48,26 @@ service MerchantService {
 
 }
 
-message MerchantRegisterRequest {
+message merchantOpenRequest {
+	string name = 1;
+	string cellphone = 2;
+	string address = 3;
+	uint32 paymentBit = 4;
+}
+
+message merchantOpenResponse {
+	bool successed = 1;
+}
+
+message merchantRegisterRequest {
 	string key = 1;
 	string name = 2;
 	string verifyCode = 3;
-	string cellphone = 4;
+	uint32 role = 5;
+	uint32 merchantID = 6;
 }
 
-message MerchantLoginResponse {
+message merchantRegisterResponse {
 	bool successed = 1;
 }
 
@@ -57,7 +76,6 @@ message merchantChangePswRequest {
 	string sessionToken = 2;
 	string verifyCode = 3;
 	string cellphone = 4;
-
 }
 
 message merchantChangePswResponse {
@@ -66,13 +84,12 @@ message merchantChangePswResponse {
 
 message merchantLoginRequest {
 	string key = 1;
-	string userAgent = 2;
-	string sessionToken = 3;
+	string tokenRequest = 2;
+	uint32 merchantID = 3;
 }
 
 message merchantLoginResponse {
-	string merchantID = 1;
-	string sessionToken = 2;
+	string sessionToken = 1;
 }
 
 message merchantInfoRequest {
@@ -82,7 +99,7 @@ message merchantInfoRequest {
 
 message merchantInfoResponse {
 	string merchantName = 1;
-	meessage innerMerchantAccount {
+	message innerMerchantAccount {
 		uint32 role = 1;
 		string name = 2;
 	}

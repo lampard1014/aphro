@@ -5,129 +5,253 @@ import (
 	"net"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-    "github.com/xxtea/xxtea-go/xxtea"
-	pb "github.com/lampard1014/aphro/encryption/encryption-pb"
-    "encoding/pem"
-    "encoding/base64"
+	merchantServicePB "github.com/lampard1014/aphro/merchant/pb"
+    encryptionServicePB "github.com/lampard1014/aphro/encryption/encryption-pb"
+    sessionServicePB "github.com/lampard1014/aphro/sesssion/pb"
+    redisPb "github.com/lampard1014/aphro/redis/pb"
     "os"
-    "io/ioutil"
-    "crypto/rsa"
-    "crypto/x509"
-    "crypto/rand"
     "fmt"
+    "strings"
+    "database/sql"
+    _ "github.com/go-sql-driver/mysql"
+
 )
 
 const (
-	port  = ":10087"
+	port  = ":10089"
+    redisRPCAddress = "127.0.0.1:10101"
+    sessionRPCAddress = "127.0.0.1:10101"
+    encyptRPCAddress = "127.0.0.1:10088"
+    mysqlDSN = "root:@tcp(127.0.0.1:3306)/iris_db"
 )
 
-type encryptionService struct{}
+type merchantService struct{}
 
-/*
-base64Encode
-base64Decode 
-*/
 
-func (s *encryptionService) Base64Encode(ctx context.Context, in *pb.EncryptionBase64EncodeRequest) (*pb.EncryptionBase64EncodeResponse, error) {
-    str := base64.StdEncoding.EncodeToString(in.RawValue)
-    return &pb.EncryptionBase64EncodeResponse{EncodedStr:str},nil
-}
+func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
 
-func (s *encryptionService) Base64Decode(ctx context.Context, in *pb.EncryptionBase64DecodeRequest) (*pb.EncryptionBase64DecodeResponse, error) {
-    decodeBytes , _ := base64.StdEncoding.DecodeString(in.DecodedStr)
-    return &pb.EncryptionBase64DecodeResponse{RawValue:decodeBytes},nil
-}
-
-func (s *encryptionService) XxteaEncryption(ctx context.Context, in *pb.EncryptionXXTEARequest) (*pb.EncryptionXXTEAResponse, error) {
-    encrypt_data := xxtea.Encrypt([]byte(in.RawValue),[]byte(in.Key))
-    return &pb.EncryptionXXTEAResponse{Key:in.Key,EncryptedStr:encrypt_data},nil
-}
-
-func (s *encryptionService) XxteaDecryption(ctx context.Context, in *pb.DecryptionXXTEARequest) (*pb.DecryptionXXTEAResponse, error) {
-    decrypt_data := xxtea.Decrypt([]byte(in.EncryptedStr),[]byte(in.Key))
-    return &pb.DecryptionXXTEAResponse{Key:in.Key,RawValue:string(decrypt_data)},nil
-}
-
-func (s *encryptionService) RsaEncryption(ctx context.Context, in *pb.EncryptionRSARequest) (*pb.EncryptionRSAResponse, error) {
-   encrypedData := RsaEncrypt(in.RawValue)
-   return &pb.EncryptionRSAResponse{EncryptedStr:encrypedData},nil;
-}
-
-func (s *encryptionService) RsaDecryption(ctx context.Context, in *pb.DecryptionRSARequest) (*pb.DecryptionRSAResponse, error) {
-    decryptdData := RsaDecrypt(in.EncryptedStr)
-    return &pb.DecryptionRSAResponse{RawValue:decryptdData},nil
-}
-
-var pemMap = map[string]string{"public": "../rsa/public.pem", "private": "../rsa/private.pem"}
-
-func GetBlockFromPem(key string) []byte {
-    path := pemMap[key]
-    fi, err := os.Open(path)
+    conn,err := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
     if err != nil {
         panic(err)
     }
-    defer fi.Close()
-    fd, err := ioutil.ReadAll(fi) //读取文件内容
+    defer conn.Close()
+    c := encryptionServicePB.NewEncryptionService(conn)
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
 
-     pemKey := []byte(string(fd))
-    block, _ := pem.Decode(pemKey)
-    if block == nil {
-        panic(key + " key error!")
-    }
-    return block.Bytes
-}
-
-// 加密
-func RsaEncrypt(origData []byte) []byte {
-    publicPem := GetBlockFromPem("public") //获取公钥pem的block
-    pubInterface, err := x509.ParsePKIXPublicKey(publicPem) //解析公钥
+    res, err := c.Base64Decode(ctx,&encryptionServicePB.EncryptionBase64DecodeRequest:{DecodedStr:key})
     if err != nil {
         panic(err)
     }
-    pub := pubInterface.(*rsa.PublicKey)
-    encypt, err := rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
+    rawData, err := c.RsaDecryption(ctx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:res.RawValue})
     if err != nil {
         panic(err)
     }
-    return encypt
-}
 
-// 解密
-func RsaDecrypt(encypt []byte) []byte {
-    privatePem := GetBlockFromPem("private")
-    priv, err := x509.ParsePKCS1PrivateKey(privatePem) //解析私钥
+    usernameAndPsw := string(rawData.RawValue)
+    tmpSplit := strings.Split(usernameAndPsw,"@|@")
+
+    var username string = ""
+    var psw string = ""
+
+    if 2 == len(tmpSplit) {
+        username = tmpSplit[0]
+        psw = tmpSplit[1]
+    } else {
+        err := errors.New("拆分用户名密码错误")
+    }
+
+    return username,psw,err
+} 
+
+func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServicePB.MerchantOpenRequest) (*merchantServicePB.MerchantOpenResponse, error) {
+
+    merchantName := in.Name
+    cellphone := in.Cellphone
+    address := in.Address
+    paymentBit := in.PaymentBit
+
+    db, err := sql.Open("mysql", mysqlDSN)
+    defer db.Close()
+    // Open doesn't open a connection. Validate DSN data:
+    err = db.Ping()
     if err != nil {
-    panic(err)
+        panic(err.Error()) // proper error handling instead of panic in your app
     }
-    decypt, err := rsa.DecryptPKCS1v15(rand.Reader, priv, encypt)
+
+    stmtIns, err := db.Prepare("INSERT INTO merchant (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`) VALUES( ?, ?, ?, ?)") // ? = placeholder
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+
+    _, err = stmtIns.Exec(merchantName, address, paymentBit, cellphone) 
+    if err != nil {
+        panic(err.Error())
+    }
+
+    return &merchantServicePB.MerchantOpenResponse{Successed:err == nil}
+}
+
+
+func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServicePB.MerchantRegisterRequest) (*merchantServicePB.MerchantRegisterResponse, error) {
+    cellphone, psw, err:= parseUsernameAndPsw(in.Key)
+    name := in.name
+    role := in.Role
+    verifyCode := in.VerifyCode
+    merchantID := in.MerchantID
+
+    operatorSuccess := false
 
     if err != nil {
-    panic(err)
+        panic(err)
     }
-    return decypt
+
+    //验证码检查
+    conn,err := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
+    if err != nil {
+        panic(err)
+    }
+    defer conn.Close()
+    c := redisPb.NewRedisServiceClient(conn)
+    ctxRPC, cancel := context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
+
+    checkKey := "_verify_sms_"+ cellphone + "@1" 
+
+    queryRes, err1 := c.Query(ctxRPC, &redisPb.QueryRedisRequest{Key: checkKey})
+
+    hasError := err != nil || err1 != nil
+
+    verifyCodeBingo := false
+
+    if !hasError && queryRes!= nil && queryRes.Value ==  verifyCode {
+        verifyCodeBingo = true
+    }
+    
+    if verifyCodeBingo {
+        //插入数据库
+        db, err := sql.Open("mysql", mysqlDSN)
+        defer db.Close()
+        // Open doesn't open a connection. Validate DSN data:
+        err = db.Ping()
+        if err != nil {
+            panic(err.Error()) // proper error handling instead of panic in your app
+        }
+
+        stmtIns, err := db.Prepare("INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)") // ? = placeholder
+        if err != nil {
+            panic(err.Error()) // proper error handling instead of panic in your app
+        }
+        defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+
+        _, err = stmtIns.Exec(name, cellphone, psw, role,merchantID) 
+        if err != nil {
+            panic(err.Error())
+        } else {
+            operatorSuccess = true
+        }
+    }
+
+    return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess}
 }
 
+func (s *merchantService) MerchantChangePsw(ctx context.Context, in *MerchantChangePswRequest) (*MerchantChangePswResponse, error) {
 
-func deferFunc() {
-    if err := recover(); err != nil {
-        fmt.Println("error happend:")
-        fmt.Println(err)
-    }
 }
 
-// /////
+func (s *merchantService) MerchantLogin(ctx context.Context, in *MerchantLoginRequest) (*MerchantLoginResponse, error) {
+    cellphone, psw, err:= parseUsernameAndPsw(in.Key)
+    name := in.name
+    tokenRequest := in.TokenRequest
+    merchantID := in.MerchantID
 
-// func (s *encryptionService ) EncryptionWithXXTEA(ctx context.Context, in *pb.EncryptionXXTEAStrRequest) (*pb.EncryptionXXTEAStrResponse, error) {
-//     encrypt_data := xxtea.Encrypt([]byte(in.Str.RawValue),[]byte(in.XXTEAKey))
-// 	encodedStr := base64.StdEncoding.EncodeToString(encrypt_data)
-//     return &pb.EncryptionXXTEAStrResponse{XXTEAKey: in.XXTEAKey,Str:&pb.EncryptionStrResponse {EncryptStr:encodedStr}}, nil
-// }
+    operatorSuccess := false
 
-// func (s *encryptionService ) DecryptionWithXXTEA(ctx context.Context, in *pb.DecryptionXXTEAStrRequest) (*pb.DecryptionXXTEAStrResponse, error) {
-// 	decodeStr ,_:= base64.StdEncoding.DecodeString(in.Str.EncryptStr)
-//     decrypt_data := xxtea.Decrypt([]byte(decodeStr),[]byte(in.XXTEAKey))
-//     return &pb.DecryptionXXTEAStrResponse{XXTEAKey: in.XXTEAKey,Str:&pb.DecryptionStrResponse{RawValue:string(decrypt_data)}}, nil
-// }
+    if err != nil {
+        panic(err)
+    }
+    //查询数据库
+    var (
+        uid uint32
+        name string
+        role int
+        merchantID uint32
+    )
+
+    db, err := sql.Open("mysql", mysqlDSN)
+    defer db.Close()
+    // Open doesn't open a connection. Validate DSN data:
+    err = db.Ping()
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    err := db.QueryRow("SELECT id as uid, name ,role,merchant_id FROM merchant_account WHERE cellphone = ? AND psw = ? LIMIT 1", cellphone, psw).
+    Scan(&uid,&name,&role,&merchantID)
+    if err != nil {
+        log.Fatal(err)
+    } else if err == sql.ErrNoRows{
+
+    } else {
+        //生成令牌
+
+        conn,err := grpc.Dial(sessionRPCAddress,grpc.WithInsecure())
+        if err != nil {
+            panic(err)
+        }
+        defer conn.Close()
+        c := sessionServicePB.NewSessionServiceClient(conn)
+        ctxRPC, cancel := context.WithTimeout(context.Background(), time.Second)
+        defer cancel()
+
+        if tokenRequest {
+            
+            connRSA,errRSA := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
+            if errRSA != nil {
+                panic(err)
+            }
+            defer connRSA.Close()
+            cRSA := encryptionServicePB.NewEncryptionService(conn)
+            ctxRSA, cancelRSA := context.WithTimeout(context.Background(), time.Second)
+            defer cancel()
+
+            res, err := c.Base64Decode(ctx,&encryptionServicePB.EncryptionBase64DecodeRequest:{DecodedStr:tokenRequest})
+            if err != nil {
+                panic(err)
+            }
+            rawData, err := c.RsaDecryption(ctx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:res.RawValue})
+            if err != nil {
+                panic(err)
+            }
+            //得到xxtea key
+
+
+
+
+
+        }
+
+        checkKey := "_usertoken_"+ cellphone + "@" 
+
+        queryRes, err1 := c.CreateSessionToken(ctxRPC, &sessionServicePB.SessionTokenCreateRequest{SessionTokenRequestStr: checkKey})
+
+        hasError := err != nil || err1 != nil
+
+        verifyCodeBingo := false
+
+  
+
+
+    }
+
+
+    return &merchantServicePB.MerchantLoginResponse{Successed:operatorSuccess}
+}
+
+func (s *merchantService) MerchantInfo(ctx context.Context, in *MerchantInfoRequest) (*MerchantInfoResponse, error) {
+
+}
+
 
 func main() {
     defer deferFunc() 
