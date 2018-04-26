@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package Aphro.Merchant.pb;
+
+service MerchantService {
+
+	
+		//app用户注册
+		rpc merchantRegister(merchantRegisterRequest) returns (merchantRegisterResponse) {
+			option (google.api.http) = {
+				post: "/session/merchant/register"
+				body:"*"
+			};
+		}
+
+		//app用户修改密码
+		rpc merchantChangePsw(merchantChangePswRequest) returns (merchantChangePswResponse) {
+			option (google.api.http) = {
+				post: "/session/merchant/changePsw"
+				body:"*"
+			};
+		}
+
+		//商户app登陆
+		rpc merchantLogin(merchantLoginRequest) returns (merchantLoginResponse) {
+			option (google.api.http) = {
+				post: "/session/merchant/login"
+				body:"*"
+			};
+		}
+
+		//商户app 信息
+		rpc merchantInfo(merchantInfoRequest) returns (merchantInfoResponse) {
+			option (google.api.http) = {
+				post: "/session/merchant/info"
+				body:"*"
+			};
+		}
+
+}
+
+message MerchantRegisterRequest {
+	string key = 1;
+	string name = 2;
+	string verifyCode = 3;
+	string cellphone = 4;
+}
+
+message MerchantLoginResponse {
+	bool successed = 1;
+}
+
+message merchantChangePswRequest {
+	string newPsw = 1;
+	string sessionToken = 2;
+	string verifyCode = 3;
+	string cellphone = 4;
+
+}
+
+message merchantChangePswResponse {
+	bool successed = 1;
+}
+
+message merchantLoginRequest {
+	string key = 1;
+	string userAgent = 2;
+	string sessionToken = 3;
+}
+
+message merchantLoginResponse {
+	string merchantID = 1;
+	string sessionToken = 2;
+}
+
+message merchantInfoRequest {
+	string token = 1;
+	string merchantID = 2;
+}
+
+message merchantInfoResponse {
+	string merchantName = 1;
+	meessage innerMerchantAccount {
+		uint32 role = 1;
+		string name = 2;
+	}
+	innerMerchantAccount merchantAccount = 2;
+}
+
