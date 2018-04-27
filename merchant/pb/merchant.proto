@@ -7,59 +7,59 @@ package Aphro.Merchant.pb;
 service MerchantService {
 
 		//商户开户
-		rpc merchantOpen(merchantOpenRequest) returns (merchantOpenResponse) {
+		rpc merchantOpen(MerchantOpenRequest) returns (MerchantOpenResponse) {
 			option (google.api.http) = {
-				post: "/session/merchant/open"
+				post: "/merchant/open"
 				body:"*"
 			};
 		}
 	
 		//商户用户注册
-		rpc merchantRegister(merchantRegisterRequest) returns (merchantRegisterResponse) {
+		rpc merchantRegister(MerchantRegisterRequest) returns (MerchantRegisterResponse) {
 			option (google.api.http) = {
-				post: "/session/merchant/register"
+				post: "/merchant/register"
 				body:"*"
 			};
 		}
 
 		//商户用户修改密码
-		rpc merchantChangePsw(merchantChangePswRequest) returns (merchantChangePswResponse) {
+		rpc merchantChangePsw(MerchantChangePswRequest) returns (MerchantChangePswResponse) {
 			option (google.api.http) = {
-				post: "/session/merchant/changePsw"
+				post: "/merchant/changePsw"
 				body:"*"
 			};
 		}
 
 		//商户app登陆
-		rpc merchantLogin(merchantLoginRequest) returns (merchantLoginResponse) {
+		rpc merchantLogin(MerchantLoginRequest) returns (MerchantLoginResponse) {
 			option (google.api.http) = {
-				post: "/session/merchant/login"
+				post: "/merchant/login"
 				body:"*"
 			};
 		}
 
 		//商户app 信息
-		rpc merchantInfo(merchantInfoRequest) returns (merchantInfoResponse) {
+		rpc merchantInfo(MerchantInfoRequest) returns (MerchantInfoResponse) {
 			option (google.api.http) = {
-				post: "/session/merchant/info"
+				post: "/merchant/info"
 				body:"*"
 			};
 		}
 
 }
 
-message merchantOpenRequest {
+message MerchantOpenRequest {
 	string name = 1;
 	string cellphone = 2;
 	string address = 3;
 	uint32 paymentBit = 4;
 }
 
-message merchantOpenResponse {
+message MerchantOpenResponse {
 	bool successed = 1;
 }
 
-message merchantRegisterRequest {
+message MerchantRegisterRequest {
 	string key = 1;
 	string name = 2;
 	string verifyCode = 3;
@@ -67,42 +67,44 @@ message merchantRegisterRequest {
 	uint32 merchantID = 6;
 }
 
-message merchantRegisterResponse {
+message MerchantRegisterResponse {
 	bool successed = 1;
 }
 
-message merchantChangePswRequest {
+message MerchantChangePswRequest {
 	string newPsw = 1;
 	string sessionToken = 2;
 	string verifyCode = 3;
 	string cellphone = 4;
 }
 
-message merchantChangePswResponse {
+message MerchantChangePswResponse {
 	bool successed = 1;
 }
 
-message merchantLoginRequest {
+message MerchantLoginRequest {
 	string key = 1;
 	string tokenRequest = 2;
 	uint32 merchantID = 3;
 }
 
-message merchantLoginResponse {
+message MerchantLoginResponse {
 	string sessionToken = 1;
+	bool successed = 2;
+
 }
 
-message merchantInfoRequest {
+message MerchantInfoRequest {
 	string token = 1;
 	string merchantID = 2;
 }
 
-message merchantInfoResponse {
+message MerchantInfoResponse {
 	string merchantName = 1;
-	message innerMerchantAccount {
+	message InnerMerchantAccount {
 		uint32 role = 1;
 		string name = 2;
 	}
-	innerMerchantAccount merchantAccount = 2;
+	InnerMerchantAccount merchantAccount = 2;
 }
 

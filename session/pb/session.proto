@@ -104,11 +104,13 @@ message SessionTokenQueryResponse {
 
 
 message SessionTokenCreateRequest {
-	string  sessionTokenRequestStr = 1;
+	string sessionTokenRequestStr = 1;//key
+	uint32 uid = 2;
+	uint32 merchantID = 3;
 }
 
 message SessionTokenCreateResponse {
-	string 	sessionToken = 1;
+	string 	sessionToken = 1;//令牌格式为 uid@merchantID@key
 	int64 	ttl	=	2;
 	bool 	successed = 3;
 }
