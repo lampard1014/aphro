@@ -11,7 +11,7 @@ import (
     "fmt"
     "time"
     "math/rand"
-
+    "strconv" 
 )
 
 const (
@@ -54,6 +54,7 @@ func (s *sessionService) QuerySessionToken(ctx context.Context, in *sessionPb.Se
         },err
 }
 
+
 func (s *sessionService) CreateSessionToken(ctx context.Context, in *sessionPb.SessionTokenCreateRequest) (*sessionPb.SessionTokenCreateResponse, error) {
     conn,err := grpc.Dial(redisRpcAddress,grpc.WithInsecure())
     if err != nil {
@@ -63,22 +64,31 @@ func (s *sessionService) CreateSessionToken(ctx context.Context, in *sessionPb.S
     c := redisPb.NewRedisServiceClient(conn)
     ctx, cancel := context.WithTimeout(context.Background(), time.Second)
     defer cancel()
-    token := GetRandomString(6)
 
-    setRes, err := c.Set(ctx, &redisPb.SetRedisRequest{Key:token,Value:in.SessionTokenRequestStr,Ttl:uint64(tokenDuration)})
+    uid := strconv.FormatUint(uint64(in.Uid),36)
+    merchantID := strconv.FormatUint(uint64(in.MerchantID),36)
+    encryptionkey := in.SessionTokenRequestStr
+    //general key
+    t :=  time.Now().Unix()
+    tokenKeyPrefix := uid
+    tokenKey := strconv.FormatUint(uint64(t),36)
+    tokenKeySuffix := merchantID
+    tokenKey = tokenKeyPrefix + tokenKey + tokenKeySuffix
+    //general value
+    tokenValue := uid + "@" + merchantID + "#" + encryptionkey
 
+    setRes, err := c.Set(ctx, &redisPb.SetRedisRequest{Key:tokenKey,Value:tokenValue,Ttl:uint64(tokenDuration)})
     if err != nil {
         panic(err)
     }
+    // queryRes, err2 := c.Query(ctx, &redisPb.QueryRedisRequest{Key: token})
 
-    queryRes, err2 := c.Query(ctx, &redisPb.QueryRedisRequest{Key: token})
+    // fmt.Println(token,in.SessionTokenRequestStr,err,time.Now(),int64(tokenDuration))
 
-    fmt.Println(token,in.SessionTokenRequestStr,err,time.Now(),int64(tokenDuration))
-
-    fmt.Println(queryRes,err2)
+    // fmt.Println(queryRes,err2)
 
     return &sessionPb.SessionTokenCreateResponse{
-            SessionToken:token,
+            SessionToken:tokenKey,
             Ttl:int64(tokenDuration),
             Successed:setRes.Successed,
         },err

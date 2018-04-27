@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 func request_MerchantService_MerchantOpen_0(ctx context.Context, marshaler runtime.Marshaler, client MerchantServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq merchantOpenRequest
+	var protoReq MerchantOpenRequest
 	var metadata runtime.ServerMetadata
 
 	if req.ContentLength > 0 {
@@ -44,7 +44,7 @@ func request_MerchantService_MerchantOpen_0(ctx context.Context, marshaler runti
 }
 
 func request_MerchantService_MerchantRegister_0(ctx context.Context, marshaler runtime.Marshaler, client MerchantServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq merchantRegisterRequest
+	var protoReq MerchantRegisterRequest
 	var metadata runtime.ServerMetadata
 
 	if req.ContentLength > 0 {
@@ -59,7 +59,7 @@ func request_MerchantService_MerchantRegister_0(ctx context.Context, marshaler r
 }
 
 func request_MerchantService_MerchantChangePsw_0(ctx context.Context, marshaler runtime.Marshaler, client MerchantServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq merchantChangePswRequest
+	var protoReq MerchantChangePswRequest
 	var metadata runtime.ServerMetadata
 
 	if req.ContentLength > 0 {
@@ -74,7 +74,7 @@ func request_MerchantService_MerchantChangePsw_0(ctx context.Context, marshaler 
 }
 
 func request_MerchantService_MerchantLogin_0(ctx context.Context, marshaler runtime.Marshaler, client MerchantServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq merchantLoginRequest
+	var protoReq MerchantLoginRequest
 	var metadata runtime.ServerMetadata
 
 	if req.ContentLength > 0 {
@@ -89,7 +89,7 @@ func request_MerchantService_MerchantLogin_0(ctx context.Context, marshaler runt
 }
 
 func request_MerchantService_MerchantInfo_0(ctx context.Context, marshaler runtime.Marshaler, client MerchantServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq merchantInfoRequest
+	var protoReq MerchantInfoRequest
 	var metadata runtime.ServerMetadata
 
 	if req.ContentLength > 0 {
@@ -290,15 +290,15 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_MerchantService_MerchantOpen_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"session", "merchant", "open"}, ""))
+	pattern_MerchantService_MerchantOpen_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"merchant", "open"}, ""))
 
-	pattern_MerchantService_MerchantRegister_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"session", "merchant", "register"}, ""))
+	pattern_MerchantService_MerchantRegister_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"merchant", "register"}, ""))
 
-	pattern_MerchantService_MerchantChangePsw_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"session", "merchant", "changePsw"}, ""))
+	pattern_MerchantService_MerchantChangePsw_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"merchant", "changePsw"}, ""))
 
-	pattern_MerchantService_MerchantLogin_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"session", "merchant", "login"}, ""))
+	pattern_MerchantService_MerchantLogin_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"merchant", "login"}, ""))
 
-	pattern_MerchantService_MerchantInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"session", "merchant", "info"}, ""))
+	pattern_MerchantService_MerchantInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"merchant", "info"}, ""))
 )
 
 var (

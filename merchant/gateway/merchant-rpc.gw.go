@@ -25,7 +25,7 @@ func run() error {
 
   opts := []grpc.DialOption{grpc.WithInsecure()}
 
-    err := gw.RegisterEncryptionServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
+    err := gw.RegisterMerchantServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
     if err != nil {
         return  err
     }
