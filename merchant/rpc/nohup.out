@@ -1,0 +1,22 @@
+parseUsernameAndPsw
+parseUsernameAndPsw
+parseUsernameAndPsw
+parseUsernameAndPsw
+user and psw   
+验证码验证错误
+signal: terminated
+# command-line-arguments
+./merchant-rpc.go:67:40: syntax error: unexpected key, expecting comma or )
+parseUsernameAndPsw: YtEj3urx+aGWqZZ7xBQaRNumPkmjlduqHs21aZMaXwuh4SKfTy8InrTF6BL730hHpp1XYSjApGcOi8lxLGsuBCC1UnMQRw5tAfsjzWsAz4c9mHj8XFv1jlA8XUs7V/DkJYzruEK/dwaRAszCma/Heg1kXyyIy3lS10n18ODvmiw=
+user and psw err    rpc error: code = Unimplemented desc = unknown service Aphro.Encryption.pb.EncryptionService
+验证码验证错误
+parseUsernameAndPsw: jQk8+7giZxBEPESfbVGcKUdhaVJy2HDFRH2chZbs4eOtcoxhwz0uzOdOlzZMixIH6VY3YOy2HtE0MeJ/Zbp5XqQ95MzOmOCU8vr5i+rU5A8Q8SZiIEIKF4b+AcIN/rK6NLdzifM/OLk6Ty1WWTtlDX+T7vp5oDngjjbNde3WG6k=
+user and psw err    rpc error: code = Unimplemented desc = unknown service Aphro.Encryption.pb.EncryptionService
+验证码验证错误
+parseUsernameAndPsw: Stjpm47L+amSo1FOiiVqFb8XqywnX4fsojjWZ6+3YYRA9lFJ6hsUuDH5MbKRZHRZCLYFr2aZzyQvZyfgzKiQ2NG0Xxy0l/YvBhZLOAxBPNWt7emhe/bHrnYu4IgVle2qFTt0C9fT3ZoinGjHL8UZa+uvMLhNkCbbj70USE0Wvj0=
+user and psw err    rpc error: code = Unimplemented desc = unknown service Aphro.Encryption.pb.EncryptionService
+验证码验证错误
+signal: terminated
+parseUsernameAndPsw: htpHsShu0g2vgjvijWcssrDUDJI+Db8emfqrH4oyUZ0DNn84nQSeoZVB18kxuBm5CMdA4KDUwhPNBKZ69wgjrMSHsdqnQEDngTpMeHZ+ymNAMw/sEsEVlqc7qQsGT7Y095jz6BEm60TaOL/CNOL6KJtVTv1fDWWJg77RNs9yqNw=
+user and psw err  xmg 123456 <nil>
+验证码验证错误
