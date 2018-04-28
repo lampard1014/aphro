@@ -46,6 +46,24 @@ service MerchantService {
 			};
 		}
 
+		//商户app 信息
+		rpc merchantRoomInfo(MerchantRoomInfoRequest) returns (MerchantRoomInfoResponse) {
+			option (google.api.http) = {
+				get: "/merchant/room/{roomID}"
+				body:"*"
+			};
+		}
+
+
+}
+
+message MerchantRoomInfoRequest {
+	string sessionToken = 1;
+	uint32 roomID = 2;
+}
+
+message MerchantRoomInfoResponse {
+	string reverse = 1;
 }
 
 message MerchantOpenRequest {
@@ -91,7 +109,6 @@ message MerchantLoginRequest {
 message MerchantLoginResponse {
 	string sessionToken = 1;
 	bool successed = 2;
-
 }
 
 message MerchantInfoRequest {
