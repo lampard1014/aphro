@@ -18,6 +18,7 @@ const (
 	port  = ":10088"
     redisRpcAddress = "127.0.0.1:10101"
     tokenDuration = 24 * 3600 * time.Second //1 day
+    verifyCodeDuration = 60*30
 )
 
 type sessionService struct{}
@@ -179,9 +180,9 @@ func (s *sessionService) MerchantVerifyCode(ctx context.Context, in *sessionPb.M
     defer cancel()
 
     cellphone :=  in.Cellphone
-    scence :=  fmt.Sprint(in.Scence)
+    scene :=  strconv.Itoa(int(in.Scene))
     smsCode := in.SmsCode
-    checkKey := "_verify_sms_"+ cellphone + "@" + scence
+    checkKey := "_verify_sms_"+ cellphone + "@" + scene
     queryRes, err := c.Query(ctx, &redisPb.QueryRedisRequest{Key: checkKey})
 
     fmt.Println("xxx",queryRes, err)
@@ -207,13 +208,14 @@ func (s *sessionService) MerchantSendCode(ctx context.Context, in *sessionPb.Mer
     defer cancel()
 
     cellphone :=  in.Cellphone
-    scence :=  fmt.Sprint(in.Scence)
+    scene :=  strconv.Itoa(int(in.Scene))
 
     // token := in.Token
-    checkKey := "_verify_sms_"+ cellphone + "@" + scence
+    checkKey := "_verify_sms_"+ cellphone + "@" + scene
     smsCodeTmp := "123456"
-    ttl := uint64(60 * time.Second)//60秒过期
+    ttl := uint64(verifyCodeDuration * time.Second)//60秒过期
 
+    fmt.Println("scene,checkKey, smsCode :",scene,checkKey,smsCodeTmp)
     setRes, err := c.Set(ctx, &redisPb.SetRedisRequest{Key:checkKey,Value:smsCodeTmp,Ttl:ttl})
     if err != nil {
         panic(err)

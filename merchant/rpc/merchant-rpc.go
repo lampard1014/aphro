@@ -158,33 +158,54 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
         hasError := queryRedisErr != nil
 
         if !hasError && queryRes!= nil && queryRes.Value ==  verifyCode {
-
             //插入数据库
             db, dbOpenErr := sql.Open("mysql", mysqlDSN)
             defer db.Close()
             dbOpenErr = db.Ping()
             if dbOpenErr == nil {
-                stmtIns, stmtInsErr := db.Prepare("INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)") // ? = placeholder
-                if stmtInsErr == nil {
-
-                    insertResult, insertErr := stmtIns.Exec(name, cellphone, pswEncryption(psw), role,merchantID) 
-
-                    if insertErr == nil {
-                        afftectedRow, afftectedRowErr := insertResult.RowsAffected()
-                        if afftectedRow != 1 || afftectedRowErr == nil {
-                            returnErr = afftectedRowErr
+                //当注册是店长的时候 需要先自动注册一个店铺
+                if role == 1 {
+                    stmtMerhcantIns, stmtMerhcantInsErr := db.Prepare("INSERT INTO `merchant` (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`)VALUES(?,?,?,?)") // ? = placeholder
+                    if stmtMerhcantInsErr == nil {
+                        stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerhcantIns.Exec("@", "@", 0, cellphone) 
+                        if stmtMerhcantInsertErr == nil {
+                            stmtMerhcantAfftectedRow, stmtMerhcantAfftectedRowErr := stmtMerhcantInsertResult.RowsAffected()
+                            if stmtMerhcantAfftectedRow != 1 || stmtMerhcantAfftectedRowErr != nil {
+                                returnErr = stmtMerhcantAfftectedRowErr
+                                fmt.Println("[if]",stmtMerhcantAfftectedRowErr,"stmtMerhcantAfftectedRow",stmtMerhcantAfftectedRow)
+                            } else {
+                                fmt.Println("[insert merchant sucess!]")
+                            }
                         } else {
-                            //成功
-                            operatorSuccess = true
+                            returnErr = stmtMerhcantInsertErr
                         }
                     } else {
-                        returnErr = insertErr
+                        returnErr = stmtMerhcantInsErr
                     }
-                } else {
-
-                    returnErr = stmtInsErr
+                    defer stmtMerhcantIns.Close()
+                } 
+                //正常的注册流程
+                if returnErr == nil {
+                    //成功新建商户 继续 新建操作员，todo 事务回滚
+                    stmtIns, stmtInsErr := db.Prepare("INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)") // ? = placeholder
+                    if stmtInsErr == nil {
+                        insertResult, insertErr := stmtIns.Exec(name, cellphone, pswEncryption(psw), role,merchantID) 
+                        if insertErr == nil {
+                            afftectedRow, afftectedRowErr := insertResult.RowsAffected()
+                            if afftectedRow != 1 || afftectedRowErr != nil {
+                                returnErr = afftectedRowErr
+                            } else {
+                                //成功
+                                operatorSuccess = true
+                            }
+                        } else {
+                            returnErr = insertErr
+                        }
+                    } else {
+                        returnErr = stmtInsErr
+                    }
+                    defer stmtIns.Close()
                 }
-                defer stmtIns.Close()
             } else {
                 returnErr = dbOpenErr
             }
@@ -195,8 +216,8 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
         returnErr = redisRPCError
     }
     defer conn.Close()
-    fmt.Println(returnErr)
-    return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},nil
+    fmt.Println("success:",operatorSuccess,"returnErr:",returnErr)
+    return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},returnErr
 }
 
 func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantServicePB.MerchantChangePswRequest) (*merchantServicePB.MerchantChangePswResponse, error) {
@@ -246,7 +267,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                                 updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone) 
                                                 if updateErr == nil {
                                                     afftectedRow, afftectedRowErr := updateResult.RowsAffected()
-                                                    if afftectedRow != 1 || afftectedRowErr == nil {
+                                                    if afftectedRow != 1 || afftectedRowErr != nil {
                                                         returnErr = afftectedRowErr
                                                     } else {
                                                         //成功
