@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "room_charge_rule.proto";
+package Aphro.Room.pb;
+
+service RoomService {
+
+		//绑定二维码终端信息
+		rpc terminalBind(RSTerminalBindRequest) returns (RSTerminalBindResponse) {
+			option (google.api.http) = {
+				post: "/room/terminal/bind"
+				body:"*"
+			};
+		}
+	
+		//解绑二维码终端信息
+		rpc terminalUnbind(RSTerminalUnbindRequest) returns (RSTerminalUnindResponse) {
+			option (google.api.http) = {
+				post: "/room/terminal/unbind"
+				body:"*"
+			};
+		}
+
+		//直接创建房间 同时绑定二维码
+		rpc create(RSCreateRequest) returns (RSCreateResponse) {
+			option (google.api.http) = {
+				post: "/room/create"
+				body:"*"
+			};
+		}
+
+		//更新房间的信息 同时更新计费方式
+		rpc update(RSUpdateRequest) returns (RSUpdateResponse) {
+			option (google.api.http) = {
+				post: "/room/update"
+				body:"*"
+			};
+		}
+
+		//删除房间
+		rpc delete(RSDeleteRequest) returns (RSDeleteResponse) {
+			option (google.api.http) = {
+				put: "/room/delete/{roomID}"
+				body:"*"
+			};
+		}
+
+		//查询房间
+		rpc query(RSQueryRequest) returns (RSQueryResponse) {
+			option (google.api.http) = {
+				get: "/room/query"
+			};
+		}
+}
+
+message RSDeleteRequest {
+	uint32 roomID = 1;
+}
+
+message RSDeleteResponse {
+	bool successed = 1;
+}
+
+message RSResult {
+	uint32 roomID = 1;
+	uint32 merchantID =2;
+	string terminalCode = 3;
+	RSLocation location = 4;
+	uint32 status = 5;
+	string roomName = 6;
+	repeated Aphro.RoomChargeRule.RCRResult chargeRules = 7;
+}
+
+message RSQueryRequest {
+	string sessionToken = 1;
+	uint32 roomID = 2;
+	uint32 merchantID =3;
+}
+ 
+message RSQueryResponse {
+	bool successed = 1;
+	repeated RSResult results = 2;
+}
+
+message RSCreateRequest {
+	string terminalCode = 1;
+	string sessionToken = 2;
+	RSLocation location = 3;
+	string roomName = 4;
+}
+
+message RSCreateResponse {
+	uint32 roomID = 1;
+	bool successed = 2;
+}
+
+message RSUpdateRequest {
+	string sessionToken = 1;
+	uint32 roomID = 2;
+
+	string terminalCode = 3;
+	RSLocation location = 4;
+	uint32 status = 5;
+	string roomName = 7;
+
+	repeated Aphro.RoomChargeRule.RCRCreateRequest chargeRules = 6;
+}
+
+message RSUpdateResponse {
+	bool successed = 2;
+}
+
+message RSLocation {
+	string longitude = 1;	//经度
+	string latitude = 2;	//纬度
+}
+
+message RSTerminalBindRequest {
+	string sessionToken = 1;
+	string terminalCode = 2;
+	RSLocation location = 3;
+	uint32 roomID = 4;
+}
+
+message RSTerminalBindResponse {
+	bool successed = 1;
+}
+
+message RSTerminalUnbindRequest {
+	uint32 roomID = 1;
+	string sessionToken = 2;
+}
+
+message RSTerminalUnindResponse {
+	bool successed = 1;
+}
+
