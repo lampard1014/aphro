@@ -32,13 +32,12 @@ type merchantService struct{}
 
 func pswEncryption(psw string) (encryptionPsw string) {
     h := sha256.New()
-    h.write([]byte(psw))
-    encryptionPsw := base64.URLEncoding.EncodeToString(h.Sum(nil))
+    h.Write([]byte(psw))
+    encryptionPsw = base64.URLEncoding.EncodeToString(h.Sum(nil))
     return encryptionPsw
 }
 
-func fetchSessionTokenValue(sessionToken string) (uid, merchantID, err) {
-
+func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string, err error) {
     var returnErr error = nil
     sessionRPCConn,sessionRPCErr := grpc.Dial(sessionRPCAddress,grpc.WithInsecure())
     if sessionRPCErr == nil {
@@ -46,7 +45,7 @@ func fetchSessionTokenValue(sessionToken string) (uid, merchantID, err) {
 
         sessionRPCConnClientCtx, sessionRPCConnClientCancel := context.WithTimeout(context.Background(), time.Second)
         defer sessionRPCConnClientCancel()
-        sessionTokenQueryResponse, sessionTokenQueryResponseErr := sessionRPCConnClient.querySessionToken(sessionRPCConnClientCtx, &sessionServicePB.SessionTokenQueryRequest{SessionToken:sessionToken})
+        sessionTokenQueryResponse, sessionTokenQueryResponseErr := sessionRPCConnClient.QuerySessionToken(sessionRPCConnClientCtx, &sessionServicePB.SessionTokenQueryRequest{SessionToken:sessionToken})
         if sessionTokenQueryResponseErr == nil && sessionTokenQueryResponse != nil {
             sessionTokenValue := sessionTokenQueryResponse.SessionToken
             splitValue := strings.Split(sessionTokenValue, "#")
@@ -68,7 +67,6 @@ func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
     fmt.Println("parseUsernameAndPsw")
     conn,encyptRPCErr := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
 
-    var operatorSuccess bool = false
     var returnErr error = nil
     if encyptRPCErr == nil {
         c := encryptionServicePB.NewEncryptionServiceClient(conn)
@@ -83,9 +81,8 @@ func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
                 if 2 == len(tmpSplit) {
                     username = tmpSplit[0]
                     psw = tmpSplit[1]
-                    operatorSuccess = true
                 } else {
-                    returnErr := errors.New("拆分用户名密码错误")
+                    returnErr = errors.New("拆分用户名密码错误")
                 }
             } else {
                returnErr = RSADecryptionErr
@@ -120,7 +117,7 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
             if insertErr == nil {
                 afftectedRow, afftectedRowErr := insertResult.RowsAffected()
                 if afftectedRow != 1 || afftectedRowErr == nil {
-                    returnErr := afftectedRowErr
+                    returnErr = afftectedRowErr
                 }
             } else {
                 returnErr = insertErr
@@ -136,14 +133,14 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
 }
 
 func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServicePB.MerchantRegisterRequest) (*merchantServicePB.MerchantRegisterResponse, error) {
-    cellphone, psw, err:= parseUsernameAndPsw(in.Key)
+    cellphone, psw, err := parseUsernameAndPsw(in.Key)
     name := in.Name
     role := in.Role
     verifyCode := in.VerifyCode
     merchantID := in.MerchantID
 
     var operatorSuccess bool = false
-    var returnErr error = nil
+    var returnErr error = err
 
     //step1 验证码检查
     conn,redisRPCError := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
@@ -171,7 +168,7 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                     if insertErr == nil {
                         afftectedRow, afftectedRowErr := insertResult.RowsAffected()
                         if afftectedRow != 1 || afftectedRowErr == nil {
-                            returnErr := afftectedRowErr
+                            returnErr = afftectedRowErr
                         } else {
                             //成功
                             operatorSuccess = true
@@ -203,7 +200,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
     sessionToken := in.SessionToken
     verifyCode := in.VerifyCode
     cellphone := in.Cellphone
-    scene := 2
+    scene := uint32(2)
     var operatorSuccess bool = false
     var returnErr error = nil
     //检查session 是否合法
@@ -218,22 +215,20 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
         var isSessionTokenOK bool = false
         isSessionTokenVailate, isSessionTokenVailateErr := sessionRPCConnClient.IsSessionTokenVailate(sessionRPCConnClientCtx, &sessionServicePB.IsSessionTokenVailateRequest{SessionToken:sessionToken})
         if isSessionTokenVailateErr == nil {
-            isSessionTokenOK := isSessionTokenVailate.Successed
+            isSessionTokenOK = isSessionTokenVailate.Successed
 
             if isSessionTokenOK {
                 encyptRPCConn,encyptRPCErr := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
-                var operatorSuccess bool = false
-                var returnErr error = nil
                 if encyptRPCErr == nil {
                     encyptRPCClient := encryptionServicePB.NewEncryptionServiceClient(encyptRPCConn)
                     encyptRPCClientCtx, encyptRPCClientCancel := context.WithTimeout(context.Background(), time.Second)
                     defer encyptRPCClientCancel()
-                    base64DecodeRes, base64DecodeErr := c.Base64Decode(ctx,&encryptionServicePB.EncryptionBase64DecodeRequest{DecodedStr:newPsw})
+                    base64DecodeRes, base64DecodeErr := encyptRPCClient.Base64Decode(encyptRPCClientCtx,&encryptionServicePB.EncryptionBase64DecodeRequest{DecodedStr:newPsw})
                     if base64DecodeErr == nil {
-                        rawData, RSADecryptionErr := c.RsaDecryption(ctx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:base64DecodeRes.RawValue})
+                        rawData, RSADecryptionErr := encyptRPCClient.RsaDecryption(encyptRPCClientCtx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:base64DecodeRes.RawValue})
                         if RSADecryptionErr == nil {
                             newPsw := string(rawData.RawValue)
-                            if nil != newPsw {
+                            if newPsw != "" {
                                     //获取到最新的密码 验证 验证码是否正常
                                     verifyCodeRes ,verifyCodeResErr := sessionRPCConnClient.MerchantVerifyCode(sessionRPCConnClientCtx,&sessionServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
                                     if verifyCodeRes.Successed {
@@ -245,15 +240,15 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                             if stmtInsErr == nil {
                                                 updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone) 
                                                 if updateErr == nil {
-                                                    afftectedRow, afftectedRowErr := insertResult.RowsAffected()
+                                                    afftectedRow, afftectedRowErr := updateResult.RowsAffected()
                                                     if afftectedRow != 1 || afftectedRowErr == nil {
-                                                        returnErr := afftectedRowErr
+                                                        returnErr = afftectedRowErr
                                                     } else {
                                                         //成功
                                                         operatorSuccess = true
                                                     }
                                                 } else {
-                                                    returnErr = insertErr
+                                                    returnErr = updateErr
                                                 }
                                             } else {
 
@@ -267,7 +262,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                         returnErr = verifyCodeResErr
                                     }
                             } else {
-                                returnErr := errors.New("解析密码错误")
+                                returnErr = errors.New("解析密码错误")
                             }
                         } else {
                            returnErr = RSADecryptionErr
@@ -298,8 +293,7 @@ func (s *merchantService) MerchantLogin(ctx context.Context, in *merchantService
     cellphone, psw, err:= parseUsernameAndPsw(in.Key)
     tokenRequest := in.TokenRequest
     merchantID := in.MerchantID
-    var operatorSuccess bool = false
-    var returnErr error = nil
+    var returnErr error = err
     var sessionToken string = "";
     //查询数据库
     var (
@@ -324,7 +318,7 @@ func (s *merchantService) MerchantLogin(ctx context.Context, in *merchantService
 
                 createSessionTokenRes, err := c.CreateSessionToken(ctx, &sessionServicePB.SessionTokenCreateRequest{SessionTokenRequestStr:tokenRequest,Uid:uid,MerchantID:merchantID})
                 if err == nil {
-                    sessionToken := createSessionTokenRes.SessionToken
+                    sessionToken = createSessionTokenRes.SessionToken
 
                 } else {
                     returnErr = err
@@ -349,19 +343,21 @@ func (s *merchantService) MerchantLogin(ctx context.Context, in *merchantService
 func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServicePB.MerchantInfoRequest) (*merchantServicePB.MerchantInfoResponse, error) {
 
     //验证token合法性
-    uid, merchantID, sessionTokenError := fetchSessionTokenValue(in.SessionToken)
+    uid, merchantID, sessionTokenError := fetchSessionTokenValue(in.Token)
     var returnErr error = nil
+
+    var (
+        merchantName string
+        name string
+        role int
+    )
     if sessionTokenError == nil {
-        var (
-            merchantName string
-            name string
-            role int
-        )
+  
         db, dbOpenErr := sql.Open("mysql", mysqlDSN)
         defer db.Close()
         dbOpenErr = db.Ping()
         if dbOpenErr == nil {
-            queryRowErr := db.QueryRow("SELECT m.merchant_name,ma.role,ma.name FROM merchant_account AS ma, merchant AS m WHERE ma.merchant_id = ? and ma.ID = ? limit 1;", merchantID, uid).Scan(&merchantName,,&role,&name)
+            queryRowErr := db.QueryRow("SELECT m.merchant_name,ma.role,ma.name FROM merchant_account AS ma, merchant AS m WHERE ma.merchant_id = ? and ma.ID = ? limit 1;", merchantID, uid).Scan(&merchantName,&role,&name)
             if queryRowErr == nil {
                 //制作 令牌
             } else if queryRowErr == sql.ErrNoRows {
@@ -378,7 +374,12 @@ func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServiceP
         returnErr = sessionTokenError
     }
 
-    return &merchantServicePB.MerchantInfoResponse{MerchantName:merchantName,&merchantServicePB.InnerMerchantAccount{Role:uint32(role),Name:name}},returnErr
+    return &merchantServicePB.MerchantInfoResponse{MerchantName:merchantName,MerchantAccount:&merchantServicePB.InnerMerchantAccount{Role:uint32(role),Name:name}},returnErr
+}
+
+
+func (s *merchantService) MerchantRoomInfo(ctx context.Context, in *merchantServicePB.MerchantRoomInfoRequest) (*merchantServicePB.MerchantRoomInfoResponse, error) {
+    return nil,nil
 }
 
 func deferFunc() {

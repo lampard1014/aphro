@@ -12,16 +12,11 @@ import (
 
 
 
-type AphroPersistentStoreResult interface {
-
-}
-
-
+type AphroPersistentStoreResult interface {}
 
 ///////////////////////////////////////////////
 //field的结构体，实现接口IAphroPersistentStoreField
 ///////////////////////////////////////////////
-
 type IAphroPersistentStoreField interface {
 	func FetchFieldName() (string,error)
 	func FetchAlias() (string,error)
@@ -46,11 +41,9 @@ func (apsField *APSField) FetchAlias (string, error) {
 	}
 	return apsField.alias,returnErr
 }
-
 ///////////////////////////////////////////////
 //entity的结构体，实现接口IAphroPersistentStoreEntity
 ///////////////////////////////////////////////
-
 type IAphroPersistentStoreEntity interface {
 	FetchEntityName()(string,error)
 	FetchEntityAlais()(string,error)
@@ -76,12 +69,10 @@ func (apsEntity *APSEntity) FetchEntityAlais (string, error) {
 	}
 	return apsEntity.alias,returnErr
 }
-
 ////////////////////////////////////////
-
 type IAphroPersistentStore interface {
-	Query(MysqlField)(MysqlResult,error)
-	Insert(MysqlField)
+	Query()(AphroPersistentStoreResult,error)
+	Insert()
 	Update()
 	Delete()
 }
@@ -153,7 +144,6 @@ func (apsMysql *APSMysql)From(entity string,entityAlais string) (apsMysql *APSMy
 
 //////////////////////////////////////////////////////////////////////////////////////
 func (apsMysql *APSMysql)InnerJoin(entity string,entityAlais string) (apsMysql *APSMysql,error) {
-
 	var returnErr error = nil
 	var returnInstance *APSMysql = nil
 
@@ -259,7 +249,6 @@ const (
 )
 
 
-
 type APSMysqlCondition struct {
 	operator ConditionOperator 
 	operand1 []interface{}
@@ -270,7 +259,7 @@ type APSMysqlCondition struct {
 
 func (apsMysql *APSMysql)Where(condition APSMysqlCondition,bindValues []) (apsMysql *APSMysql,error) {
 
-	if len(whereCondition) == 0 {
+	if condition == nil {
 		append(wheres,"1")
 	} else {
 
@@ -282,83 +271,29 @@ func (apsMysql *APSMysql)Update() (apsMysql *APSMysql,error) {
 
 func (apsMysql *APSMysql)Insert() (apsMysql *APSMysql,error) {
 }
-// type InsertFields struct {
-// 	columns []string
-// 	columnsAs [string]string
-// }
-
-// func (f *InsertFields) fetchFields () (string, error) {
-
-// }
-
-
-// type InsertAsFields {
-// 	InsertFields
-// }
-
-
 
 const (
 	port  = ":10102"
     mysqlDSN = "root:@tcp(127.0.0.1:3306)/iris_db"
 )
 
-func (m *Mysql) Query  {
+func (apsMysql *APSMysql) Open() (apsMysql *APSMysql, error) {
 
-}
-
-type InsertResult struct {
-
-}
-
-type DeleteResult struct {
-
-}
-
-type criteria struct {
-
-}
-
-type whereCondition struct {
-
-}
+	var returnErr error = nil
+	var returnInstance *APSMysql = nil
 
 
-type updateCriteria struct {
-
-}
-
-type selectCriteria struct {
-
-}
-
-
-func (am *mysql) Open() (Result, error) {
 	db, dbOpenErr := sql.Open("mysql", mysqlDSN)
     defer db.Close()
     // Open doesn't open a connection. Validate DSN data:
     dbOpenErr = db.Ping()
     if (dbOpenErr == nil) {
-        stmtIns, stmtInsErr := db.Prepare("INSERT INTO merchant (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`) VALUES( ?, ?, ?, ?)") // ? = placeholder
-        if stmtInsErr == nil {
-            insertResult, insertErr := stmtIns.Exec(merchantName, address, paymentBit, cellphone) 
-            if insertErr == nil {
-                afftectedRow, afftectedRowErr := insertResult.RowsAffected()
-                if afftectedRow != 1 || afftectedRowErr == nil {
-                    returnErr := afftectedRowErr
-                }
-            } else {
-                returnErr = insertErr
-            }
-        } else {
-            returnErr = stmtInsErr
-        }
-        defer stmtIns.Close()
+    	returnInstance = apsMysql
     } else {
         returnErr = dbOpenErr        
     }
+    return returnInstance,returnErr
 }
-
 
 func (am *mysql) Query() (Result,error) {
 

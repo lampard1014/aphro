@@ -50,11 +50,8 @@ service MerchantService {
 		rpc merchantRoomInfo(MerchantRoomInfoRequest) returns (MerchantRoomInfoResponse) {
 			option (google.api.http) = {
 				get: "/merchant/room/{roomID}"
-				body:"*"
 			};
 		}
-
-
 }
 
 message MerchantRoomInfoRequest {
@@ -116,12 +113,13 @@ message MerchantInfoRequest {
 	string merchantID = 2;
 }
 
+message InnerMerchantAccount {
+	uint32 role = 1;
+	string name = 2;
+}
+
 message MerchantInfoResponse {
 	string merchantName = 1;
-	message InnerMerchantAccount {
-		uint32 role = 1;
-		string name = 2;
-	}
 	InnerMerchantAccount merchantAccount = 2;
 }
 

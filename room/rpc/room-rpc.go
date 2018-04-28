@@ -23,6 +23,7 @@ const (
 
 type roomService struct{}
 
+
 func checkSessionVaildate (sessionToken string) (isVailate, error) {
     var isSessionTokenOK bool = false
     var returnErr error = nil
@@ -54,8 +55,6 @@ func checkSessionVaildate (sessionToken string) (isVailate, error) {
     return isSessionTokenOK, returnErr
 }
 
-
-
 func (s *roomService) TerminalBind(ctx context.Context, in *roomServicePB.RSTerminalBindRequest) (*roomServicePB.RSTerminalBindResponse, error) {
 
     sessionToken := in.SessionToken
@@ -68,7 +67,7 @@ func (s *roomService) TerminalBind(ctx context.Context, in *roomServicePB.RSTerm
     isVailate, checkSessionError := checkSessionVaildate(sessionToken)
 
     if isVailate {
-        
+
         db, dbOpenErr := sql.Open("mysql", mysqlDSN)
         defer db.Close()
         // Open doesn't open a connection. Validate DSN data:
