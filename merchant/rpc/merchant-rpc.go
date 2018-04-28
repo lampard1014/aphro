@@ -22,8 +22,8 @@ import (
 const (
 	port  = ":10089"
     redisRPCAddress = "127.0.0.1:10101"
-    sessionRPCAddress = "127.0.0.1:10101"
-    encyptRPCAddress = "127.0.0.1:10088"
+    sessionRPCAddress = "127.0.0.1:10088"
+    encyptRPCAddress = "127.0.0.1:10087"
     mysqlDSN = "root:@tcp(127.0.0.1:3306)/iris_db"
 )
 
@@ -64,7 +64,8 @@ func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 
 func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
 
-    fmt.Println("parseUsernameAndPsw")
+    fmt.Println("parseUsernameAndPsw:",key)
+
     conn,encyptRPCErr := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
 
     var returnErr error = nil
@@ -134,6 +135,9 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
 
 func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServicePB.MerchantRegisterRequest) (*merchantServicePB.MerchantRegisterResponse, error) {
     cellphone, psw, err := parseUsernameAndPsw(in.Key)
+
+    fmt.Println("user and psw err ",cellphone,psw, err)
+
     name := in.Name
     role := in.Role
     verifyCode := in.VerifyCode
@@ -191,7 +195,8 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
         returnErr = redisRPCError
     }
     defer conn.Close()
-    return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},returnErr
+    fmt.Println(returnErr)
+    return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},nil
 }
 
 func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantServicePB.MerchantChangePswRequest) (*merchantServicePB.MerchantChangePswResponse, error) {
