@@ -65,7 +65,7 @@ service SessionService {
 
 message MerchantSendCodeRequest {
 	string 	cellphone = 1;
-	uint32	scence	=	2;
+	uint32	scene	=	2;
 }
 
 message MerchantSendCodeResponse {
