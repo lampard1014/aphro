@@ -450,6 +450,8 @@ func (c *merchantServiceClient) MerchantOpen(ctx context.Context, in *MerchantOp
 func (c *merchantServiceClient) MerchantRegister(ctx context.Context, in *MerchantRegisterRequest, opts ...grpc.CallOption) (*MerchantRegisterResponse, error) {
 	out := new(MerchantRegisterResponse)
 	err := grpc.Invoke(ctx, "/Aphro.Merchant.pb.MerchantService/merchantRegister", in, out, c.cc, opts...)
+
+	fmt.Println("dddddd", err)
 	if err != nil {
 		return nil, err
 	}

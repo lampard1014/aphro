@@ -1,0 +1,16 @@
+panic: MISCONF Redis is configured to save RDB snapshots, but is currently not able to persist on disk. Commands that may modify the data set are disabled. Please check Redis logs for details about the error.
+
+goroutine 759 [running]:
+main.(*redisService).Set(0x17e76e8, 0x1783060, 0xc42019e5a0, 0xc42019e660, 0x17e76e8, 0x1783060, 0xc420450c60)
+	/Users/yomyoutama/Documents/work/src/github.com/lampard1014/aphro/redis/rpc/redis-rpc.go:78 +0x127
+github.com/lampard1014/aphro/redis/pb._RedisService_Set_Handler(0x14975c0, 0x17e76e8, 0x1783060, 0xc42019e5a0, 0xc4203e0000, 0x0, 0x0, 0x0, 0x1053280, 0xc420041b30)
+	/Users/yomyoutama/Documents/work/src/github.com/lampard1014/aphro/redis/pb/redis.pb.go:480 +0x276
+google.golang.org/grpc.(*Server).processUnaryRPC(0xc420001500, 0x17862a0, 0xc420230000, 0xc42032c000, 0xc420077c20, 0x17bf538, 0x0, 0x0, 0x0)
+	/Users/yomyoutama/Documents/work/src/google.golang.org/grpc/server.go:969 +0x92d
+google.golang.org/grpc.(*Server).handleStream(0xc420001500, 0x17862a0, 0xc420230000, 0xc42032c000, 0x0)
+	/Users/yomyoutama/Documents/work/src/google.golang.org/grpc/server.go:1194 +0x1528
+google.golang.org/grpc.(*Server).serveStreams.func1.1(0xc420182020, 0xc420001500, 0x17862a0, 0xc420230000, 0xc42032c000)
+	/Users/yomyoutama/Documents/work/src/google.golang.org/grpc/server.go:677 +0x9f
+created by google.golang.org/grpc.(*Server).serveStreams.func1
+	/Users/yomyoutama/Documents/work/src/google.golang.org/grpc/server.go:675 +0xa1
+exit status 2

@@ -1,7 +1,5 @@
-signal: terminated
-signal: terminated
-signal: terminated
-signal: terminated
-signal: terminated
-signal: terminated
-signal: terminated
+
+{map[] map[content-type:[application/grpc]]}
+signal: killed
+# command-line-arguments
+./merchant-rpc.gw.go:51:20: undefined: st

@@ -6,10 +6,10 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
     "time"
+    "reflect"
     "fmt"
     "strings"
     "database/sql"
-    "errors"
     "crypto/sha256"
     "encoding/base64"
     _ "github.com/go-sql-driver/mysql"
@@ -17,6 +17,11 @@ import (
     encryptionServicePB "github.com/lampard1014/aphro/encryption/encryption-pb"
     sessionServicePB "github.com/lampard1014/aphro/session/pb"
     redisPb "github.com/lampard1014/aphro/redis/pb"
+    "github.com/lampard1014/aphro/gateway/error"
+
+    // "google.golang.org/grpc/status"
+    // "google.golang.org/grpc/codes"
+
 )
 
 const (
@@ -53,7 +58,7 @@ func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
             uid = uidAndMerchantID[0]
             merchantID = uidAndMerchantID[1]
         } else {
-            returnErr = errors.New("session expired, pls login again")
+            returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
         }
     } else {
         returnErr = sessionRPCErr
@@ -83,7 +88,7 @@ func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
                     username = tmpSplit[0]
                     psw = tmpSplit[1]
                 } else {
-                    returnErr = errors.New("拆分用户名密码错误")
+                    returnErr = AphroError.New(AphroError.BizError,"拆分用户名密码错误")
                 }
             } else {
                returnErr = RSADecryptionErr
@@ -100,7 +105,7 @@ func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
 
 func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServicePB.MerchantOpenRequest) (*merchantServicePB.MerchantOpenResponse, error) {
 
-    merchantName := in.Name
+    merchantName := in.Name //select 1 from ... where 
     cellphone := in.Cellphone
     address := in.Address
     paymentBit := in.PaymentBit
@@ -119,6 +124,8 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
                 afftectedRow, afftectedRowErr := insertResult.RowsAffected()
                 if afftectedRow != 1 || afftectedRowErr == nil {
                     returnErr = afftectedRowErr
+                } else {
+
                 }
             } else {
                 returnErr = insertErr
@@ -130,6 +137,7 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
     } else {
         returnErr = dbOpenErr        
     }
+
     return &merchantServicePB.MerchantOpenResponse{Successed:returnErr == nil},returnErr
 }
 
@@ -210,13 +218,13 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                 returnErr = dbOpenErr
             }
         } else {
-           returnErr = errors.New("验证码验证错误")
+            returnErr = AphroError.New(AphroError.BizError,"验证码验证错误")
         }
     } else {
         returnErr = redisRPCError
     }
     defer conn.Close()
-    fmt.Println("success:",operatorSuccess,"returnErr:",returnErr)
+    fmt.Println("success:",operatorSuccess,"returnErr:",returnErr ,"returnErrType:",reflect.TypeOf(returnErr))
     return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},returnErr
 }
 
@@ -288,7 +296,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                         returnErr = verifyCodeResErr
                                     }
                             } else {
-                                returnErr = errors.New("解析密码错误")
+                                returnErr = AphroError.New(AphroError.BizError,"解析密码错误")
                             }
                         } else {
                            returnErr = RSADecryptionErr
@@ -302,7 +310,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                 defer encyptRPCConn.Close()
 
             } else {
-                returnErr = errors.New("session expired, pls login again")
+                returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
             }
         } else {
             returnErr = isSessionTokenVailateErr
@@ -355,7 +363,7 @@ func (s *merchantService) MerchantLogin(ctx context.Context, in *merchantService
             defer sessionRPCConn.Close()
         } else if queryRowErr == sql.ErrNoRows {
             //没有记录
-            returnErr = errors.New("密码或者用户名错误")
+            returnErr = AphroError.New(AphroError.BizError,"密码或者用户名错误")
         } else {
             returnErr = queryRowErr
         }
@@ -388,7 +396,7 @@ func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServiceP
                 //制作 令牌
             } else if queryRowErr == sql.ErrNoRows {
                 //没有记录
-                returnErr = errors.New("没用商户信息")
+               returnErr = AphroError.New(AphroError.BizError,"没用商户信息")
             } else {
                 returnErr = queryRowErr
             }
@@ -415,13 +423,57 @@ func deferFunc() {
     }
 }
 
+// // auth 验证Token
+// func auth(ctx context.Context) error {
+//     md, ok := metadata.FromContext(ctx)
+//     if !ok {
+//         return grpc.Errorf(codes.Unauthenticated, "无Token认证信息")
+//     }
+
+//     var (
+//         appid  string
+//         appkey string
+//     )
+
+//     if val, ok := md["appid"]; ok {
+//         appid = val[0]
+//     }
+
+//     if val, ok := md["appkey"]; ok {
+//         appkey = val[0]
+//     }
+
+//     if appid != "101010" || appkey != "i am key" {
+//         return grpc.Errorf(codes.Unauthenticated, "Token认证信息无效: appid=%s, appkey=%s", appid, appkey)
+//     }
+
+//     return nil
+// }
+
+
 func main() {
     defer deferFunc() 
     lis, err := net.Listen("tcp", port)
     if err != nil {
         log.Fatal(err)
     }
-    s := grpc.NewServer()
+
+    // var opts []grpc.ServerOption //签名 和 验签
+
+    // // 注册interceptor
+    // var interceptor grpc.UnaryServerInterceptor
+    // interceptor = func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+    //     err = auth(ctx)
+    //     if err != nil {
+    //         return
+    //     }
+    //     // 继续处理请求
+    //     return handler(ctx, req)
+    // }
+    // opts = append(opts, grpc.UnaryInterceptor(interceptor))
+
+
+    s := grpc.NewServer()//opts...)
     merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
     err = s.Serve(lis)
     if err != nil {
