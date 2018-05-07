@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
+	"fmt"
 )
 
 var _ codes.Code
@@ -54,6 +55,9 @@ func request_MerchantService_MerchantRegister_0(ctx context.Context, marshaler r
 	}
 
 	msg, err := client.MerchantRegister(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+
+	fmt.Printf("my erro ",err )	
+
 	return msg, metadata, err
 
 }
@@ -219,11 +223,17 @@ func RegisterMerchantServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		}
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+
+
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 		resp, md, err := request_MerchantService_MerchantRegister_0(rctx, inboundMarshaler, client, req, pathParams)
+
+		fmt.Println("------------",resp,md,err)
+
+
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)

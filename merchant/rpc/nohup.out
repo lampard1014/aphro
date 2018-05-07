@@ -104,3 +104,222 @@ parseUsernameAndPsw: hMSHCy2HuHkb3bzzcsbDKSh6nL96BoAEQqSLZlPYcoyhis3tbrZFcgNETMn
 user and psw err  18868829208 123456 <nil>
 [insert merchant sucess]
 success: true returnErr: <nil>
+parseUsernameAndPsw: eFwDIzuAGgcpdaxPt2XlkNN02EgmnwN94Q1dx9J9ivBw27lsGASVcvabqM1qqcr/Q/HxMK3YCpBmioJnR1uwZ4vaTiSSJSgFdZrOCBHlBHdI3/pB2UrTwtmdT0Lue10NRqJMI0clB9cmIQRNfPO6PrCvCM1VKIZ1dNDKjDUNRmI=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: CGQhkloPKUwTt2XhQgU2tRI+5wHfT6NEhRGXE5FEFGS6PqNgH3hDI8bzS4fhtGAeMgZvG3lb9nWAQJybbxkk/Ai/p9+n8xTxTl8RCFq14PtPVy3emXT/pf69LfBNWdtcca2J7CBiD8YTySzVBI+oC+mOfE9D2DWWp32uLhPY3KE=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: F/uGE9joPy+3mtliWrFV6J3zusq1dQA2MDDd6ygr2nhFphDrrfBwfR4hqn9yG3PQnWLAvXTIpimUa+7zqfH0OB6Ax8TeXrGbkoMhA6x10zDsuhFTTVKBihQwb2Y1Uuii7z4uM6loo46miRGa9RpbpXAENavfNXQ3d+oJeisrAP8=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: gCPMP8fn5W67c+dGlT1gMxKo68SYge1DI/vf8HW/2TMSEfSCqUI418J7JOeSSJbFt4C4dicdrEm5KUNTLEriYBhqe4f8GAATWBbBkaht5YbRWCqFq4oB6FfPunHp8/XHuhc9jFsHjP9MlJNd24vIdVX8VTgvyaPIbXspwc3Jegs=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: AGldwNw/w3XaH4tYL20a8fe32xALko19BXdv4MGY7a0PKD6SKqccze+seaM/6sE++S4cAF3EODwv9VHBGRiWKUYFJeXjNf9oWo1AeXx/HSP5BvJafecW5gjjqo4YrredbntgVnlW28Nkm6MLI0Tz7fmiWYuKRQ+zie7201Zzeug=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: V9rJ5PtJz8qMFw6PgQZtIuHiLA3P5kzXqqAcQLELrPN72pbRmDGEuu52CyhbCAlyw/mTfmK8En+X1eTXpxvO53IrlkplUNKHcnku8CineXFEvm3elU0oJw+lS8xrRJ4XUzsJKHBVWFa7fIXGwJVgyWqR8GTF7QdBFyiIbiBn0dU=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: GjWOkxC3gCag/D2C1XnzjliZmHAxqPtiFGU4xKQ6IJ45Ba5RBg39LtwX+dDcaMRUmNu3xt6N8lZrfozJLSweykkhHmx43tIBIOX4i6op2l6B4hwghw6BJQ6YVIt4JdqQo/xEoRAt5Ibb+tgxFd9griUhbPXELNpt2b33ROHRdNg=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+signal: terminated
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: false returnErr: Error 1062: Duplicate entry '18868829208' for key 'cellphone_UNIQUE' returnErrType: *mysql.MySQLError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: false returnErr: Error 1062: Duplicate entry '18868829208' for key 'cellphone_UNIQUE' returnErrType: *mysql.MySQLError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: false returnErr: Error 1062: Duplicate entry '18868829208' for key 'cellphone_UNIQUE' returnErrType: *mysql.MySQLError
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+[insert merchant sucess!]
+success: true returnErr: <nil> returnErrType: <nil>
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
+parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERzcvFkluisZ0gpTO2rql6niHqxPTB0S7c9o6kMYEiZWlX4//0QsE7C8eFzghHSkF3Je9itoCGP8pFHaYn7GNS06kkK+mMOcxwPwq18x1sGXx3DoCnk=
+user and psw err  18868829208 123456 <nil>
+success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
+called!!!!!!!!!!
