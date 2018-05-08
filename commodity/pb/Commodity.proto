@@ -30,6 +30,15 @@ service CommodityService {
         body: "*"
       };
     }
+
+    //更新商品
+    rpc CommodityUpdate(CommodityUpdateRequest) returns (CommodityUpdateResponse) {
+      option (google.api.http) = {
+        post: "/merchant/commodity/update"
+        body: "*"
+      };
+
+    }
 }
 
 message CommodityQueryRequest {
@@ -45,15 +54,35 @@ message InnerComodityInfo {
   string name = 1;
   double price = 2;
   uint32 count = 3;
+  uint64 id = 4;
 }
 message CommodityCreateRequest {
-
+  
   string token = 1;
   string merchantID = 2;
-  InnerComodityInfo goods = 3;
+  InnerComodityInfo good = 3;
 
 }
 
 message CommodityCreateResponse {
+  
   bool successed = 1;
+}
+
+message CommodityCreateRequest {
+ string token = 1;
+ string merchantID = 2;
+ InnerComodityInfo good = 3;
+}
+
+message CommodityDeleteResponse {
+ 
+  bool successed = 1;
+}
+
+
+message CommodityUpdateRequest {
+  string token = 1;
+  string merchantID = 2;
+  InnerComodityInfo good = 3;
 }
