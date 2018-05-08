@@ -26,10 +26,10 @@ import (
 
 const (
 	port  = ":10089"
-    redisRPCAddress = "127.0.0.1:10101"
+    redisRPCAddress = "192.168.140.23:10101"
     sessionRPCAddress = "127.0.0.1:10088"
     encyptRPCAddress = "127.0.0.1:10087"
-    mysqlDSN = "root:@tcp(127.0.0.1:3306)/iris_db"
+    mysqlDSN = "root:123456@tcp(192.168.140.23:3306)/iris_db"
 )
 
 type merchantService struct{}

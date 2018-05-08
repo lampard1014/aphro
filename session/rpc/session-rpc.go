@@ -16,7 +16,7 @@ import (
 
 const (
 	port  = ":10088"
-    redisRpcAddress = "127.0.0.1:10101"
+    redisRpcAddress = "192.168.140.23:10101"
     tokenDuration = 24 * 3600 * time.Second //1 day
     verifyCodeDuration = 60*30
 )
