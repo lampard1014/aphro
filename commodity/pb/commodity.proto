@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package Aphro.Commodity.pb;
+
+service CommodityService{
+	rpc commodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
+		option (google.api.http) = {
+				post: "/merchant/open"
+				body:"*"
+		}
+	}
+}
+
+message CommodityCreateRequest {
+
+}

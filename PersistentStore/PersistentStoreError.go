@@ -18,7 +18,6 @@ var  ErrorMap  = map[ErrCode]string {
 	NoFieldAliasSpecify:"no field alias specify....",
 	NoEntityAliasSpecify:"no entity alias specify....",
 	UnknowError:"unknow error ....",
-
 }
 
 type PersistentStoreError struct{

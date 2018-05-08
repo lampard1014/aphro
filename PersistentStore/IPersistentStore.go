@@ -30,10 +30,7 @@ type IAphroPersistentStoreEntity interface {
 	FetchEntityAlais()(string,error)
 }
 
-
-
 /////abstract /////
-
 
 ///////////////////////////////////////////////
 //field的结构体，实现接口IAphroPersistentStoreField
