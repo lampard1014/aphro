@@ -7,6 +7,14 @@ package Aphro.Commodity.pb;
 
 service CommodityService {
 
+    // 查看商品
+    rpc CommodityQuery(CommodityQueryRequest) returns (CommodityQueryResponse) {
+       option (google.api.http) = {
+         post: "/merchant/commodity/query"
+         body: "*"
+       };
+    }
+
 		//增加商品
 		rpc CommodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
 			option (google.api.http) = {
@@ -31,6 +39,15 @@ service CommodityService {
       };
 
     }
+}
+
+message CommodityQueryRequest {
+  string token = 1;
+  string merchantID = 2;
+}
+
+message CommodityQueryResponse {
+    repeated InnerComodityInfo goods = 1;
 }
 
 message InnerComodityInfo {
