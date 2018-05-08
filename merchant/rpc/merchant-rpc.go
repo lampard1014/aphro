@@ -101,11 +101,11 @@ func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
     }
     defer conn.Close()
     return username,psw,returnErr
-} 
+}
 
 func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServicePB.MerchantOpenRequest) (*merchantServicePB.MerchantOpenResponse, error) {
 
-    merchantName := in.Name //select 1 from ... where 
+    merchantName := in.Name //select 1 from ... where
     cellphone := in.Cellphone
     address := in.Address
     paymentBit := in.PaymentBit
@@ -119,7 +119,7 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
     if (dbOpenErr == nil) {
         stmtIns, stmtInsErr := db.Prepare("INSERT INTO merchant (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`) VALUES( ?, ?, ?, ?)") // ? = placeholder
         if stmtInsErr == nil {
-            insertResult, insertErr := stmtIns.Exec(merchantName, address, paymentBit, cellphone) 
+            insertResult, insertErr := stmtIns.Exec(merchantName, address, paymentBit, cellphone)
             if insertErr == nil {
                 afftectedRow, afftectedRowErr := insertResult.RowsAffected()
                 if afftectedRow != 1 || afftectedRowErr == nil {
@@ -135,7 +135,7 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
         }
         defer stmtIns.Close()
     } else {
-        returnErr = dbOpenErr        
+        returnErr = dbOpenErr
     }
 
     return &merchantServicePB.MerchantOpenResponse{Successed:returnErr == nil},returnErr
@@ -159,8 +159,8 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
     if redisRPCError == nil {
         c := redisPb.NewRedisServiceClient(conn)
         ctxRPC, cancel := context.WithTimeout(context.Background(), time.Second)
-        defer cancel() 
-        checkKey := "_verify_sms_"+ cellphone + "@1" 
+        defer cancel()
+        checkKey := "_verify_sms_"+ cellphone + "@1"
         queryRes, queryRedisErr := c.Query(ctxRPC, &redisPb.QueryRedisRequest{Key: checkKey})
 
         hasError := queryRedisErr != nil
@@ -175,7 +175,7 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                 if role == 1 {
                     stmtMerhcantIns, stmtMerhcantInsErr := db.Prepare("INSERT INTO `merchant` (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`)VALUES(?,?,?,?)") // ? = placeholder
                     if stmtMerhcantInsErr == nil {
-                        stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerhcantIns.Exec("@", "@", 0, cellphone) 
+                        stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerhcantIns.Exec("@", "@", 0, cellphone)
                         if stmtMerhcantInsertErr == nil {
                             stmtMerhcantAfftectedRow, stmtMerhcantAfftectedRowErr := stmtMerhcantInsertResult.RowsAffected()
                             if stmtMerhcantAfftectedRow != 1 || stmtMerhcantAfftectedRowErr != nil {
@@ -191,13 +191,13 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                         returnErr = stmtMerhcantInsErr
                     }
                     defer stmtMerhcantIns.Close()
-                } 
+                }
                 //正常的注册流程
                 if returnErr == nil {
                     //成功新建商户 继续 新建操作员，todo 事务回滚
                     stmtIns, stmtInsErr := db.Prepare("INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)") // ? = placeholder
                     if stmtInsErr == nil {
-                        insertResult, insertErr := stmtIns.Exec(name, cellphone, pswEncryption(psw), role,merchantID) 
+                        insertResult, insertErr := stmtIns.Exec(name, cellphone, pswEncryption(psw), role,merchantID)
                         if insertErr == nil {
                             afftectedRow, afftectedRowErr := insertResult.RowsAffected()
                             if afftectedRow != 1 || afftectedRowErr != nil {
@@ -272,7 +272,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                         if dbOpenErr == nil {
                                             stmtIns, stmtInsErr := db.Prepare("update `merchant_account` set psw = ? where cellphone = ? limit 1") // ? = placeholder
                                             if stmtInsErr == nil {
-                                                updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone) 
+                                                updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone)
                                                 if updateErr == nil {
                                                     afftectedRow, afftectedRowErr := updateResult.RowsAffected()
                                                     if afftectedRow != 1 || afftectedRowErr != nil {
@@ -291,7 +291,7 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                                             defer stmtIns.Close()
                                         } else {
                                             returnErr = dbOpenErr
-                                        }   
+                                        }
                                     } else {
                                         returnErr = verifyCodeResErr
                                     }
@@ -385,7 +385,7 @@ func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServiceP
         role int
     )
     if sessionTokenError == nil {
-  
+
         db, dbOpenErr := sql.Open("mysql", mysqlDSN)
         defer db.Close()
         dbOpenErr = db.Ping()
@@ -543,7 +543,7 @@ func deferFunc() {
 
 
 func main() {
-    defer deferFunc() 
+    defer deferFunc()
     lis, err := net.Listen("tcp", port)
     if err != nil {
         log.Fatal(err)
