@@ -1,0 +1,42 @@
+
+syntax = "proto3";
+import "google/api/annotations.proto";
+
+
+package Aphro.Commodity.pb;
+
+service CommodityService {
+
+		//增加商品
+		rpc CommodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
+			option (google.api.http) = {
+        post: "/merchant/commodity/create"
+        body: "*"
+			};
+		}
+
+    //删除商品
+    rpc CommodityDelete(CommodityDeleteRequest) returns (CommodityDeleteResponse) {
+      option (google.api.http) = {
+        post: "/merchant/commodity/delete"
+        body: "*"
+      };
+    }
+}
+
+message InnerComodityInfo {
+  string name = 1;
+  double price = 2;
+  uint32 count = 3;
+}
+message CommodityCreateRequest {
+
+  string token = 1;
+  string merchantID = 2;
+  InnerComodityInfo goods = 3;
+
+}
+
+message CommodityCreateResponse {
+  bool successed = 1;
+}
