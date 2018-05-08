@@ -375,7 +375,6 @@ func (s *merchantService) MerchantLogin(ctx context.Context, in *merchantService
 }
 
 func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServicePB.MerchantInfoRequest) (*merchantServicePB.MerchantInfoResponse, error) {
-
     //验证token合法性
     uid, merchantID, sessionTokenError := fetchSessionTokenValue(in.Token)
     var returnErr error = nil
@@ -414,6 +413,98 @@ func (s *merchantService) MerchantInfo(ctx context.Context, in *merchantServiceP
 
 func (s *merchantService) MerchantRoomInfo(ctx context.Context, in *merchantServicePB.MerchantRoomInfoRequest) (*merchantServicePB.MerchantRoomInfoResponse, error) {
     return nil,nil
+}
+//  新增商户服务信息
+func (s *merchantService) MerchantWaiterCreate(ctx context.Context, in *merchantServicePB.MerchantWaiterCreateRequest) (*merchantServicePB.MerchantWaiterCreateRespone, error) {
+    token := in.Token
+    merchantID := in.MerchantID
+    name := in.Waiter.Name
+    imageID := in.Waiter.ImageID
+    //验证token合法性
+    uid, merchantID, sessionTokenError := fetchSessionTokenValue(in.Token)
+
+    fmt.Println(token,merchantID,name,imageID,uid);
+
+    var returnErr error = nil
+
+    var (
+        success bool 
+    )
+    
+    if sessionTokenError == nil {
+        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+        defer db.Close()
+        dbOpenErr = db.Ping()
+        if dbOpenErr == nil {
+            queryRowErr := db.QueryRow("").Scan()
+            if queryRowErr == nil {
+                success = true
+            } else if queryRowErr == sql.ErrNoRows{
+                //没有记录
+                success = false
+               returnErr = AphroError.New(AphroError.BizError,"没用商户信息")
+            } else {
+                success = false
+                returnErr = queryRowErr
+            }
+        } else {
+            success = false
+            returnErr = dbOpenErr
+
+        }
+
+    } else {
+        success = false
+        returnErr =  sessionTokenError
+
+    }
+
+    return &merchantServicePB.MerchantWaiterCreateRespone{Successed:success},returnErr
+}
+// 删除商户服务信息
+func (s *merchantService) MerchantWaiterDelete(ctx context.Context, in *merchantServicePB.MerchantWaiterDeleteRequest) (*merchantServicePB.MerchantWaiterDeleteRespone, error) {
+    token := in.Token
+    merchantID := in.MerchantID
+    waiterid := in.Waiterid
+    //验证token合法性
+    uid, merchantID, sessionTokenError := fetchSessionTokenValue(in.Token)
+    fmt.Println(token,merchantID,waiterid,uid);
+    var returnErr error = nil
+
+    var (
+        success bool 
+    )
+    
+    if sessionTokenError == nil {
+        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+        defer db.Close()
+        dbOpenErr = db.Ping()
+        if dbOpenErr == nil {
+            queryRowErr := db.QueryRow("").Scan()
+            if queryRowErr == nil {
+                success = true
+            } else if queryRowErr == sql.ErrNoRows{
+                //没有记录
+                success = false
+               returnErr = AphroError.New(AphroError.BizError,"没用商户信息")
+            } else {
+                success = false
+                returnErr = queryRowErr
+            }
+        } else {
+            success = false
+            returnErr = dbOpenErr
+
+        }
+
+    } else {
+        success = false
+        returnErr =  sessionTokenError
+
+    }
+
+    return &merchantServicePB.MerchantWaiterDeleteRespone{Successed:success},returnErr
+
 }
 
 func deferFunc() {
