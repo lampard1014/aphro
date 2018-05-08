@@ -37,7 +37,7 @@ message InnerComodityInfo {
   string name = 1;
   double price = 2;
   uint32 count = 3;
-  string id = 4;
+  uint64 id = 4;
 }
 message CommodityCreateRequest {
   
