@@ -1,81 +1,19 @@
-package aphro_mysql
+package PersistentStore
 
 import (
-	"fmt"
 	"errors"
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
+    "github.com/lampard1014/aphro/PersistentStore"
 )
 
 /////// interface //////
 
-
-
-
 type AphroPersistentStoreResult interface {}
 
-///////////////////////////////////////////////
-//field的结构体，实现接口IAphroPersistentStoreField
-///////////////////////////////////////////////
-type IAphroPersistentStoreField interface {
-	func FetchFieldName() (string,error)
-	func FetchAlias() (string,error)
-}
-type APSField struct {
-	filedName string
-	alias string
-}
 
-func (apsField *APSField) FetchFieldName (string, error) {
-	var returnErr error = nil
-	if fetchFieldName == nil {
-		returnErr = errors.New("没有列名")
-	}
-	return apsField.filedName,returnErr
-}
 
-func (apsField *APSField) FetchAlias (string, error) {
-	var returnErr error = nil
-	if alias == nil {
-		returnErr = errors.New("没有列的别名")
-	}
-	return apsField.alias,returnErr
-}
-///////////////////////////////////////////////
-//entity的结构体，实现接口IAphroPersistentStoreEntity
-///////////////////////////////////////////////
-type IAphroPersistentStoreEntity interface {
-	FetchEntityName()(string,error)
-	FetchEntityAlais()(string,error)
-}
 
-type APSEntity struct {
-	entityName string
-	alias string
-}
-
-func (apsEntity *APSEntity) FetchEntityName (string, error) {
-	var returnErr error = nil
-	if entityName == nil {
-		returnErr = errors.New("没有实体名")
-	}
-	return apsEntity.entityName,returnErr
-}
-
-func (apsEntity *APSEntity) FetchEntityAlais (string, error) {
-	var returnErr error = nil
-	if alias == nil {
-		returnErr = errors.New("没有实体名的别名")
-	}
-	return apsEntity.alias,returnErr
-}
-////////////////////////////////////////
-type IAphroPersistentStore interface {
-	Query()(AphroPersistentStoreResult,error)
-	Insert()
-	Update()
-	Delete()
-}
 
 type APSEntityJoin int 
 const (
