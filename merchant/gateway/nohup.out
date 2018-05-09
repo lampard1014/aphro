@@ -3,3 +3,5 @@
 signal: killed
 # command-line-arguments
 ./merchant-rpc.gw.go:51:20: undefined: st
+stat merchant-rpc.go: no such file or directory
+stat merchant-rpc.go: no such file or directory

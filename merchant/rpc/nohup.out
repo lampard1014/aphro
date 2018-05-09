@@ -323,3 +323,6 @@ parseUsernameAndPsw: fU1OgNXDtnsQ1WaEM6/DGQlWuvRjpQQYgbh6H7DCRW643djc0Vuxciv8ERz
 user and psw err  18868829208 123456 <nil>
 success: false returnErr: 验证码验证错误 returnErrType: *AphroError.CustomGRPCError
 called!!!!!!!!!!
+2018/05/09 12:51:51 before handling. Info: &{Server:0x181f1c0 FullMethod:/Aphro.Merchant.pb.MerchantService/MerchantOpen}
+2018/05/09 12:51:51 after handling. resp: successed:true 
+signal: terminated

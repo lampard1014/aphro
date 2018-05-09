@@ -1,6 +1,7 @@
 package  main
 
 import (
+
     //"github.com/lampard1014/aphro/PersistentStore"
 	"log"
 	"net"
@@ -474,10 +475,24 @@ func main() {
     // opts = append(opts, grpc.UnaryInterceptor(interceptor))
 
 
-    s := grpc.NewServer()//opts...)
+    s := grpc.NewServer(grpc.StreamInterceptor(StreamServerInterceptor),grpc.UnaryInterceptor(UnaryServerInterceptor))//opts...)
     merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
     err = s.Serve(lis)
     if err != nil {
         log.Fatal(err)
     }
+}
+
+func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+    log.Printf("before handling. Info: %+v", info)
+    resp, err := handler(ctx, req)
+    log.Printf("after handling. resp: %+v", resp)
+    return resp, err
+}
+// StreamServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Streaming RPCs.
+func StreamServerInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+    log.Printf("before handling. Info: %+v", info)
+    err := handler(srv, ss)
+    log.Printf("after handling. err: %v", err)
+    return err
 }

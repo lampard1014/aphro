@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+package Aphro.Common.pb;
+
+message Response{
+	int64 code
+	string message
+	result bytes
+}
+

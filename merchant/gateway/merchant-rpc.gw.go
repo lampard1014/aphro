@@ -67,16 +67,16 @@ func CustomForwardResponseOption(ctx context.Context,w http.ResponseWriter,pm pr
   // c,rw,e := hi.Hijack()
   // fmt.Println("c,rw,e ",c,rw,e)
 
-  retJsonStruct := &RetJsonStruct{
-    Message:"",
-    Code:int32(0),
-    Result:pm,//pm.GetData(),
-  }
+  //retJsonStruct := &RetJsonStruct{
+  //  Message:"",
+  //  Code:int32(0),
+  //  Result:pm,//pm.GetData(),
+  //}
 
   // pm = retJsonStruct
-  b, _ := json.Marshal(retJsonStruct)
-  _, err := w.Write(b) 
-  return err
+  //b, _ := json.Marshal(retJsonStruct)
+  //_, err := w.Write(b)
+  return nil
 }
 
 
