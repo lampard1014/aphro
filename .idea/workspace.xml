@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9228a757-b1d2-4ade-9e3c-14e297403ef8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/merchant/gateway/merchant-rpc.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/merchant/gateway/merchant-rpc.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/merchant/rpc/merchant-rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/merchant/rpc/merchant-rpc.go" afterDir="false" />
-    </list>
+    <list default="true" id="9228a757-b1d2-4ade-9e3c-14e297403ef8" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +14,8 @@
       <file leaf-file-name="merchant-rpc.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/merchant/rpc/merchant-rpc.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="122">
-              <caret line="488" selection-start-line="488" selection-end-line="488" />
+            <state relative-caret-position="196">
+              <caret line="488" column="21" lean-forward="true" selection-start-line="488" selection-end-line="489" />
               <folding>
                 <element signature="e#15#630#0" expanded="true" />
               </folding>
@@ -322,6 +319,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="36" y="42" width="1400" height="792" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21354933" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -683,8 +681,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/merchant/rpc/merchant-rpc.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="122">
-          <caret line="488" selection-start-line="488" selection-end-line="488" />
+        <state relative-caret-position="196">
+          <caret line="488" column="21" lean-forward="true" selection-start-line="488" selection-end-line="489" />
           <folding>
             <element signature="e#15#630#0" expanded="true" />
           </folding>
