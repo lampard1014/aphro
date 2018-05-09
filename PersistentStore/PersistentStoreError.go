@@ -8,6 +8,8 @@ const (
 	NoEntitySpecify
 	NoFieldAliasSpecify
 	NoEntityAliasSpecify
+	ConfigurationErr
+	WhereConditionParseErr
 	UnknowError
 )
 
@@ -17,6 +19,8 @@ var  ErrorMap  = map[ErrCode]string {
 	NoEntitySpecify:"no entity specify....",
 	NoFieldAliasSpecify:"no field alias specify....",
 	NoEntityAliasSpecify:"no entity alias specify....",
+	ConfigurationErr:"configuration err ....",
+	WhereConditionParseErr:"Where Conditions Parse Err ...",
 	UnknowError:"unknow error ....",
 }
 

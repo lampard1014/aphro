@@ -2,16 +2,36 @@ package PersistentStore
 
 //CRUD
 type IAphroPersistentStore interface {
-	Query()(IAphroPersistentStoreResult)
-	Insert()(IAphroPersistentStoreResult)
-	Update()(IAphroPersistentStoreResult)
-	Delete()(IAphroPersistentStoreResult)
+	Connect()(IAphroPersistentStore)
+
+	Query(querySQL string, bindsValue []interface{})(IAphroPersistentStore)
+	Select(columnsAs map[string]string)(IAphroPersistentStore)
+	Insert(entity string,columns []string,values [][]interface{})(IAphroPersistentStore)
+	Update(entity string,columnValues map[string]interface{})(IAphroPersistentStore)
+	Delete()(IAphroPersistentStore)
+	From(entity string, entityAlias string)(IAphroPersistentStore)
+
+}
+
+
+type IAphroPersistentStoreClientConfiguration interface {
+	SetOptions (map[string]string)
+	GetOptions()(map[string]string)
+}
+
+//client interface
+type IAphroPersistentStoreClient interface {
+	FetchClient()(interface{})
+	FetchConfiguration()(IAphroPersistentStoreClientConfiguration)
+	SetConfiguration(IAphroPersistentStoreClientConfiguration)(error)
 }
 
 //result interface
 type IAphroPersistentStoreResult interface {
-	FetchErr() error
-	FetchRes() interface{}
+	LastInsertId() (uint64, error)
+	RowsAffected() (int64, error)
+	FetchRow(dest ...interface{}) (error)
+	FetchAll(dest ...interface{}) (error)
 }
 
 ///////////////////////////////////////////////
@@ -30,49 +50,6 @@ type IAphroPersistentStoreEntity interface {
 	FetchEntityAlais()(string,error)
 }
 
-/////abstract /////
 
-///////////////////////////////////////////////
-//field的结构体，实现接口IAphroPersistentStoreField
-///////////////////////////////////////////////
-type APSField struct {
-	filedName string
-	alias string
-}
 
-func (apsField *APSField) FetchFieldName() (string, error) {
-	var returnErr error = nil
-	if apsField.filedName == "" {
-		returnErr = NewPSErrC(NoFieldSpecify)
-	}
-	return apsField.filedName,returnErr
-}
 
-func (apsField *APSField) FetchAlias() (string, error) {
-	var returnErr error = nil
-	if apsField.alias == "" {
-		returnErr = NewPSErrC(NoFieldAliasSpecify)
-	}
-	return apsField.alias,returnErr
-}
-
-type APSEntity struct {
-	entityName string
-	alias string
-}
-
-func (apsEntity *APSEntity) FetchEntityName() (string, error) {
-	var returnErr error = nil
-	if apsEntity.entityName == "" {
-		returnErr = NewPSErrC(NoEntitySpecify)
-	}
-	return apsEntity.entityName,returnErr
-}
-
-func (apsEntity *APSEntity) FetchEntityAlais() (string, error) {
-	var returnErr error = nil
-	if apsEntity.alias == "" {
-		returnErr = NewPSErrC(NoEntityAliasSpecify)
-	}
-	return apsEntity.alias,returnErr
-}
