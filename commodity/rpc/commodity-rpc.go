@@ -52,65 +52,6 @@ func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 
 type  commodityService struct{}
 
-func (s *commodityService) CommodityQuery(ctx context.Context, in *commodityServicePB.CommodityQueryRequest) (*commodityServicePB.CommodityQueryResponse, error) {
-    token := in.Token
-    merchantID := in.MerchantID
-    fmt.Println(token,merchantID)
-
-    // commodityInfo := in.Goods;
-    var returnError error = nil
-
-    var (
-        name  string  
-        price float64  
-        count uint32  
-        id    uint64  
-        good  *commodityServicePB.InnerComodityInfo
-    )
-     
-    
-    //验证token的合法性
-    _, _, sessionTokenError := fetchSessionTokenValue(in.Token)
-    // 初始化一个切片
-    var slice []*commodityServicePB.InnerComodityInfo
-
-    if sessionTokenError == nil {
-
-        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
-        defer db.Close()
-        dbOpenErr = db.Ping()
-        if dbOpenErr == nil {
-            rows, stmtInsErr := db.Query("select id, name from users where id = ?", 1)
-            if stmtInsErr == nil {
-                
-                for rows.Next() {
-                    queryErr := rows.Scan(&id,&name,&price,&count)
-                    if queryErr == nil {
-
-                        log.Println(id, name, price, count)
-                        good.Id = id; good.Name = name; good.Count = count; good.Price = price
-                        slice = append(slice, good)
-    
-                        } else {
-                            returnError = queryErr
-                        }
-
-                }
-                
-            } else {
-                returnError = stmtInsErr
-            }
-            defer rows.Close()
-        } else {
-            returnError = dbOpenErr
-        }
-    } else {
-        returnError = sessionTokenError
-    }
-   
-      return &commodityServicePB.CommodityQueryResponse{Goods:slice} , returnError
-
-}
 
 func (s *commodityService) CommodityCreate(ctx context.Context, in *commodityServicePB.CommodityCreateRequest) (*commodityServicePB.CommodityCreateResponse, error) {
 
@@ -241,7 +182,65 @@ func (s *commodityService) CommodityUpdate(ctx context.Context, in *commoditySer
    return &commodityServicePB.CommodityUpdateResponse{Successed: returnError == nil}, returnError
 }
 
+func (s *commodityService) CommodityQuery(ctx context.Context, in *commodityServicePB.CommodityQueryRequest) (*commodityServicePB.CommodityQueryResponse, error) {
+    token := in.Token
+    merchantID := in.MerchantID
+    fmt.Println(token,merchantID)
 
+    // commodityInfo := in.Goods;
+    var returnError error = nil
+
+    var (
+        name  string  
+        price float64  
+        count uint32  
+        id    uint64  
+        good  *commodityServicePB.InnerComodityInfo
+    )
+     
+    
+    //验证token的合法性
+    _, _, sessionTokenError := fetchSessionTokenValue(in.Token)
+    // 初始化一个切片
+    var slice []*commodityServicePB.InnerComodityInfo
+
+    if sessionTokenError == nil {
+
+        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+        defer db.Close()
+        dbOpenErr = db.Ping()
+        if dbOpenErr == nil {
+            rows, stmtInsErr := db.Query("select id, name from users where id = ?", 1)
+            if stmtInsErr == nil {
+                
+                for rows.Next() {
+                    queryErr := rows.Scan(&id,&name,&price,&count)
+                    if queryErr == nil {
+
+                        log.Println(id, name, price, count)
+                        good.Id = id; good.Name = name; good.Count = count; good.Price = price
+                        slice = append(slice, good)
+    
+                        } else {
+                            returnError = queryErr
+                        }
+
+                }
+                
+            } else {
+                returnError = stmtInsErr
+            }
+            defer rows.Close()
+        } else {
+            returnError = dbOpenErr
+        }
+    } else {
+        returnError = sessionTokenError
+    }
+   
+      return &commodityServicePB.CommodityQueryResponse{Goods:slice} , returnError
+
+}
 
 func deferFunc() {
     if err := recover(); err != nil {
@@ -257,7 +256,7 @@ func main()  {
         log.Fatal(err)
     }
     s := grpc.NewServer()//opts...)
-    commodityServicePB.RegisterCommodityServiceServer(s, new(commodityService))
+    commodityServicePB.RegisterCommodityServiceServer(s,new(commodityService))
     err = s.Serve(lis)
     if err != nil {
         log.Fatal(err)

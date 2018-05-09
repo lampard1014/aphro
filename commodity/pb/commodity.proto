@@ -7,16 +7,8 @@ package Aphro.Commodity.pb;
 
 service CommodityService {
 
-    // 查看商品
-    rpc CommodityQuery(CommodityQueryRequest) returns (CommodityQueryResponse) {
-       option (google.api.http) = {
-         post: "/merchant/commodity/query"
-         body: "*"
-       };
-    }
-
 		//增加商品
-		rpc CommodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
+		rpc commodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
 			option (google.api.http) = {
         post: "/merchant/commodity/create"
         body: "*"
@@ -24,7 +16,7 @@ service CommodityService {
 		}
 
     //删除商品
-    rpc CommodityDelete(CommodityDeleteRequest) returns (CommodityDeleteResponse) {
+    rpc commodityDelete(CommodityDeleteRequest) returns (CommodityDeleteResponse) {
       option (google.api.http) = {
         post: "/merchant/commodity/delete"
         body: "*"
@@ -32,22 +24,20 @@ service CommodityService {
     }
 
     //更新商品
-    rpc CommodityUpdate(CommodityUpdateRequest) returns (CommodityUpdateResponse) {
+    rpc commodityUpdate(CommodityUpdateRequest) returns (CommodityUpdateResponse) {
       option (google.api.http) = {
         post: "/merchant/commodity/update"
         body: "*"
       };
 
     }
-}
-
-message CommodityQueryRequest {
-  string token = 1;
-  string merchantID = 2;
-}
-
-message CommodityQueryResponse {
-    repeated InnerComodityInfo goods = 1;
+      // 查看商品
+    rpc commodityQuery(CommodityQueryRequest) returns (CommodityQueryResponse) {
+       option (google.api.http) = {
+         post: "/merchant/commodity/query"
+         body: "*"
+       };
+    }
 }
 
 message InnerComodityInfo {
@@ -90,4 +80,13 @@ message CommodityUpdateRequest {
 
 message CommodityUpdateResponse {
   bool successed = 1;
+}
+
+message CommodityQueryRequest {
+  string token = 1;
+  string merchantID = 2;
+}
+
+message CommodityQueryResponse {
+    repeated InnerComodityInfo goods = 1;
 }
