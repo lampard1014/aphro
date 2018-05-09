@@ -1,19 +1,92 @@
 
 syntax = "proto3";
-
 import "google/api/annotations.proto";
+
 
 package Aphro.Commodity.pb;
 
-service CommodityService{
-	rpc commodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
-		option (google.api.http) = {
-				post: "/merchant/open"
-				body:"*"
+service CommodityService {
+
+		//增加商品
+		rpc commodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
+			option (google.api.http) = {
+        post: "/merchant/commodity/create"
+        body: "*"
+			};
 		}
-	}
+
+    //删除商品
+    rpc commodityDelete(CommodityDeleteRequest) returns (CommodityDeleteResponse) {
+      option (google.api.http) = {
+        post: "/merchant/commodity/delete"
+        body: "*"
+      };
+    }
+
+    //更新商品
+    rpc commodityUpdate(CommodityUpdateRequest) returns (CommodityUpdateResponse) {
+      option (google.api.http) = {
+        post: "/merchant/commodity/update"
+        body: "*"
+      };
+
+    }
+      // 查看商品
+    rpc commodityQuery(CommodityQueryRequest) returns (CommodityQueryResponse) {
+       option (google.api.http) = {
+         post: "/merchant/commodity/query"
+         body: "*"
+       };
+    }
 }
 
+message InnerComodityInfo {
+  string name = 1;
+  double price = 2;
+  uint32 count = 3;
+  uint32 id = 4;
+}
 message CommodityCreateRequest {
+  
+  string token = 1;
+  string merchantID = 2;
+  InnerComodityInfo good = 3;
 
+}
+
+message CommodityCreateResponse {
+  
+  bool successed = 1;
+}
+
+
+message CommodityDeleteRequest {
+  string token = 1;
+  string merchant = 2;
+  InnerComodityInfo good = 3;
+}
+
+message CommodityDeleteResponse {
+ 
+  bool successed = 1;
+}
+
+
+message CommodityUpdateRequest {
+  string token = 1;
+  string merchantID = 2;
+  InnerComodityInfo good = 3;
+}
+
+message CommodityUpdateResponse {
+  bool successed = 1;
+}
+
+message CommodityQueryRequest {
+  string token = 1;
+  string merchantID = 2;
+}
+
+message CommodityQueryResponse {
+    repeated InnerComodityInfo goods = 1;
 }

@@ -52,7 +52,51 @@ service MerchantService {
 				get: "/merchant/room/{roomID}"
 			};
 		}
+
+		// 新增商户服务信息
+		rpc merchantWaiterCreate(MerchantWaiterCreateRequest) returns (MerchantWaiterCreateRespone) {
+			option (google.api.http) = {
+				post: "/merchant/waiter/create"
+				body: "*"
+			};
+		}
+
+		// 删除商户服务信息
+		rpc merchantWaiterDelete (MerchantWaiterDeleteRequest) returns (MerchantWaiterDeleteRespone) {
+			option (google.api.http) = {
+				post: "/merchant/waiter/delete"
+				body: "*"
+			};
+		}
 }
+
+message MerchantWaiterInfor{
+	string name = 1;
+	double imageID = 2;
+}
+
+message MerchantWaiterCreateRequest {
+	string token = 1;
+	string merchantID = 2;
+	MerchantWaiterInfor waiter = 3;
+	
+}
+
+message MerchantWaiterCreateRespone {
+	bool successed = 1;
+
+}
+
+message MerchantWaiterDeleteRequest {
+	string token = 1;
+	string merchantID = 2;
+	uint64 waiterid = 3;
+}
+
+message MerchantWaiterDeleteRespone {
+	bool successed = 1;
+}
+
 
 message MerchantRoomInfoRequest {
 	string sessionToken = 1;
