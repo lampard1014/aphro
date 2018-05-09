@@ -52,10 +52,61 @@ func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 
 type  commodityService struct{}
 
+func (s *commodityService) CommodityQuery(ctx context.Context, in *commodityServicePB.CommodityQueryRequest) (*commodityServicePB.CommodityQueryResponse, error) {
+    token := in.Token
+    merchantID := in.MerchantID
+    fmt.Println(token,merchantID)
+
+    // commodityInfo := in.Goods;
+
+    var returnError error = nil
+    // var (
+    //     string name 
+    //     double price 
+    //     uint32 count 
+    //     uint64 id 
+    // )
+
+    //验证token的合法性
+    _, _, sessionTokenError := fetchSessionTokenValue(in.Token)
+
+    if sessionTokenError == nil {
+
+        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+        defer db.Close()
+        dbOpenErr = db.Ping()
+        if dbOpenErr == nil {
+            stmtIns, stmtInsErr := db.Prepare("INSERT INTO commodity (`commodity_name`,`commodity_price`,`commodity_count`) VALUES( ?, ?, ?, ?)")
+            if stmtInsErr == nil {
+                insertResult, insertErr := stmtIns.Exec()
+                if insertErr == nil {
+                      affectedRow, affectedRowErr := insertResult.RowsAffected() 
+                      if affectedRow != 1 || affectedRowErr == nil {
+                          returnError = affectedRowErr
+                      }
+                    
+                } else {
+                    returnError = insertErr
+                }
+            } else {
+                returnError = stmtInsErr
+            }
+            defer stmtIns.Close()
+        } else {
+            returnError = dbOpenErr
+        }
+    } else {
+        returnError = sessionTokenError
+    }
+   
+      return &commodityServicePB.CommodityQueryResponse{} , returnError
+
+}
+
 func (s *commodityService) CommodityCreate(ctx context.Context, in *commodityServicePB.CommodityCreateRequest) (*commodityServicePB.CommodityCreateResponse, error) {
 
      
-    commodityInfo := in.Goods;
+    commodityInfo := in.Good;
 
     var returnError error = nil
 

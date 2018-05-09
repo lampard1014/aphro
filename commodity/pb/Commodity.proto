@@ -69,7 +69,7 @@ message CommodityCreateResponse {
   bool successed = 1;
 }
 
-message CommodityCreateRequest {
+message CommodityDeleteRequest {
  string token = 1;
  string merchantID = 2;
  InnerComodityInfo good = 3;
@@ -85,4 +85,9 @@ message CommodityUpdateRequest {
   string token = 1;
   string merchantID = 2;
   InnerComodityInfo good = 3;
+}
+
+message CommodityUpdateResponse {
+ 
+  bool successed = 1;
 }
