@@ -15,6 +15,14 @@ const (
 	vConfigKey_DSN = "root:@tcp(127.0.0.1:3306)/iris_db"
 )
 
+//SQL : select a AS a1,b AS b1 from table1 AS  where c=3 and d =4 order by f limit 5
+/// mysql := NewAPSMySQL(nil)
+//mysql->Select(map[string]string{a:"a1"})->From("table1")->Where()->Limit(1)->OrderBy("a desc")->Execute()
+
+//  &APSMySQLCondition{APSMySQLOperator_AND, &APSMySQLCondition{APSMySQLOperator_EQUAL, "a" ,3} ,&APSMySQLCondition{APSMySQLOperator_EQUAL, "b" ,4}}
+
+//select a From table1
+
 ///////////////////////////////////////////////
 //field的结构体，实现接口IAphroPersistentStoreField
 ///////////////////////////////////////////////
