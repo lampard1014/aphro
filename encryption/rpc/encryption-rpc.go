@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
     "github.com/xxtea/xxtea-go/xxtea"
-	pb "github.com/lampard1014/aphro/encryption/encryption-pb"
+	pb "github.com/lampard1014/aphro/Encryption/PB"
     "encoding/pem"
     "encoding/base64"
     "os"

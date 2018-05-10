@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 
-package Aphro.Encryption.pb;
+package Encryption.pb;
 
 service EncryptionService {
 
