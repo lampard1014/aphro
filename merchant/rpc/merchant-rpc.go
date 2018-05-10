@@ -20,10 +20,9 @@ import (
     sessionServicePB "github.com/lampard1014/aphro/session/pb"
     redisPb "github.com/lampard1014/aphro/redis/pb"
     "github.com/lampard1014/aphro/gateway/error"
-    // "google.golang.org/grpc/status"
-    // "google.golang.org/grpc/codes"
+    "github.com/lampard1014/aphro/CommonBiz/Response"
 
-    "github.com/lampard1014/aphro/CommonBiz"
+    "strconv"
 )
 
 const (
@@ -32,6 +31,7 @@ const (
     sessionRPCAddress = "127.0.0.1:10088"
     encyptRPCAddress = "127.0.0.1:10087"
     mysqlDSN = "root:123456@tcp(192.168.140.23:3306)/iris_db"
+    verifyCodeDuration = 60*30
 )
 
 type merchantService struct{}
@@ -506,8 +506,66 @@ func (s *merchantService) MerchantWaiterDelete(ctx context.Context, in *merchant
     }
 
     return &merchantServicePB.MerchantWaiterDeleteRespone{Successed:success},returnErr
-
 }
+
+func (s *merchantService) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (*merchantServicePB.MerchantVerifyCodeResponse, error) {
+
+    conn,err := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
+    if err != nil {
+        panic(err)
+    }
+    defer conn.Close()
+    c := redisPb.NewRedisServiceClient(conn)
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
+
+    cellphone :=  in.Cellphone
+    scene :=  strconv.Itoa(int(in.Scene))
+    smsCode := in.SmsCode
+    checkKey := "_verify_sms_"+ cellphone + "@" + scene
+    queryRes, err := c.Query(ctx, &redisPb.QueryRedisRequest{Key: checkKey})
+
+    fmt.Println("xxx",queryRes, err)
+
+    if err != nil {
+        panic(err)
+    }
+
+    return &merchantServicePB.MerchantVerifyCodeResponse{
+        Successed:queryRes.Value == smsCode,
+    },err
+}
+
+func (s *merchantService) MerchantSendCode(ctx context.Context, in *merchantServicePB.MerchantSendCodeRequest) (*merchantServicePB.MerchantSendCodeResponse, error) {
+
+    conn,err := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
+    if err != nil {
+        panic(err)
+    }
+    defer conn.Close()
+    c := redisPb.NewRedisServiceClient(conn)
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
+
+    cellphone :=  in.Cellphone
+    scene :=  strconv.Itoa(int(in.Scene))
+
+    // token := in.Token
+    checkKey := "_verify_sms_"+ cellphone + "@" + scene
+    smsCodeTmp := "123456"
+    ttl := uint64(verifyCodeDuration * time.Second)//60秒过期
+
+    fmt.Println("scene,checkKey, smsCode :",scene,checkKey,smsCodeTmp)
+    setRes, err := c.Set(ctx, &redisPb.SetRedisRequest{Key:checkKey,Value:smsCodeTmp,Ttl:ttl})
+    if err != nil {
+        panic(err)
+    }
+
+    return &merchantServicePB.MerchantSendCodeResponse{
+        Successed:setRes.Successed,
+    },err
+}
+
 
 func deferFunc() {
     if err := recover(); err != nil {
@@ -566,7 +624,7 @@ func main() {
     // opts = append(opts, grpc.UnaryInterceptor(interceptor))
 
 
-    s := grpc.NewServer(grpc.UnaryInterceptor(CommonBiz.UnaryServerInterceptor))//opts...)
+    s := grpc.NewServer(grpc.UnaryInterceptor(Response.UnaryServerInterceptor))//opts...)
     merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
     err = s.Serve(lis)
     if err != nil {

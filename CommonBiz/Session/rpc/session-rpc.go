@@ -6,7 +6,7 @@ import (
     "golang.org/x/net/context"
     "google.golang.org/grpc"
     // "github.com/xxtea/xxtea-go/xxtea"
-	sessionPb "github.com/lampard1014/aphro/session/pb"
+	sessionPb "github.com/lampard1014/aphro/CommonBiz/Session/PB"
     redisPb "github.com/lampard1014/aphro/redis/pb"
     "fmt"
     "time"
@@ -18,7 +18,6 @@ const (
 	port  = ":10088"
     redisRpcAddress = "192.168.140.23:10101"
     tokenDuration = 24 * 3600 * time.Second //1 day
-    verifyCodeDuration = 60*30
 )
 
 type sessionService struct{}
@@ -166,64 +165,6 @@ func (s *sessionService) IsSessionTokenVailate(ctx context.Context, in *sessionP
     return &sessionPb.IsSessionTokenVailateResponse{
             Successed:res.IsExists,
         },err 
-}
-
-func (s *sessionService) MerchantVerifyCode(ctx context.Context, in *sessionPb.MerchantVerifyCodeRequest) (*sessionPb.MerchantVerifyCodeResponse, error) {
-
-    conn,err := grpc.Dial(redisRpcAddress,grpc.WithInsecure())
-    if err != nil {
-        panic(err)
-    }
-    defer conn.Close()
-    c := redisPb.NewRedisServiceClient(conn)
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-    defer cancel()
-
-    cellphone :=  in.Cellphone
-    scene :=  strconv.Itoa(int(in.Scene))
-    smsCode := in.SmsCode
-    checkKey := "_verify_sms_"+ cellphone + "@" + scene
-    queryRes, err := c.Query(ctx, &redisPb.QueryRedisRequest{Key: checkKey})
-
-    fmt.Println("xxx",queryRes, err)
-
-    if err != nil {
-        panic(err)
-    }
-
-    return &sessionPb.MerchantVerifyCodeResponse{
-             Successed:queryRes.Value == smsCode,
-        },err
-}
-
-func (s *sessionService) MerchantSendCode(ctx context.Context, in *sessionPb.MerchantSendCodeRequest) (*sessionPb.MerchantSendCodeResponse, error) {
-
-    conn,err := grpc.Dial(redisRpcAddress,grpc.WithInsecure())
-    if err != nil {
-        panic(err)
-    }
-    defer conn.Close()
-    c := redisPb.NewRedisServiceClient(conn)
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-    defer cancel()
-
-    cellphone :=  in.Cellphone
-    scene :=  strconv.Itoa(int(in.Scene))
-
-    // token := in.Token
-    checkKey := "_verify_sms_"+ cellphone + "@" + scene
-    smsCodeTmp := "123456"
-    ttl := uint64(verifyCodeDuration * time.Second)//60秒过期
-
-    fmt.Println("scene,checkKey, smsCode :",scene,checkKey,smsCodeTmp)
-    setRes, err := c.Set(ctx, &redisPb.SetRedisRequest{Key:checkKey,Value:smsCodeTmp,Ttl:ttl})
-    if err != nil {
-        panic(err)
-    }
-
-    return &sessionPb.MerchantSendCodeResponse{
-             Successed:setRes.Successed,
-        },err
 }
 
 func deferFunc() {

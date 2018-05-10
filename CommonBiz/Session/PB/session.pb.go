@@ -2,16 +2,12 @@
 // source: session.proto
 
 /*
-Package Aphro_Session_pb is a generated protocol buffer package.
+Package Session is a generated protocol buffer package.
 
 It is generated from these files:
 	session.proto
 
 It has these top-level messages:
-	MerchantSendCodeRequest
-	MerchantSendCodeResponse
-	MerchantVerifyCodeRequest
-	MerchantVerifyCodeResponse
 	IsSessionTokenVailateRequest
 	IsSessionTokenVailateResponse
 	SessionTokenQueryRequest
@@ -23,7 +19,7 @@ It has these top-level messages:
 	RenewSessionTokenRequest
 	RenewSessionTokenResponse
 */
-package Aphro_Session_pb
+package Session
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -46,94 +42,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type MerchantSendCodeRequest struct {
-	Cellphone string `protobuf:"bytes,1,opt,name=cellphone" json:"cellphone,omitempty"`
-	Scene     uint32 `protobuf:"varint,2,opt,name=scene" json:"scene,omitempty"`
-}
-
-func (m *MerchantSendCodeRequest) Reset()                    { *m = MerchantSendCodeRequest{} }
-func (m *MerchantSendCodeRequest) String() string            { return proto.CompactTextString(m) }
-func (*MerchantSendCodeRequest) ProtoMessage()               {}
-func (*MerchantSendCodeRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
-
-func (m *MerchantSendCodeRequest) GetCellphone() string {
-	if m != nil {
-		return m.Cellphone
-	}
-	return ""
-}
-
-func (m *MerchantSendCodeRequest) GetScene() uint32 {
-	if m != nil {
-		return m.Scene
-	}
-	return 0
-}
-
-type MerchantSendCodeResponse struct {
-	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-}
-
-func (m *MerchantSendCodeResponse) Reset()                    { *m = MerchantSendCodeResponse{} }
-func (m *MerchantSendCodeResponse) String() string            { return proto.CompactTextString(m) }
-func (*MerchantSendCodeResponse) ProtoMessage()               {}
-func (*MerchantSendCodeResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *MerchantSendCodeResponse) GetSuccessed() bool {
-	if m != nil {
-		return m.Successed
-	}
-	return false
-}
-
-type MerchantVerifyCodeRequest struct {
-	Cellphone string `protobuf:"bytes,1,opt,name=cellphone" json:"cellphone,omitempty"`
-	Scene     uint32 `protobuf:"varint,2,opt,name=scene" json:"scene,omitempty"`
-	SmsCode   string `protobuf:"bytes,3,opt,name=smsCode" json:"smsCode,omitempty"`
-}
-
-func (m *MerchantVerifyCodeRequest) Reset()                    { *m = MerchantVerifyCodeRequest{} }
-func (m *MerchantVerifyCodeRequest) String() string            { return proto.CompactTextString(m) }
-func (*MerchantVerifyCodeRequest) ProtoMessage()               {}
-func (*MerchantVerifyCodeRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *MerchantVerifyCodeRequest) GetCellphone() string {
-	if m != nil {
-		return m.Cellphone
-	}
-	return ""
-}
-
-func (m *MerchantVerifyCodeRequest) GetScene() uint32 {
-	if m != nil {
-		return m.Scene
-	}
-	return 0
-}
-
-func (m *MerchantVerifyCodeRequest) GetSmsCode() string {
-	if m != nil {
-		return m.SmsCode
-	}
-	return ""
-}
-
-type MerchantVerifyCodeResponse struct {
-	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-}
-
-func (m *MerchantVerifyCodeResponse) Reset()                    { *m = MerchantVerifyCodeResponse{} }
-func (m *MerchantVerifyCodeResponse) String() string            { return proto.CompactTextString(m) }
-func (*MerchantVerifyCodeResponse) ProtoMessage()               {}
-func (*MerchantVerifyCodeResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
-
-func (m *MerchantVerifyCodeResponse) GetSuccessed() bool {
-	if m != nil {
-		return m.Successed
-	}
-	return false
-}
-
 type IsSessionTokenVailateRequest struct {
 	SessionToken string `protobuf:"bytes,1,opt,name=sessionToken" json:"sessionToken,omitempty"`
 }
@@ -141,7 +49,7 @@ type IsSessionTokenVailateRequest struct {
 func (m *IsSessionTokenVailateRequest) Reset()                    { *m = IsSessionTokenVailateRequest{} }
 func (m *IsSessionTokenVailateRequest) String() string            { return proto.CompactTextString(m) }
 func (*IsSessionTokenVailateRequest) ProtoMessage()               {}
-func (*IsSessionTokenVailateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*IsSessionTokenVailateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *IsSessionTokenVailateRequest) GetSessionToken() string {
 	if m != nil {
@@ -157,7 +65,7 @@ type IsSessionTokenVailateResponse struct {
 func (m *IsSessionTokenVailateResponse) Reset()                    { *m = IsSessionTokenVailateResponse{} }
 func (m *IsSessionTokenVailateResponse) String() string            { return proto.CompactTextString(m) }
 func (*IsSessionTokenVailateResponse) ProtoMessage()               {}
-func (*IsSessionTokenVailateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*IsSessionTokenVailateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *IsSessionTokenVailateResponse) GetSuccessed() bool {
 	if m != nil {
@@ -173,7 +81,7 @@ type SessionTokenQueryRequest struct {
 func (m *SessionTokenQueryRequest) Reset()                    { *m = SessionTokenQueryRequest{} }
 func (m *SessionTokenQueryRequest) String() string            { return proto.CompactTextString(m) }
 func (*SessionTokenQueryRequest) ProtoMessage()               {}
-func (*SessionTokenQueryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*SessionTokenQueryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *SessionTokenQueryRequest) GetSessionToken() string {
 	if m != nil {
@@ -191,7 +99,7 @@ type SessionTokenQueryResponse struct {
 func (m *SessionTokenQueryResponse) Reset()                    { *m = SessionTokenQueryResponse{} }
 func (m *SessionTokenQueryResponse) String() string            { return proto.CompactTextString(m) }
 func (*SessionTokenQueryResponse) ProtoMessage()               {}
-func (*SessionTokenQueryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*SessionTokenQueryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *SessionTokenQueryResponse) GetSessionToken() string {
 	if m != nil {
@@ -223,7 +131,7 @@ type SessionTokenCreateRequest struct {
 func (m *SessionTokenCreateRequest) Reset()                    { *m = SessionTokenCreateRequest{} }
 func (m *SessionTokenCreateRequest) String() string            { return proto.CompactTextString(m) }
 func (*SessionTokenCreateRequest) ProtoMessage()               {}
-func (*SessionTokenCreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*SessionTokenCreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *SessionTokenCreateRequest) GetSessionTokenRequestStr() string {
 	if m != nil {
@@ -255,7 +163,7 @@ type SessionTokenCreateResponse struct {
 func (m *SessionTokenCreateResponse) Reset()                    { *m = SessionTokenCreateResponse{} }
 func (m *SessionTokenCreateResponse) String() string            { return proto.CompactTextString(m) }
 func (*SessionTokenCreateResponse) ProtoMessage()               {}
-func (*SessionTokenCreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*SessionTokenCreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *SessionTokenCreateResponse) GetSessionToken() string {
 	if m != nil {
@@ -285,7 +193,7 @@ type DeleteSessionTokenRequest struct {
 func (m *DeleteSessionTokenRequest) Reset()                    { *m = DeleteSessionTokenRequest{} }
 func (m *DeleteSessionTokenRequest) String() string            { return proto.CompactTextString(m) }
 func (*DeleteSessionTokenRequest) ProtoMessage()               {}
-func (*DeleteSessionTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*DeleteSessionTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *DeleteSessionTokenRequest) GetSessionToken() string {
 	if m != nil {
@@ -301,7 +209,7 @@ type DeleteSessionTokenResponse struct {
 func (m *DeleteSessionTokenResponse) Reset()                    { *m = DeleteSessionTokenResponse{} }
 func (m *DeleteSessionTokenResponse) String() string            { return proto.CompactTextString(m) }
 func (*DeleteSessionTokenResponse) ProtoMessage()               {}
-func (*DeleteSessionTokenResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*DeleteSessionTokenResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 func (m *DeleteSessionTokenResponse) GetSuccessed() bool {
 	if m != nil {
@@ -317,7 +225,7 @@ type RenewSessionTokenRequest struct {
 func (m *RenewSessionTokenRequest) Reset()                    { *m = RenewSessionTokenRequest{} }
 func (m *RenewSessionTokenRequest) String() string            { return proto.CompactTextString(m) }
 func (*RenewSessionTokenRequest) ProtoMessage()               {}
-func (*RenewSessionTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*RenewSessionTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *RenewSessionTokenRequest) GetSessionToken() string {
 	if m != nil {
@@ -334,7 +242,7 @@ type RenewSessionTokenResponse struct {
 func (m *RenewSessionTokenResponse) Reset()                    { *m = RenewSessionTokenResponse{} }
 func (m *RenewSessionTokenResponse) String() string            { return proto.CompactTextString(m) }
 func (*RenewSessionTokenResponse) ProtoMessage()               {}
-func (*RenewSessionTokenResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*RenewSessionTokenResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *RenewSessionTokenResponse) GetTtl() int64 {
 	if m != nil {
@@ -351,20 +259,16 @@ func (m *RenewSessionTokenResponse) GetSuccessed() bool {
 }
 
 func init() {
-	proto.RegisterType((*MerchantSendCodeRequest)(nil), "Aphro.Session.pb.MerchantSendCodeRequest")
-	proto.RegisterType((*MerchantSendCodeResponse)(nil), "Aphro.Session.pb.MerchantSendCodeResponse")
-	proto.RegisterType((*MerchantVerifyCodeRequest)(nil), "Aphro.Session.pb.MerchantVerifyCodeRequest")
-	proto.RegisterType((*MerchantVerifyCodeResponse)(nil), "Aphro.Session.pb.MerchantVerifyCodeResponse")
-	proto.RegisterType((*IsSessionTokenVailateRequest)(nil), "Aphro.Session.pb.IsSessionTokenVailateRequest")
-	proto.RegisterType((*IsSessionTokenVailateResponse)(nil), "Aphro.Session.pb.IsSessionTokenVailateResponse")
-	proto.RegisterType((*SessionTokenQueryRequest)(nil), "Aphro.Session.pb.SessionTokenQueryRequest")
-	proto.RegisterType((*SessionTokenQueryResponse)(nil), "Aphro.Session.pb.SessionTokenQueryResponse")
-	proto.RegisterType((*SessionTokenCreateRequest)(nil), "Aphro.Session.pb.SessionTokenCreateRequest")
-	proto.RegisterType((*SessionTokenCreateResponse)(nil), "Aphro.Session.pb.SessionTokenCreateResponse")
-	proto.RegisterType((*DeleteSessionTokenRequest)(nil), "Aphro.Session.pb.DeleteSessionTokenRequest")
-	proto.RegisterType((*DeleteSessionTokenResponse)(nil), "Aphro.Session.pb.DeleteSessionTokenResponse")
-	proto.RegisterType((*RenewSessionTokenRequest)(nil), "Aphro.Session.pb.RenewSessionTokenRequest")
-	proto.RegisterType((*RenewSessionTokenResponse)(nil), "Aphro.Session.pb.RenewSessionTokenResponse")
+	proto.RegisterType((*IsSessionTokenVailateRequest)(nil), "Session.IsSessionTokenVailateRequest")
+	proto.RegisterType((*IsSessionTokenVailateResponse)(nil), "Session.IsSessionTokenVailateResponse")
+	proto.RegisterType((*SessionTokenQueryRequest)(nil), "Session.SessionTokenQueryRequest")
+	proto.RegisterType((*SessionTokenQueryResponse)(nil), "Session.SessionTokenQueryResponse")
+	proto.RegisterType((*SessionTokenCreateRequest)(nil), "Session.SessionTokenCreateRequest")
+	proto.RegisterType((*SessionTokenCreateResponse)(nil), "Session.SessionTokenCreateResponse")
+	proto.RegisterType((*DeleteSessionTokenRequest)(nil), "Session.DeleteSessionTokenRequest")
+	proto.RegisterType((*DeleteSessionTokenResponse)(nil), "Session.DeleteSessionTokenResponse")
+	proto.RegisterType((*RenewSessionTokenRequest)(nil), "Session.RenewSessionTokenRequest")
+	proto.RegisterType((*RenewSessionTokenResponse)(nil), "Session.RenewSessionTokenResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -384,10 +288,6 @@ type SessionServiceClient interface {
 	RenewSessionToken(ctx context.Context, in *RenewSessionTokenRequest, opts ...grpc.CallOption) (*RenewSessionTokenResponse, error)
 	// 检查SessionToken是否过期
 	IsSessionTokenVailate(ctx context.Context, in *IsSessionTokenVailateRequest, opts ...grpc.CallOption) (*IsSessionTokenVailateResponse, error)
-	// 短信验证码 验证接口
-	MerchantVerifyCode(ctx context.Context, in *MerchantVerifyCodeRequest, opts ...grpc.CallOption) (*MerchantVerifyCodeResponse, error)
-	// 短信验证码 发送接口
-	MerchantSendCode(ctx context.Context, in *MerchantSendCodeRequest, opts ...grpc.CallOption) (*MerchantSendCodeResponse, error)
 }
 
 type sessionServiceClient struct {
@@ -400,7 +300,7 @@ func NewSessionServiceClient(cc *grpc.ClientConn) SessionServiceClient {
 
 func (c *sessionServiceClient) QuerySessionToken(ctx context.Context, in *SessionTokenQueryRequest, opts ...grpc.CallOption) (*SessionTokenQueryResponse, error) {
 	out := new(SessionTokenQueryResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/querySessionToken", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Session.SessionService/querySessionToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -409,7 +309,7 @@ func (c *sessionServiceClient) QuerySessionToken(ctx context.Context, in *Sessio
 
 func (c *sessionServiceClient) CreateSessionToken(ctx context.Context, in *SessionTokenCreateRequest, opts ...grpc.CallOption) (*SessionTokenCreateResponse, error) {
 	out := new(SessionTokenCreateResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/createSessionToken", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Session.SessionService/createSessionToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -418,7 +318,7 @@ func (c *sessionServiceClient) CreateSessionToken(ctx context.Context, in *Sessi
 
 func (c *sessionServiceClient) DeleteSessionToken(ctx context.Context, in *DeleteSessionTokenRequest, opts ...grpc.CallOption) (*DeleteSessionTokenResponse, error) {
 	out := new(DeleteSessionTokenResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/deleteSessionToken", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Session.SessionService/deleteSessionToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -427,7 +327,7 @@ func (c *sessionServiceClient) DeleteSessionToken(ctx context.Context, in *Delet
 
 func (c *sessionServiceClient) RenewSessionToken(ctx context.Context, in *RenewSessionTokenRequest, opts ...grpc.CallOption) (*RenewSessionTokenResponse, error) {
 	out := new(RenewSessionTokenResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/renewSessionToken", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Session.SessionService/renewSessionToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -436,25 +336,7 @@ func (c *sessionServiceClient) RenewSessionToken(ctx context.Context, in *RenewS
 
 func (c *sessionServiceClient) IsSessionTokenVailate(ctx context.Context, in *IsSessionTokenVailateRequest, opts ...grpc.CallOption) (*IsSessionTokenVailateResponse, error) {
 	out := new(IsSessionTokenVailateResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/isSessionTokenVailate", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) MerchantVerifyCode(ctx context.Context, in *MerchantVerifyCodeRequest, opts ...grpc.CallOption) (*MerchantVerifyCodeResponse, error) {
-	out := new(MerchantVerifyCodeResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/merchantVerifyCode", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *sessionServiceClient) MerchantSendCode(ctx context.Context, in *MerchantSendCodeRequest, opts ...grpc.CallOption) (*MerchantSendCodeResponse, error) {
-	out := new(MerchantSendCodeResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Session.pb.SessionService/merchantSendCode", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Session.SessionService/isSessionTokenVailate", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -470,10 +352,6 @@ type SessionServiceServer interface {
 	RenewSessionToken(context.Context, *RenewSessionTokenRequest) (*RenewSessionTokenResponse, error)
 	// 检查SessionToken是否过期
 	IsSessionTokenVailate(context.Context, *IsSessionTokenVailateRequest) (*IsSessionTokenVailateResponse, error)
-	// 短信验证码 验证接口
-	MerchantVerifyCode(context.Context, *MerchantVerifyCodeRequest) (*MerchantVerifyCodeResponse, error)
-	// 短信验证码 发送接口
-	MerchantSendCode(context.Context, *MerchantSendCodeRequest) (*MerchantSendCodeResponse, error)
 }
 
 func RegisterSessionServiceServer(s *grpc.Server, srv SessionServiceServer) {
@@ -490,7 +368,7 @@ func _SessionService_QuerySessionToken_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/QuerySessionToken",
+		FullMethod: "/Session.SessionService/QuerySessionToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SessionServiceServer).QuerySessionToken(ctx, req.(*SessionTokenQueryRequest))
@@ -508,7 +386,7 @@ func _SessionService_CreateSessionToken_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/CreateSessionToken",
+		FullMethod: "/Session.SessionService/CreateSessionToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SessionServiceServer).CreateSessionToken(ctx, req.(*SessionTokenCreateRequest))
@@ -526,7 +404,7 @@ func _SessionService_DeleteSessionToken_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/DeleteSessionToken",
+		FullMethod: "/Session.SessionService/DeleteSessionToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SessionServiceServer).DeleteSessionToken(ctx, req.(*DeleteSessionTokenRequest))
@@ -544,7 +422,7 @@ func _SessionService_RenewSessionToken_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/RenewSessionToken",
+		FullMethod: "/Session.SessionService/RenewSessionToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SessionServiceServer).RenewSessionToken(ctx, req.(*RenewSessionTokenRequest))
@@ -562,7 +440,7 @@ func _SessionService_IsSessionTokenVailate_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/IsSessionTokenVailate",
+		FullMethod: "/Session.SessionService/IsSessionTokenVailate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SessionServiceServer).IsSessionTokenVailate(ctx, req.(*IsSessionTokenVailateRequest))
@@ -570,44 +448,8 @@ func _SessionService_IsSessionTokenVailate_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SessionService_MerchantVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MerchantVerifyCodeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).MerchantVerifyCode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/MerchantVerifyCode",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).MerchantVerifyCode(ctx, req.(*MerchantVerifyCodeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SessionService_MerchantSendCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MerchantSendCodeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SessionServiceServer).MerchantSendCode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Aphro.Session.pb.SessionService/MerchantSendCode",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SessionServiceServer).MerchantSendCode(ctx, req.(*MerchantSendCodeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _SessionService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "Aphro.Session.pb.SessionService",
+	ServiceName: "Session.SessionService",
 	HandlerType: (*SessionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -630,14 +472,6 @@ var _SessionService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "isSessionTokenVailate",
 			Handler:    _SessionService_IsSessionTokenVailate_Handler,
 		},
-		{
-			MethodName: "merchantVerifyCode",
-			Handler:    _SessionService_MerchantVerifyCode_Handler,
-		},
-		{
-			MethodName: "merchantSendCode",
-			Handler:    _SessionService_MerchantSendCode_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "session.proto",
@@ -646,44 +480,35 @@ var _SessionService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("session.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 613 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x96, 0xd1, 0x6a, 0x13, 0x4d,
-	0x14, 0xc7, 0x99, 0x86, 0xef, 0xb3, 0x3d, 0x18, 0x89, 0x43, 0x6b, 0x37, 0x4b, 0xaa, 0x61, 0xf0,
-	0xa2, 0x8d, 0x92, 0x05, 0x05, 0x91, 0x80, 0x8a, 0xb6, 0x37, 0x45, 0x7a, 0xe1, 0x46, 0x7a, 0xbf,
-	0xdd, 0x1c, 0x9b, 0xc5, 0xcd, 0xce, 0x76, 0x67, 0x52, 0xe9, 0xad, 0x20, 0x78, 0x23, 0x28, 0xbe,
-	0x81, 0x77, 0x3e, 0x8f, 0xaf, 0xe0, 0x83, 0xc8, 0x4c, 0x26, 0xcd, 0x66, 0x33, 0xa3, 0xab, 0xe2,
-	0xdd, 0xee, 0xd9, 0x33, 0xe7, 0xff, 0x9b, 0x73, 0xfe, 0xcc, 0x2c, 0x34, 0x05, 0x0a, 0x91, 0xf0,
-	0xac, 0x9f, 0x17, 0x5c, 0x72, 0xda, 0x7a, 0x9a, 0x8f, 0x0b, 0xde, 0x1f, 0xce, 0x83, 0x27, 0x7e,
-	0xe7, 0x94, 0xf3, 0xd3, 0x14, 0x83, 0x28, 0x4f, 0x82, 0x28, 0xcb, 0xb8, 0x8c, 0x64, 0xc2, 0x33,
-	0x31, 0xcb, 0x67, 0x47, 0xb0, 0x7d, 0x84, 0x45, 0x3c, 0x8e, 0x32, 0x39, 0xc4, 0x6c, 0xb4, 0xcf,
-	0x47, 0x18, 0xe2, 0xd9, 0x14, 0x85, 0xa4, 0x1d, 0xd8, 0x88, 0x31, 0x4d, 0xf3, 0x31, 0xcf, 0xd0,
-	0x23, 0x5d, 0xb2, 0xbb, 0x11, 0x2e, 0x02, 0x74, 0x13, 0xfe, 0x13, 0x31, 0x66, 0xe8, 0xad, 0x75,
-	0xc9, 0x6e, 0x33, 0x9c, 0xbd, 0xb0, 0x87, 0xe0, 0xad, 0x96, 0x13, 0x39, 0xcf, 0x04, 0xaa, 0x7a,
-	0x62, 0x1a, 0xc7, 0x28, 0x04, 0x8e, 0x74, 0xbd, 0xf5, 0x70, 0x11, 0x60, 0x09, 0xb4, 0xe7, 0x2b,
-	0x8f, 0xb1, 0x48, 0x5e, 0x5d, 0xfc, 0x25, 0x0a, 0xf5, 0xe0, 0x8a, 0x98, 0x08, 0x55, 0xc5, 0x6b,
-	0xe8, 0x15, 0xf3, 0x57, 0x36, 0x00, 0xdf, 0x26, 0x55, 0x0b, 0xf3, 0x19, 0x74, 0x0e, 0x85, 0xe9,
-	0xee, 0x4b, 0xfe, 0x1a, 0xb3, 0xe3, 0x28, 0x49, 0x23, 0x79, 0x49, 0xca, 0xe0, 0xaa, 0x28, 0x7d,
-	0x35, 0xb0, 0x4b, 0x31, 0xf6, 0x08, 0x76, 0x1c, 0x35, 0x6a, 0x21, 0x3c, 0x06, 0xaf, 0xbc, 0xf8,
-	0xc5, 0x14, 0x8b, 0x8b, 0xdf, 0x91, 0xe7, 0xd0, 0xb6, 0xac, 0x37, 0xd2, 0x35, 0x0a, 0xd0, 0x16,
-	0x34, 0xa4, 0x4c, 0x75, 0xb7, 0x1b, 0xa1, 0x7a, 0x5c, 0x06, 0x6e, 0x54, 0x81, 0xdf, 0x91, 0x65,
-	0xc5, 0xfd, 0x02, 0x4b, 0x1d, 0x7b, 0x00, 0x37, 0xca, 0xd5, 0x4d, 0x78, 0x28, 0x0b, 0xa3, 0xed,
-	0xf8, 0xaa, 0x28, 0xa6, 0xc9, 0xc8, 0xcc, 0x5c, 0x3d, 0xd2, 0x9b, 0x00, 0x13, 0x33, 0xd7, 0xc3,
-	0x03, 0x8d, 0xd1, 0x0c, 0x4b, 0x11, 0x96, 0x83, 0x6f, 0xc3, 0xf8, 0x87, 0x3b, 0x7f, 0x02, 0xed,
-	0x03, 0x4c, 0x51, 0xe2, 0x70, 0x75, 0x0f, 0xb5, 0x66, 0x35, 0x00, 0xdf, 0x56, 0xa0, 0xae, 0x4f,
-	0x42, 0xcc, 0xf0, 0xcd, 0x9f, 0x6a, 0x3f, 0x87, 0xb6, 0x65, 0xbd, 0x91, 0x36, 0x9d, 0x20, 0x8e,
-	0x4e, 0xac, 0x55, 0x60, 0xee, 0x7d, 0x59, 0x87, 0x6b, 0xa6, 0xd0, 0x10, 0x8b, 0xf3, 0x24, 0x46,
-	0xfa, 0x81, 0xc0, 0xf5, 0x33, 0x65, 0xbe, 0xb2, 0x00, 0xed, 0xf5, 0xab, 0x27, 0x58, 0xdf, 0xe5,
-	0x76, 0xff, 0x4e, 0xad, 0xdc, 0x19, 0x31, 0xbb, 0xf5, 0xf6, 0xdb, 0xf7, 0xcf, 0x6b, 0x6d, 0xb6,
-	0x19, 0x98, 0x5d, 0x06, 0x52, 0x25, 0x05, 0x1a, 0x61, 0x40, 0x7a, 0xf4, 0x13, 0x01, 0x1a, 0x6b,
-	0x4f, 0x2c, 0x01, 0xfd, 0x42, 0x64, 0xc9, 0xcc, 0xfe, 0xdd, 0x7a, 0xc9, 0x06, 0xa9, 0xab, 0x91,
-	0x7c, 0xb6, 0x55, 0x41, 0x9a, 0x51, 0xcc, 0x99, 0x46, 0x2b, 0x06, 0xb0, 0x31, 0x39, 0x7d, 0x66,
-	0x63, 0x72, 0x7b, 0xca, 0xc9, 0x34, 0xa3, 0x50, 0x4c, 0x6a, 0x6e, 0x45, 0xd5, 0x18, 0xb6, 0xb9,
-	0xb9, 0xdc, 0x67, 0x9b, 0x9b, 0xd3, 0x69, 0xce, 0xb9, 0x69, 0x04, 0xc5, 0xf3, 0x95, 0xc0, 0x56,
-	0x62, 0x3b, 0x4f, 0x69, 0x7f, 0x55, 0xe7, 0x67, 0x87, 0xb7, 0x1f, 0xd4, 0xce, 0x37, 0x6c, 0x81,
-	0x66, 0xdb, 0x63, 0xb7, 0x2b, 0x6c, 0x56, 0x1c, 0xc5, 0xfa, 0x91, 0x00, 0x9d, 0xac, 0xdc, 0x3d,
-	0xb6, 0x79, 0x3a, 0x2f, 0x43, 0xdb, 0x3c, 0xdd, 0xd7, 0x59, 0xa9, 0x7d, 0x73, 0xdd, 0xe0, 0xfc,
-	0x32, 0x4b, 0x21, 0xbd, 0x27, 0xd0, 0x9a, 0x54, 0xee, 0x6c, 0xba, 0xe7, 0xd6, 0xa8, 0xfc, 0x26,
-	0xf8, 0xbd, 0x3a, 0xa9, 0x06, 0x66, 0x47, 0xc3, 0x6c, 0x33, 0xba, 0x80, 0x11, 0x26, 0x67, 0x40,
-	0x7a, 0x27, 0xff, 0xeb, 0x7f, 0x92, 0xfb, 0x3f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x44, 0x62, 0x0f,
-	0x9d, 0xd4, 0x08, 0x00, 0x00,
+	// 468 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0xdf, 0xea, 0xd3, 0x30,
+	0x14, 0xc7, 0xc9, 0x86, 0x7f, 0x7e, 0x07, 0x27, 0xfe, 0x82, 0x93, 0xb5, 0x4c, 0x9d, 0xf1, 0x0f,
+	0x73, 0x17, 0x2b, 0x28, 0x78, 0x31, 0x50, 0x41, 0x77, 0x33, 0xbc, 0xb2, 0x15, 0xef, 0x6b, 0x77,
+	0x98, 0xc5, 0x9a, 0x74, 0x4d, 0xaa, 0xc8, 0x2e, 0x04, 0xc1, 0x27, 0xf0, 0xc2, 0x37, 0xf0, 0x85,
+	0x7c, 0x05, 0x1f, 0x44, 0x9a, 0x06, 0x4d, 0xbb, 0x66, 0x4e, 0xc1, 0xbb, 0x36, 0x39, 0xf9, 0x7e,
+	0x3f, 0x39, 0xe7, 0x4b, 0x60, 0x20, 0x51, 0xca, 0x54, 0xf0, 0x79, 0x5e, 0x08, 0x25, 0xe8, 0xb9,
+	0xa8, 0xfe, 0xf5, 0xc7, 0x1b, 0x21, 0x36, 0x19, 0x06, 0x71, 0x9e, 0x06, 0x31, 0xe7, 0x42, 0xc5,
+	0x2a, 0x15, 0x5c, 0xd6, 0x65, 0xec, 0x09, 0x8c, 0x57, 0xd2, 0x94, 0xbe, 0x10, 0x6f, 0x90, 0xbf,
+	0x8c, 0xd3, 0x2c, 0x56, 0x18, 0xe2, 0xb6, 0x44, 0xa9, 0x28, 0x83, 0x0b, 0xd2, 0xda, 0x1d, 0x91,
+	0x09, 0x99, 0x9e, 0x84, 0x8d, 0x35, 0xf6, 0x10, 0xae, 0x3a, 0x34, 0x64, 0x2e, 0xb8, 0x44, 0x3a,
+	0x86, 0x13, 0x59, 0x26, 0x09, 0x4a, 0x89, 0x6b, 0xad, 0x70, 0x3e, 0xfc, 0xbd, 0xc0, 0x1e, 0xc1,
+	0xc8, 0x3e, 0xfc, 0xbc, 0xc4, 0xe2, 0xc3, 0xdf, 0xd8, 0x0b, 0xf0, 0x3a, 0xce, 0x1b, 0xeb, 0x23,
+	0x04, 0xe8, 0x25, 0xe8, 0x2b, 0x95, 0x8d, 0x7a, 0x13, 0x32, 0xed, 0x87, 0xd5, 0x67, 0x13, 0xb8,
+	0xdf, 0x06, 0xfe, 0x4c, 0x9a, 0x8e, 0x4f, 0x0b, 0xb4, 0x3a, 0xf6, 0x00, 0xae, 0xd8, 0xea, 0x66,
+	0x39, 0x52, 0x85, 0xf1, 0x76, 0xec, 0x56, 0x14, 0x65, 0xba, 0xd6, 0x14, 0x83, 0xb0, 0xfa, 0xa4,
+	0xd7, 0x00, 0xde, 0x62, 0x91, 0xbc, 0x8e, 0xb9, 0x5a, 0x2d, 0x35, 0xc6, 0x20, 0xb4, 0x56, 0x58,
+	0x0e, 0x7e, 0x17, 0xc6, 0x7f, 0xbc, 0xf9, 0x63, 0xf0, 0x96, 0x98, 0xa1, 0xc2, 0x68, 0xff, 0x0e,
+	0x47, 0xcd, 0x6a, 0x01, 0x7e, 0x97, 0xc0, 0xb1, 0x39, 0x09, 0x91, 0xe3, 0xfb, 0x7f, 0xf5, 0x7e,
+	0x06, 0x5e, 0xc7, 0x79, 0x63, 0x6d, 0x3a, 0x41, 0x1c, 0x9d, 0xe8, 0xb5, 0x60, 0xee, 0x7d, 0x3b,
+	0x03, 0x17, 0x8d, 0x50, 0x84, 0xc5, 0xbb, 0x34, 0x41, 0xba, 0x83, 0xd3, 0x6d, 0x95, 0x3d, 0x5b,
+	0x9f, 0xde, 0x98, 0x9b, 0xdf, 0xb9, 0x2b, 0xe3, 0x3e, 0x3b, 0x54, 0x52, 0xe3, 0xb1, 0xeb, 0x9f,
+	0xbe, 0xff, 0xf8, 0xd2, 0xf3, 0xd8, 0xe5, 0xc0, 0x5c, 0x29, 0x50, 0x55, 0x51, 0xa0, 0x0d, 0x17,
+	0x64, 0x46, 0x3f, 0x02, 0x4d, 0xf4, 0xfc, 0x1b, 0xee, 0xdd, 0xd2, 0x8d, 0xbc, 0xfa, 0x37, 0x0f,
+	0xd6, 0x18, 0xff, 0x89, 0xf6, 0xf7, 0xd9, 0xb0, 0xe5, 0x5f, 0x7b, 0x1a, 0x80, 0xf5, 0xde, 0x64,
+	0x2d, 0x00, 0x67, 0x6e, 0x2c, 0x00, 0x77, 0x34, 0x9c, 0x00, 0xb5, 0x67, 0x05, 0xb0, 0x83, 0xd3,
+	0xa2, 0x3d, 0x5e, 0xab, 0xfd, 0xae, 0xe8, 0x58, 0xed, 0x77, 0xa6, 0xc3, 0xd9, 0x7e, 0x6d, 0x58,
+	0x99, 0x7f, 0x25, 0x30, 0x4c, 0xbb, 0xde, 0x40, 0x7a, 0xfb, 0x97, 0xfc, 0xa1, 0x77, 0xd6, 0xbf,
+	0xf3, 0xa7, 0x32, 0x43, 0x12, 0x68, 0x92, 0xbb, 0xec, 0x56, 0x8b, 0xa4, 0xd3, 0x7c, 0x41, 0x66,
+	0xaf, 0xce, 0xea, 0x77, 0xfe, 0xfe, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf5, 0x40, 0xaa, 0xab,
+	0x1f, 0x06, 0x00, 0x00,
 }

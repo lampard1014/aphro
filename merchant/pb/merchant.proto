@@ -68,6 +68,22 @@ service MerchantService {
 				body: "*"
 			};
 		}
+
+                //短信验证码 验证接口
+                    rpc merchantVerifyCode(MerchantVerifyCodeRequest) returns (MerchantVerifyCodeResponse) {
+                        option (google.api.http) = {
+                            post: "/merchant/verifyCode"
+                            body:"*"
+                        };
+                    }
+
+                    //短信验证码 发送接口
+                    rpc merchantSendCode(MerchantSendCodeRequest) returns (MerchantSendCodeResponse) {
+                        option (google.api.http) = {
+                            post: "/merchant/sendCode"
+                            body:"*"
+                        };
+                    }
 }
 
 message MerchantWaiterInfor{
@@ -167,3 +183,22 @@ message MerchantInfoResponse {
 	InnerMerchantAccount merchantAccount = 2;
 }
 
+
+message MerchantSendCodeRequest {
+	string 	cellphone = 1;
+	uint32	scene	=	2;
+}
+
+message MerchantSendCodeResponse {
+	bool 	successed = 1;
+}
+
+message MerchantVerifyCodeRequest {
+	string 	cellphone = 1;
+	uint32	scene	=	2;
+	string 	smsCode	=	3;
+}
+
+message MerchantVerifyCodeResponse {
+	bool 	successed = 1;
+}
