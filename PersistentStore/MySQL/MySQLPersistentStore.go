@@ -1,10 +1,11 @@
-package PersistentStore
+package MySQL
 
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"database/sql"
 	"strconv"
 	"strings"
+	"github.com/lampard1014/aphro/PersistentStore"
 )
 
 const (
@@ -34,7 +35,7 @@ type APSField struct {
 func (apsField *APSField) FetchFieldName() (string, error) {
 	var returnErr error = nil
 	if apsField.filedName == "" {
-		returnErr = NewPSErrC(NoFieldSpecify)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.NoFieldSpecify)
 	}
 	return apsField.filedName,returnErr
 }
@@ -42,7 +43,7 @@ func (apsField *APSField) FetchFieldName() (string, error) {
 func (apsField *APSField) FetchAlias() (string, error) {
 	var returnErr error = nil
 	if apsField.alias == "" {
-		returnErr = NewPSErrC(NoFieldAliasSpecify)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.NoFieldAliasSpecify)
 	}
 	return apsField.alias,returnErr
 }
@@ -55,7 +56,7 @@ type APSEntity struct {
 func (this *APSEntity) FetchEntityName() (string, error) {
 	var returnErr error = nil
 	if this.entityName == "" {
-		returnErr = NewPSErrC(NoEntitySpecify)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	}
 	return this.entityName,returnErr
 }
@@ -63,24 +64,24 @@ func (this *APSEntity) FetchEntityName() (string, error) {
 func (this *APSEntity) FetchEntityAlais() (string, error) {
 	var returnErr error = nil
 	if this.alias == "" {
-		returnErr = NewPSErrC(NoEntityAliasSpecify)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.NoEntityAliasSpecify)
 	}
 	return this.alias,returnErr
 }
 
 type APSMySQLClientConfiguration struct {
-	config map[string]string
+	config map[string]interface{}
 }
 
-func (this *APSMySQLClientConfiguration)SetOptions(nc map[string]string){
+func (this *APSMySQLClientConfiguration)SetOptions(nc map[string]interface{}){
 	this.config = nc
 }
 
-func (this *APSMySQLClientConfiguration)GetOptions()(map[string]string) {
+func (this *APSMySQLClientConfiguration)GetOptions()(map[string]interface{}) {
 	return this.config
 }
 
-func NewAPSMySQLClientConfiguration(config map[string]string) *APSMySQLClientConfiguration {
+func NewAPSMySQLClientConfiguration(config map[string]interface{}) *APSMySQLClientConfiguration {
 	this := &APSMySQLClientConfiguration{}
 	this.SetOptions(config)
 	return this
@@ -96,17 +97,17 @@ func (this APSMySQLClient)FetchClient()(interface{}) {
 	return this.mysqlClient
 }
 
-func (this APSMySQLClient)FetchConfiguration()(IAphroPersistentStoreClientConfiguration) {
+func (this APSMySQLClient)FetchConfiguration()(PersistentStore.IAphroPersistentStoreClientConfiguration) {
 	 return this.config
 }
 
-func (this APSMySQLClient)SetConfiguration(c IAphroPersistentStoreClientConfiguration)(error) {
+func (this APSMySQLClient)SetConfiguration(c PersistentStore.IAphroPersistentStoreClientConfiguration)(error) {
 	var returnErr error = nil
 	d,b := c.(*APSMySQLClientConfiguration)
 	if !b {
 		this.config = d
 	} else {
-		returnErr = NewPSErrC(ConfigurationErr)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.ConfigurationErr)
 	}
 	return returnErr
 }
@@ -204,16 +205,16 @@ type APSMySQL struct {
 
 func NewAPSMySQL(userConfig map[string]string ) (*APSMySQL,error) {
 	var apsMysql *APSMySQL = &APSMySQL{}
-	configMap := userConfig
-	var drivername string = ""
-	var DSN string = ""
-	if drivername = configMap[KConfigKey_DriverName]; drivername == "" {
-		drivername = configMap[vConfigKey_DriverName]
+	var drivername string = vConfigKey_DriverName
+	var DSN string = vConfigKey_DSN
+	var ok bool = false
+	if drivername,ok = userConfig[KConfigKey_DriverName]; ok {
+		drivername = userConfig[KConfigKey_DriverName]
 	}
-	if DSN = configMap[KConfigKey_DSN]; DSN == "" {
-		DSN = configMap[vConfigKey_DSN]
+	if DSN,ok = userConfig[KConfigKey_DSN]; ok {
+		DSN = userConfig[KConfigKey_DriverName]
 	}
-	c := map[string]string {
+	c := map[string]interface{} {
 		KConfigKey_DriverName:drivername,
 		KConfigKey_DSN:DSN,
 	}
@@ -225,8 +226,30 @@ func NewAPSMySQL(userConfig map[string]string ) (*APSMySQL,error) {
 }
 
 
-func (this *APSMySQL) ResetData()(IAphroPersistentStore) {
+
+
+func (this *APSMySQL) Connect() (PersistentStore.IAphroPersistentStore) {
+	c := this.client.config.GetOptions()
+
+	db, dbOpenErr := sql.Open(c[KConfigKey_DriverName].(string), c[KConfigKey_DSN].(string))
+	dbOpenErr = db.Ping()
+	if (dbOpenErr == nil) {
+		this.client.mysqlClient = db
+	} else {
+		this.lastError = dbOpenErr
+	}
+	this.Reset()
+	return this
+}
+
+func (this *APSMySQL) Close() (PersistentStore.IAphroPersistentStore) {
+	defer this.client.mysqlClient.Close()
+	return this
+}
+
+func (this *APSMySQL) Reset()(PersistentStore.IAphroPersistentStore) {
 	this.result = nil
+	this.lastError = nil
 	this.columns = []*APSField{}
 	this.entities = []*APSEntity{}
 	this.entitiesJoin = []APSMySQLEntityJoin{}
@@ -244,35 +267,16 @@ func (this *APSMySQL) ResetData()(IAphroPersistentStore) {
 	return this
 }
 
-func (this *APSMySQL) Connect() (IAphroPersistentStore) {
-	var returnErr error = nil
-	c := this.client.config.GetOptions()
-	db, dbOpenErr := sql.Open(c[KConfigKey_DriverName], c[KConfigKey_DSN])
-	defer db.Close()
-	dbOpenErr = db.Ping()
-	if (dbOpenErr == nil) {
-		this.client.mysqlClient = db
-	} else {
-		returnErr = dbOpenErr
-	}
-	this.lastError = returnErr
 
-	this.ResetData()
-	return this
-}
-
-
-
-
-func (this *APSMySQL) Query(querySQL string, bindsValue []interface{})(IAphroPersistentStore) {
-	this.ResetData()
+func (this *APSMySQL) Query(querySQL string, bindsValue []interface{})(PersistentStore.IAphroSQLPersistentStore) {
+	this.Reset()
 	this.prepareStatement = querySQL
 	this.bindValues = bindsValue
 	return this
 }
 
-func (this *APSMySQL) Select(columnsAs map[string]string)(IAphroPersistentStore) {
-	this.ResetData()
+func (this *APSMySQL) Select(columnsAs map[string]string)(PersistentStore.IAphroSQLPersistentStore) {
+	this.Reset()
 	this.token = APSMySQLToken_SELECT
 	if columnsAs == nil {
 		this.columns = nil
@@ -289,10 +293,10 @@ func (this *APSMySQL) Select(columnsAs map[string]string)(IAphroPersistentStore)
 	return this
 }
 
-func (this *APSMySQL) From(entity string, entityAlias string)(IAphroPersistentStore) {
+func (this *APSMySQL) From(entity string, entityAlias string)(PersistentStore.IAphroSQLPersistentStore) {
 	var returnErr error = nil
 	if entity == "" {
-		returnErr = NewPSErrC(NoEntitySpecify)
+		returnErr = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	} else {
 		e := new(APSEntity)
 		e.entityName = entity
@@ -305,8 +309,8 @@ func (this *APSMySQL) From(entity string, entityAlias string)(IAphroPersistentSt
 	return this
 }
 
-func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{})(IAphroPersistentStore) {
-	this.ResetData()
+func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{})(PersistentStore.IAphroSQLPersistentStore) {
+	this.Reset()
 	this.token = APSMySQLToken_INSERT
 	//entity
 	e := new(APSEntity)
@@ -325,8 +329,8 @@ func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{
 }
 
 
-func (this *APSMySQL)Update(entity string,columnValues map[string]interface{})(IAphroPersistentStore) {
-	this.ResetData()
+func (this *APSMySQL)Update(entity string,columnValues map[string]interface{})(PersistentStore.IAphroSQLPersistentStore) {
+	this.Reset()
 	this.token = APSMySQLToken_UPDATE
 	//entity
 	e := new(APSEntity)
@@ -337,16 +341,16 @@ func (this *APSMySQL)Update(entity string,columnValues map[string]interface{})(I
 	return this
 }
 
-func (this *APSMySQL)Delete()(IAphroPersistentStore) {
-	this.ResetData()
+func (this *APSMySQL)Delete()(PersistentStore.IAphroSQLPersistentStore) {
+	this.Reset()
 	this.token = APSMySQLToken_DELETE
 	return this
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-func (this *APSMySQL)InnerJoin(entity string,entityAlais string) (*APSMySQL) {
+func (this *APSMySQL)InnerJoin(entity string,entityAlais string) (PersistentStore.IAphroSQLPersistentStore) {
 	if entity == "" {
-		this.lastError = NewPSErrC(NoEntitySpecify)
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	} else {
 		e := new(APSEntity)
 		e.entityName = entity
@@ -360,10 +364,10 @@ func (this *APSMySQL)InnerJoin(entity string,entityAlais string) (*APSMySQL) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-func (this *APSMySQL)LeftJoin(entity string,entityAlais string) (*APSMySQL) {
+func (this *APSMySQL)LeftJoin(entity string,entityAlais string) (PersistentStore.IAphroSQLPersistentStore) {
 
 	if entity == "" {
-		this.lastError = NewPSErrC(NoEntitySpecify)
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	} else {
 		e := new(APSEntity)
 		e.entityName = entity
@@ -377,9 +381,9 @@ func (this *APSMySQL)LeftJoin(entity string,entityAlais string) (*APSMySQL) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-func (this *APSMySQL)RightJoin(entity string,entityAlais string) ( *APSMySQL) {
+func (this *APSMySQL)RightJoin(entity string,entityAlais string) (PersistentStore.IAphroSQLPersistentStore) {
 	if entity == "" {
-		this.lastError = NewPSErrC(NoEntitySpecify)
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	} else {
 		e := new(APSEntity)
 		e.entityName = entity
@@ -392,7 +396,7 @@ func (this *APSMySQL)RightJoin(entity string,entityAlais string) ( *APSMySQL) {
 	return this
 }
 
-func (this *APSMySQL)Execute(bindsValue []interface{}) *APSMySQL {
+func (this *APSMySQL)Execute(bindsValue []interface{})(PersistentStore.IAphroSQLPersistentStore){
 	//form to query
 
 	var queryStatment string = ""
@@ -441,7 +445,7 @@ func (this *APSMySQL)Execute(bindsValue []interface{}) *APSMySQL {
 		}
 		fromToken += " " + strings.Join(entitiesFormer," ")
 	} else {
-		this.lastError = NewPSErrC(NoEntitySpecify)
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	}
 
 	queryStatment += " " + fromToken + " "
@@ -467,12 +471,12 @@ func (this *APSMySQL) query()(*APSMySQL) {
 }
 
 
-func (this *APSMySQL) Limit(limitSQL string)(*APSMySQL) {
+func (this *APSMySQL) Limit(limitSQL string)(PersistentStore.IAphroSQLPersistentStore) {
 	this.limit = limitSQL
 	return this
 }
 
-func (this *APSMySQL) OrderBy(orderBySQL string)(*APSMySQL) {
+func (this *APSMySQL) OrderBy(orderBySQL string)(PersistentStore.IAphroSQLPersistentStore) {
 	this.orderBy = orderBySQL
 	return this
 }
@@ -525,8 +529,14 @@ type APSMySQLCondition struct {
 
 //&aphro_mysql.APSMysqlCondition{operator:"AND",operand1:[],operand2:[]}
 
-func (this *APSMySQL)Where(condition *APSMySQLCondition) ( *APSMySQL) {
-	this.wheres = this.parseWhereCondition(condition)
+func (this *APSMySQL)Where(condition interface{}) (PersistentStore.IAphroSQLPersistentStore) {
+
+	c,ok := condition.(*APSMySQLCondition)
+	if ok {
+		this.wheres = this.parseWhereCondition(c)
+	} else {
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.WhereConditionParseErr)
+	}
 	return this
 }
 
@@ -548,7 +558,7 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 		case string:
 			parseO1 = o1
 		default:
-			this.lastError = NewPSErrC(WhereConditionParseErr)
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.WhereConditionParseErr)
 		}
 
 		switch  o2:= operand2.(type) {
@@ -561,7 +571,7 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 		case float64:
 			parseO2 = strconv.FormatFloat(o2,'f',-1,64)
 		default:
-			this.lastError = NewPSErrC(WhereConditionParseErr)
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.WhereConditionParseErr)
 		}
 
 		conditionClause = "("+parseO1+") "+ string(operator) + " (" +parseO2+")"

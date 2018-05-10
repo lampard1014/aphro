@@ -1,4 +1,4 @@
-package CommonBiz
+package Response
 
 import (
 	"github.com/lampard1014/aphro/CommonBiz/Response/PB"

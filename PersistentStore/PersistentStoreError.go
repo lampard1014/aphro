@@ -10,6 +10,7 @@ const (
 	NoEntityAliasSpecify
 	ConfigurationErr
 	WhereConditionParseErr
+	NoKeyExisted
 	UnknowError
 )
 
@@ -21,6 +22,7 @@ var  ErrorMap  = map[ErrCode]string {
 	NoEntityAliasSpecify:"no entity alias specify....",
 	ConfigurationErr:"configuration err ....",
 	WhereConditionParseErr:"Where Conditions Parse Err ...",
+	NoKeyExisted:"No Key Existed ....",
 	UnknowError:"unknow error ....",
 }
 
