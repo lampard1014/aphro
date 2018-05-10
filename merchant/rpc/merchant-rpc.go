@@ -20,10 +20,10 @@ import (
     sessionServicePB "github.com/lampard1014/aphro/session/pb"
     redisPb "github.com/lampard1014/aphro/redis/pb"
     "github.com/lampard1014/aphro/gateway/error"
-
     // "google.golang.org/grpc/status"
     // "google.golang.org/grpc/codes"
 
+    "github.com/lampard1014/aphro/CommonBiz"
 )
 
 const (
@@ -566,7 +566,7 @@ func main() {
     // opts = append(opts, grpc.UnaryInterceptor(interceptor))
 
 
-    s := grpc.NewServer(grpc.StreamInterceptor(StreamServerInterceptor),grpc.UnaryInterceptor(UnaryServerInterceptor))//opts...)
+    s := grpc.NewServer(grpc.UnaryInterceptor(CommonBiz.UnaryServerInterceptor))//opts...)
     merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
     err = s.Serve(lis)
     if err != nil {
@@ -574,16 +574,21 @@ func main() {
     }
 }
 
-func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-    log.Printf("before handling. Info: %+v", info)
-    resp, err := handler(ctx, req)
-    log.Printf("after handling. resp: %+v", resp)
-    return resp, err
-}
-// StreamServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Streaming RPCs.
-func StreamServerInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-    log.Printf("before handling. Info: %+v", info)
-    err := handler(srv, ss)
-    log.Printf("after handling. err: %v", err)
-    return err
-}
+//func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+//    log.Printf("before handling. Info: %+v", info)
+//    resp, err := handler(ctx, req)
+//
+//    fmt.Println("reflect", reflect.TypeOf(resp))
+//
+//    CommonBiz.NewCommonBizResponse(0,err.Error(),resp.(*proto.Message))
+//
+//    log.Printf("after handling. resp: %+v", resp)
+//    return resp, err
+//}
+//// StreamServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Streaming RPCs.
+//func StreamServerInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+//    log.Printf("before handling. Info: %+v", info)
+//    err := handler(srv, ss)
+//    log.Printf("after handling. err: %v", err)
+//    return err
+//}
