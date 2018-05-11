@@ -9,6 +9,9 @@ import (
     "crypto/rsa"
     "crypto/x509"
     "crypto/rand"
+    "crypto/sha256"
+    "strings"
+    "github.com/lampard1014/aphro/Gateway/error"
 )
 
 /*
@@ -94,3 +97,34 @@ func RsaDecrypt(encypt []byte) ([]byte ,error){
     return decypt,err
 }
 
+
+/*Upper Biz*/
+func PswEncryption(psw string) (encryptionPsw string) {
+    h := sha256.New()
+    h.Write([]byte(psw))
+    encryptionPsw = base64.URLEncoding.EncodeToString(h.Sum(nil))
+    return encryptionPsw
+}
+
+
+func ParseUsernameAndPsw(key string)(username string ,psw string, err error) {
+    base64DecodeRes, base64DecodeErr := Base64Decode(key)
+    if base64DecodeErr == nil {
+        rawData, RSADecryptionErr := RsaDecryption(base64DecodeRes)
+        if RSADecryptionErr == nil {
+            usernameAndPsw := string(rawData)
+            tmpSplit := strings.Split(usernameAndPsw,"@|@")
+            if 2 == len(tmpSplit) {
+                username = tmpSplit[0]
+                psw = tmpSplit[1]
+            } else {
+                err = AphroError.New(AphroError.BizError,"拆分用户名密码错误")
+            }
+        } else {
+            err = RSADecryptionErr
+        }
+    } else {
+        err = base64DecodeErr
+    }
+    return username,psw,err
+}

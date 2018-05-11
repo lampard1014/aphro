@@ -140,11 +140,13 @@ func (this *APSRedis) Connect() (PersistentStore.IAphroPersistentStore) {
 	//fmt.Println(pong, err,redisCli)
 	this.client.redisClient = redisCli
 	this.lastError = err
-	this.Reset()
+	//defer this.Close()
 	return this
 }
 
 func (this *APSRedis) Close() (PersistentStore.IAphroPersistentStore) {
+	defer this.Reset()
+	defer this.client.redisClient.Close()
 	return this
 }
 
@@ -153,21 +155,21 @@ func (this *APSRedis)IsExists(key string)(isExists bool,err error) {
 	isSuccess,err := cli.Exists(key).Result()
 	isExists = isSuccess == 1
 	this.lastError = err
-	this.Close()
+	defer this.Close()
 	return
 }
 
 func (this *APSRedis)ExpireAt(key string, ttl int64)(success bool,err error) {
 	isSuccess,err := this.client.redisClient.ExpireAt(key,time.Unix(int64(ttl),0)).Result()
 	this.lastError = err
-	this.Close()
+	defer this.Close()
 	return isSuccess,err
 }
 
 func (this *APSRedis)QueryTTL(key string)(ttl int64,err error) {
 	res,err := this.client.redisClient.TTL(key).Result()
 	this.lastError = err
-	this.Close()
+	defer this.Close()
 	return int64(res.Seconds()), err
 }
 
@@ -178,21 +180,21 @@ func (this *APSRedis)Query(key string)(value string,err error) {
 	if val != "" && err != nil {
 		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoKeyExisted)
 	}
-	this.Close()
+	defer this.Close()
 	return val,this.lastError
 }
 
 func (this *APSRedis)Delete(key string)(success bool,err error) {
 	isSuccess,err := this.client.redisClient.Del(key).Result()
 	this.lastError = err
-	this.Close()
+	defer this.Close()
 	return isSuccess == 1,err
 }
 
 func (this *APSRedis)Set(key string ,value string ,ttl int64)(success bool,err error) {
 	_,cmderr := this.client.redisClient.Set(key,value,time.Duration(ttl)).Result()
 	this.lastError = cmderr
-	this.Close()
+	defer this.Close()
 	return cmderr == nil ,cmderr
 }
 

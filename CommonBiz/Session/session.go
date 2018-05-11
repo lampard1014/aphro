@@ -4,11 +4,37 @@ import (
 	"math/rand"
 	"strconv"
 	"github.com/lampard1014/aphro/PersistentStore/Redis"
+	"strings"
+	"github.com/lampard1014/aphro/Gateway/error"
+
 )
 
 const (
 	tokenDuration = 24 * 3600 * time.Second //1 day
 )
+
+
+func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string, err error) {
+	var returnErr error = nil
+
+	token,_,err := QuerySessionToken(sessionToken)
+
+	if err == nil && token != "" {
+		sessionTokenValue := token
+		splitValue := strings.Split(sessionTokenValue, "#")
+		uidAndMerchantID := strings.Split(splitValue[0],"@")
+		uid = uidAndMerchantID[0]
+		merchantID = uidAndMerchantID[1]
+	} else {
+		returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
+	}
+	return uid,merchantID,returnErr
+}
+
+
+
+
+
 
 func  GetRandomString(l int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyz"

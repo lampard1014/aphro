@@ -10,7 +10,7 @@ type IAphroPersistentStore interface {
 
 type IAphroSQLPersistentStore interface {
 	IAphroPersistentStore
-	Query(querySQL string, bindsValue []interface{})(IAphroSQLPersistentStore)
+	Query(querySQL string, bindsValue []interface{})(IAphroPersistentStoreResult)
 	Select(columnsAs map[string]string)(IAphroSQLPersistentStore)
 	Insert(entity string,columns []string,values [][]interface{})(IAphroSQLPersistentStore)
 	Update(entity string,columnValues map[string]interface{})(IAphroSQLPersistentStore)
@@ -23,8 +23,8 @@ type IAphroSQLPersistentStore interface {
 
 	Where(condition interface{}) (IAphroSQLPersistentStore)
 
-	Execute(bindsValue []interface{})(IAphroSQLPersistentStore)
-	Limit(limitSQL string)(IAphroSQLPersistentStore)
+	Execute(bindsValue []interface{})(IAphroPersistentStoreResult)
+	Limit(s ...string)(IAphroSQLPersistentStore)
 	OrderBy(orderBySQL string)(IAphroSQLPersistentStore)
 }
 
@@ -57,7 +57,7 @@ type IAphroPersistentStoreClient interface {
 
 //result interface
 type IAphroPersistentStoreResult interface {
-	LastInsertId() (uint64, error)
+	LastInsertId() (int64, error)
 	RowsAffected() (int64, error)
 	FetchRow(dest ...interface{}) (error)
 	FetchAll(dest ...interface{}) (error)

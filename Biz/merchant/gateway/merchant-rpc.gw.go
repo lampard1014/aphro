@@ -10,7 +10,7 @@ import (
   "golang.org/x/net/context"
   "github.com/grpc-ecosystem/grpc-gateway/runtime"
   "google.golang.org/grpc"
-  gw "github.com/lampard1014/aphro/merchant/pb"
+  gw "github.com/lampard1014/aphro/Biz/merchant/pb"
   "github.com/golang/protobuf/proto"
   "google.golang.org/grpc/status"
   "google.golang.org/grpc/codes"

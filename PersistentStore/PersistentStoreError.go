@@ -11,6 +11,7 @@ const (
 	ConfigurationErr
 	WhereConditionParseErr
 	NoKeyExisted
+	ResultTypeErr
 	UnknowError
 )
 
@@ -23,6 +24,7 @@ var  ErrorMap  = map[ErrCode]string {
 	ConfigurationErr:"configuration err ....",
 	WhereConditionParseErr:"Where Conditions Parse Err ...",
 	NoKeyExisted:"No Key Existed ....",
+	ResultTypeErr:"Result Type Err ...",
 	UnknowError:"unknow error ....",
 }
 

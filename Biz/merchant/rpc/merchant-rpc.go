@@ -10,19 +10,18 @@ import (
     "time"
     "reflect"
     "fmt"
-    "strings"
     "database/sql"
-    "crypto/sha256"
-    "encoding/base64"
+
     _ "github.com/go-sql-driver/mysql"
-    merchantServicePB "github.com/lampard1014/aphro/merchant/pb"
-    encryptionServicePB "github.com/lampard1014/aphro/encryption/encryption-pb"
-    sessionServicePB "github.com/lampard1014/aphro/session/pb"
-    redisPb "github.com/lampard1014/aphro/redis/pb"
+    merchantServicePB "github.com/lampard1014/aphro/Biz/merchant/pb"
+
     "github.com/lampard1014/aphro/gateway/error"
     "github.com/lampard1014/aphro/CommonBiz/Response"
+    //"github.com/lampard1014/aphro/CommonBiz/Session"
 
     "strconv"
+    "github.com/lampard1014/aphro/Encryption"
+    "github.com/lampard1014/aphro/PersistentStore/Redis"
 )
 
 const (
@@ -37,73 +36,6 @@ const (
 type merchantService struct{}
 
 
-func pswEncryption(psw string) (encryptionPsw string) {
-    h := sha256.New()
-    h.Write([]byte(psw))
-    encryptionPsw = base64.URLEncoding.EncodeToString(h.Sum(nil))
-    return encryptionPsw
-}
-
-func fetchSessionTokenValue(sessionToken string) (uid string, merchantID string, err error) {
-    var returnErr error = nil
-    sessionRPCConn,sessionRPCErr := grpc.Dial(sessionRPCAddress,grpc.WithInsecure())
-    if sessionRPCErr == nil {
-        sessionRPCConnClient := sessionServicePB.NewSessionServiceClient(sessionRPCConn)
-
-        sessionRPCConnClientCtx, sessionRPCConnClientCancel := context.WithTimeout(context.Background(), time.Second)
-        defer sessionRPCConnClientCancel()
-        sessionTokenQueryResponse, sessionTokenQueryResponseErr := sessionRPCConnClient.QuerySessionToken(sessionRPCConnClientCtx, &sessionServicePB.SessionTokenQueryRequest{SessionToken:sessionToken})
-        if sessionTokenQueryResponseErr == nil && sessionTokenQueryResponse != nil {
-            sessionTokenValue := sessionTokenQueryResponse.SessionToken
-            splitValue := strings.Split(sessionTokenValue, "#")
-            uidAndMerchantID := strings.Split(splitValue[0],"@")
-            uid = uidAndMerchantID[0]
-            merchantID = uidAndMerchantID[1]
-        } else {
-            returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
-        }
-    } else {
-        returnErr = sessionRPCErr
-    }
-    defer sessionRPCConn.Close()
-    return uid,merchantID,returnErr
-}
-
-func parseUsernameAndPsw(key string)(username string ,psw string, err error) {
-
-    fmt.Println("parseUsernameAndPsw:",key)
-
-    conn,encyptRPCErr := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
-
-    var returnErr error = nil
-    if encyptRPCErr == nil {
-        c := encryptionServicePB.NewEncryptionServiceClient(conn)
-        ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-        defer cancel()
-        base64DecodeRes, base64DecodeErr := c.Base64Decode(ctx,&encryptionServicePB.EncryptionBase64DecodeRequest{DecodedStr:key})
-        if base64DecodeErr == nil {
-            rawData, RSADecryptionErr := c.RsaDecryption(ctx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:base64DecodeRes.RawValue})
-            if RSADecryptionErr == nil {
-                usernameAndPsw := string(rawData.RawValue)
-                tmpSplit := strings.Split(usernameAndPsw,"@|@")
-                if 2 == len(tmpSplit) {
-                    username = tmpSplit[0]
-                    psw = tmpSplit[1]
-                } else {
-                    returnErr = AphroError.New(AphroError.BizError,"拆分用户名密码错误")
-                }
-            } else {
-               returnErr = RSADecryptionErr
-            }
-        } else {
-            returnErr = base64DecodeErr
-        }
-    } else {
-        returnErr = encyptRPCErr
-    }
-    defer conn.Close()
-    return username,psw,returnErr
-}
 
 func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServicePB.MerchantOpenRequest) (*merchantServicePB.MerchantOpenResponse, error) {
 
@@ -144,10 +76,7 @@ func (s *merchantService) MerchantOpen(ctx context.Context, in *merchantServiceP
 }
 
 func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServicePB.MerchantRegisterRequest) (*merchantServicePB.MerchantRegisterResponse, error) {
-    cellphone, psw, err := parseUsernameAndPsw(in.Key)
-
-    fmt.Println("user and psw err ",cellphone,psw, err)
-
+    cellphone, psw, err := Encryption.ParseUsernameAndPsw(in.Key)
     name := in.Name
     role := in.Role
     verifyCode := in.VerifyCode
@@ -157,17 +86,18 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
     var returnErr error = err
 
     //step1 验证码检查
-    conn,redisRPCError := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
-    if redisRPCError == nil {
-        c := redisPb.NewRedisServiceClient(conn)
-        ctxRPC, cancel := context.WithTimeout(context.Background(), time.Second)
-        defer cancel()
-        checkKey := "_verify_sms_"+ cellphone + "@1"
-        queryRes, queryRedisErr := c.Query(ctxRPC, &redisPb.QueryRedisRequest{Key: checkKey})
 
+    Redis.NewAPSRedis(nil)
+    redis ,err := Redis.NewAPSRedis(nil)
+    returnErr = err
+    if err != nil{
+        returnErr = err
+    } else {
+        checkKey := "_verify_sms_"+ cellphone + "@1"
+        queryRes, queryRedisErr := redis.Query(checkKey)
         hasError := queryRedisErr != nil
 
-        if !hasError && queryRes!= nil && queryRes.Value ==  verifyCode {
+        if !hasError && queryRes!= nil && queryRes ==  verifyCode {
             //插入数据库
             db, dbOpenErr := sql.Open("mysql", mysqlDSN)
             defer db.Close()
@@ -175,9 +105,9 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
             if dbOpenErr == nil {
                 //当注册是店长的时候 需要先自动注册一个店铺
                 if role == 1 {
-                    stmtMerhcantIns, stmtMerhcantInsErr := db.Prepare("INSERT INTO `merchant` (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`)VALUES(?,?,?,?)") // ? = placeholder
-                    if stmtMerhcantInsErr == nil {
-                        stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerhcantIns.Exec("@", "@", 0, cellphone)
+                    stmtMerchantIns, stmtMerchantInsErr := db.Prepare("INSERT INTO `merchant` (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`)VALUES(?,?,?,?)") // ? = placeholder
+                    if stmtMerchantInsErr == nil {
+                        stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerchantIns.Exec("@", "@", 0, cellphone)
                         if stmtMerhcantInsertErr == nil {
                             stmtMerhcantAfftectedRow, stmtMerhcantAfftectedRowErr := stmtMerhcantInsertResult.RowsAffected()
                             if stmtMerhcantAfftectedRow != 1 || stmtMerhcantAfftectedRowErr != nil {
@@ -190,9 +120,9 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                             returnErr = stmtMerhcantInsertErr
                         }
                     } else {
-                        returnErr = stmtMerhcantInsErr
+                        returnErr = stmtMerchantInsErr
                     }
-                    defer stmtMerhcantIns.Close()
+                    defer stmtMerchantIns.Close()
                 }
                 //正常的注册流程
                 if returnErr == nil {
@@ -222,11 +152,78 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
         } else {
             returnErr = AphroError.New(AphroError.BizError,"验证码验证错误")
         }
-    } else {
-        returnErr = redisRPCError
+
     }
-    defer conn.Close()
-    fmt.Println("success:",operatorSuccess,"returnErr:",returnErr ,"returnErrType:",reflect.TypeOf(returnErr))
+    //conn,redisRPCError := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
+    //if redisRPCError == nil {
+    //    c := redisPb.NewRedisServiceClient(conn)
+    //    ctxRPC, cancel := context.WithTimeout(context.Background(), time.Second)
+    //    defer cancel()
+    //    checkKey := "_verify_sms_"+ cellphone + "@1"
+    //    queryRes, queryRedisErr := c.Query(ctxRPC, &redisPb.QueryRedisRequest{Key: checkKey})
+	//
+    //    hasError := queryRedisErr != nil
+	//
+    //    if !hasError && queryRes!= nil && queryRes.Value ==  verifyCode {
+    //        //插入数据库
+    //        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+    //        defer db.Close()
+    //        dbOpenErr = db.Ping()
+    //        if dbOpenErr == nil {
+    //            //当注册是店长的时候 需要先自动注册一个店铺
+    //            if role == 1 {
+    //                stmtMerhcantIns, stmtMerhcantInsErr := db.Prepare("INSERT INTO `merchant` (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`)VALUES(?,?,?,?)") // ? = placeholder
+    //                if stmtMerhcantInsErr == nil {
+    //                    stmtMerhcantInsertResult, stmtMerhcantInsertErr := stmtMerhcantIns.Exec("@", "@", 0, cellphone)
+    //                    if stmtMerhcantInsertErr == nil {
+    //                        stmtMerhcantAfftectedRow, stmtMerhcantAfftectedRowErr := stmtMerhcantInsertResult.RowsAffected()
+    //                        if stmtMerhcantAfftectedRow != 1 || stmtMerhcantAfftectedRowErr != nil {
+    //                            returnErr = stmtMerhcantAfftectedRowErr
+    //                            fmt.Println("[if]",stmtMerhcantAfftectedRowErr,"stmtMerhcantAfftectedRow",stmtMerhcantAfftectedRow)
+    //                        } else {
+    //                            fmt.Println("[insert merchant sucess!]")
+    //                        }
+    //                    } else {
+    //                        returnErr = stmtMerhcantInsertErr
+    //                    }
+    //                } else {
+    //                    returnErr = stmtMerhcantInsErr
+    //                }
+    //                defer stmtMerhcantIns.Close()
+    //            }
+    //            //正常的注册流程
+    //            if returnErr == nil {
+    //                //成功新建商户 继续 新建操作员，todo 事务回滚
+    //                stmtIns, stmtInsErr := db.Prepare("INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)") // ? = placeholder
+    //                if stmtInsErr == nil {
+    //                    insertResult, insertErr := stmtIns.Exec(name, cellphone, pswEncryption(psw), role,merchantID)
+    //                    if insertErr == nil {
+    //                        afftectedRow, afftectedRowErr := insertResult.RowsAffected()
+    //                        if afftectedRow != 1 || afftectedRowErr != nil {
+    //                            returnErr = afftectedRowErr
+    //                        } else {
+    //                            //成功
+    //                            operatorSuccess = true
+    //                        }
+    //                    } else {
+    //                        returnErr = insertErr
+    //                    }
+    //                } else {
+    //                    returnErr = stmtInsErr
+    //                }
+    //                defer stmtIns.Close()
+    //            }
+    //        } else {
+    //            returnErr = dbOpenErr
+    //        }
+    //    } else {
+    //        returnErr = AphroError.New(AphroError.BizError,"验证码验证错误")
+    //    }
+    //} else {
+    //    returnErr = redisRPCError
+    //}
+    //defer conn.Close()
+    //fmt.Println("success:",operatorSuccess,"returnErr:",returnErr ,"returnErrType:",reflect.TypeOf(returnErr))
     return &merchantServicePB.MerchantRegisterResponse{Successed:operatorSuccess},returnErr
 }
 
