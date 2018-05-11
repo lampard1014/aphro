@@ -1,13 +1,13 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-
+import "CommonBiz/Response/PB/response.proto";
 package Aphro.Merchant.pb;
 
 service MerchantService {
 
 		//商户开户
-		rpc merchantOpen(MerchantOpenRequest) returns (MerchantOpenResponse) {
+		rpc merchantOpen(MerchantOpenRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/open"
 				body:"*"
@@ -15,7 +15,7 @@ service MerchantService {
 		}
 	
 		//商户用户注册
-		rpc merchantRegister(MerchantRegisterRequest) returns (MerchantRegisterResponse) {
+		rpc merchantRegister(MerchantRegisterRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/register"
 				body:"*"
@@ -23,7 +23,7 @@ service MerchantService {
 		}
 
 		//商户用户修改密码
-		rpc merchantChangePsw(MerchantChangePswRequest) returns (MerchantChangePswResponse) {
+		rpc merchantChangePsw(MerchantChangePswRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/changePsw"
 				body:"*"
@@ -31,7 +31,7 @@ service MerchantService {
 		}
 
 		//商户app登陆
-		rpc merchantLogin(MerchantLoginRequest) returns (MerchantLoginResponse) {
+		rpc merchantLogin(MerchantLoginRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/login"
 				body:"*"
@@ -39,7 +39,7 @@ service MerchantService {
 		}
 
 		//商户app 信息
-		rpc merchantInfo(MerchantInfoRequest) returns (MerchantInfoResponse) {
+		rpc merchantInfo(MerchantInfoRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/info"
 				body:"*"
@@ -47,14 +47,14 @@ service MerchantService {
 		}
 
 		//商户app 信息
-		rpc merchantRoomInfo(MerchantRoomInfoRequest) returns (MerchantRoomInfoResponse) {
+		rpc merchantRoomInfo(MerchantRoomInfoRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				get: "/merchant/room/{roomID}"
 			};
 		}
 
 		// 新增商户服务信息
-		rpc merchantWaiterCreate(MerchantWaiterCreateRequest) returns (MerchantWaiterCreateRespone) {
+		rpc merchantWaiterCreate(MerchantWaiterCreateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/waiter/create"
 				body: "*"
@@ -62,31 +62,31 @@ service MerchantService {
 		}
 
 		// 删除商户服务信息
-		rpc merchantWaiterDelete (MerchantWaiterDeleteRequest) returns (MerchantWaiterDeleteRespone) {
+		rpc merchantWaiterDelete (MerchantWaiterDeleteRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/merchant/waiter/delete"
 				body: "*"
 			};
 		}
 
-                //短信验证码 验证接口
-                    rpc merchantVerifyCode(MerchantVerifyCodeRequest) returns (MerchantVerifyCodeResponse) {
-                        option (google.api.http) = {
-                            post: "/merchant/verifyCode"
-                            body:"*"
-                        };
-                    }
+		//短信验证码 验证接口
+        rpc merchantVerifyCode(MerchantVerifyCodeRequest) returns (Aphro.CommonBiz.Response) {
+            option (google.api.http) = {
+                post: "/merchant/verifyCode"
+                body:"*"
+            };
+        }
 
-                    //短信验证码 发送接口
-                    rpc merchantSendCode(MerchantSendCodeRequest) returns (MerchantSendCodeResponse) {
-                        option (google.api.http) = {
-                            post: "/merchant/sendCode"
-                            body:"*"
-                        };
-                    }
+        //短信验证码 发送接口
+            rpc merchantSendCode(MerchantSendCodeRequest) returns (Aphro.CommonBiz.Response) {
+                option (google.api.http) = {
+                    post: "/merchant/sendCode"
+                    body:"*"
+                };
+            }
 }
 
-message MerchantWaiterInfor{
+message MerchantWaiterInfo{
 	string name = 1;
 	double imageID = 2;
 }
@@ -94,12 +94,12 @@ message MerchantWaiterInfor{
 message MerchantWaiterCreateRequest {
 	string token = 1;
 	string merchantID = 2;
-	MerchantWaiterInfor waiter = 3;
+	MerchantWaiterInfo waiter = 3;
 	
 }
 
-message MerchantWaiterCreateRespone {
-	bool successed = 1;
+message MerchantWaiterCreateResponse {
+	bool success = 1;
 
 }
 
@@ -109,10 +109,9 @@ message MerchantWaiterDeleteRequest {
 	uint64 waiterid = 3;
 }
 
-message MerchantWaiterDeleteRespone {
-	bool successed = 1;
+message MerchantWaiterDeleteResponse {
+	bool success = 1;
 }
-
 
 message MerchantRoomInfoRequest {
 	string sessionToken = 1;
@@ -131,7 +130,7 @@ message MerchantOpenRequest {
 }
 
 message MerchantOpenResponse {
-	bool successed = 1;
+	bool success = 1;
 }
 
 message MerchantRegisterRequest {
@@ -143,7 +142,7 @@ message MerchantRegisterRequest {
 }
 
 message MerchantRegisterResponse {
-	bool successed = 1;
+	bool success = 1;
 }
 
 message MerchantChangePswRequest {
@@ -154,7 +153,7 @@ message MerchantChangePswRequest {
 }
 
 message MerchantChangePswResponse {
-	bool successed = 1;
+	bool success = 1;
 }
 
 message MerchantLoginRequest {
@@ -165,7 +164,7 @@ message MerchantLoginRequest {
 
 message MerchantLoginResponse {
 	string sessionToken = 1;
-	bool successed = 2;
+	bool success = 2;
 }
 
 message MerchantInfoRequest {
@@ -183,14 +182,13 @@ message MerchantInfoResponse {
 	InnerMerchantAccount merchantAccount = 2;
 }
 
-
 message MerchantSendCodeRequest {
 	string 	cellphone = 1;
 	uint32	scene	=	2;
 }
 
 message MerchantSendCodeResponse {
-	bool 	successed = 1;
+	bool 	success = 1;
 }
 
 message MerchantVerifyCodeRequest {
@@ -200,5 +198,5 @@ message MerchantVerifyCodeRequest {
 }
 
 message MerchantVerifyCodeResponse {
-	bool 	successed = 1;
+	bool 	success = 1;
 }

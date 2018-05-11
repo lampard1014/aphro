@@ -4,7 +4,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 
 
-package CommonBiz;
+package Aphro.CommonBiz;
 
 message Response{
 	int64 code = 1;

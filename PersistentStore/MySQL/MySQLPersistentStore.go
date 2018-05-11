@@ -208,7 +208,7 @@ func (this *APSMySQLResult)RowsAffected() (int64, error) {
 	return rowsAffected,this.lastError
 }
 
-func (this *APSMySQLResult)FetchRow(dest ...interface{})(error) {
+func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 
 	d,ok := this.rawResult.(*sql.Row)
 	if ok {
@@ -219,7 +219,7 @@ func (this *APSMySQLResult)FetchRow(dest ...interface{})(error) {
 	return this.lastError
 }
 
-func (this *APSMySQLResult)FetchAll(dest ...interface{})(error) {
+func (this *APSMySQLResult)FetchAll(dest...interface{})(error) {
 	return this.lastError
 }
 
@@ -272,7 +272,7 @@ func NewAPSMySQL(userConfig map[string]string ) (*APSMySQL,error) {
 	return apsMysql, err
 }
 
-func (this *APSMySQL) Connect() (PersistentStore.IAphroPersistentStore) {
+func (this *APSMySQL)Connect()(PersistentStore.IAphroPersistentStore) {
 	c := this.client.config.GetOptions()
 
 	db, dbOpenErr := sql.Open(c[KConfigKey_DriverName].(string), c[KConfigKey_DSN].(string))
@@ -286,13 +286,13 @@ func (this *APSMySQL) Connect() (PersistentStore.IAphroPersistentStore) {
 	return this
 }
 
-func (this *APSMySQL) Close() (PersistentStore.IAphroPersistentStore) {
+func (this *APSMySQL)Close()(PersistentStore.IAphroPersistentStore) {
 	defer this.Reset()
 	defer this.client.mysqlClient.Close()
 	return this
 }
 
-func (this *APSMySQL) Reset()(PersistentStore.IAphroPersistentStore) {
+func (this *APSMySQL)Reset()(PersistentStore.IAphroPersistentStore) {
 	this.result = nil
 	this.lastError = nil
 	this.columns = []*APSField{}
@@ -435,10 +435,10 @@ func (this *APSMySQL)RightJoin(entity string,entityAlais string) (PersistentStor
 	return this
 }
 
-func (this *APSMySQL) Query(querySQL string, bindsValue []interface{})(PersistentStore.IAphroPersistentStoreResult) {
+func (this *APSMySQL)Query(querySQL string, bindsValues...interface{})(PersistentStore.IAphroPersistentStoreResult) {
 	//this.Reset()
 	this.prepareStatement = querySQL
-	this.bindValues = bindsValue
+	this.bindValues = bindsValues
 
 	checkForToken := strings.Split(strings.ToUpper(strings.TrimSpace(this.prepareStatement))," ")[0]
 	if checkForToken == APSMySQLTokenMap[APSMySQLToken_SELECT]{
@@ -454,10 +454,9 @@ func (this *APSMySQL) Query(querySQL string, bindsValue []interface{})(Persisten
 	return this.result
 }
 
-func (this *APSMySQL)Execute(bindsValue []interface{})(PersistentStore.IAphroPersistentStoreResult){
+func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPersistentStoreResult){
 
 	var queryStatment string = ""
-	this.bindValues = bindsValue
 
 	//query Token
 	queryToken := APSMySQLTokenMap[this.token]
@@ -514,7 +513,7 @@ func (this *APSMySQL)Execute(bindsValue []interface{})(PersistentStore.IAphroPer
 	queryStatment += DELIMITER_SPACE + APSMySQLTokenMap[APSMySQLToken_LIMIT] + strings.Join(this.limit,DELIMITER_COMMA) + DELIMITER_SPACE
 	// do query
 	this.prepareStatement = queryStatment
-	this.bindValues = bindsValue
+	this.bindValues = bindsValues
 	this.query()
 	return this.result
 }
@@ -547,7 +546,7 @@ func (this *APSMySQL) query()(*APSMySQL) {
 
 
 //[3,4]
-func (this *APSMySQL) Limit(s ...string)(PersistentStore.IAphroSQLPersistentStore) {
+func (this *APSMySQL) Limit(s...string)(PersistentStore.IAphroSQLPersistentStore) {
 	this.limit = s
 	return this
 }
