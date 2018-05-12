@@ -21,6 +21,7 @@ import (
     "github.com/lampard1014/aphro/PersistentStore/Redis"
     "github.com/lampard1014/aphro/PersistentStore/MySQL"
     "fmt"
+    "github.com/lampard1014/aphro/CommonBiz/Session"
 )
 
 const (
@@ -29,6 +30,8 @@ const (
     //sessionRPCAddress = "127.0.0.1:10088"
     //encyptRPCAddress = "127.0.0.1:10087"
     //mysqlDSN = "root:123456@tcp(192.168.140.23:3306)/iris_db"
+    Scene_ChangePsw = 2
+    Scene_MerchantRegister = 1
     verifyCodeDuration = 60*30
 )
 
@@ -83,7 +86,7 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
     if err != nil{
         returnErr = err
     } else {
-        checkKey := "_verify_sms_"+ cellphone + "@1"
+        checkKey := "_verify_sms_"+ cellphone + "@" + strconv.Itoa(Scene_MerchantRegister)
         redis.Connect()
         queryRes, queryRedisErr := redis.Query(checkKey)
         hasError := queryRedisErr != nil
@@ -122,97 +125,75 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
     return res,returnErr
 }
 
-func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantServicePB.MerchantChangePswRequest) (*merchantServicePB.MerchantChangePswResponse, error) {
+func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantServicePB.MerchantChangePswRequest) (*Aphro_CommonBiz.Response, error) {
 
     newPsw := in.NewPsw
     sessionToken := in.SessionToken
     verifyCode := in.VerifyCode
     cellphone := in.Cellphone
-    scene := uint32(2)
+    scene := uint32(Scene_ChangePsw)
     var operatorSuccess bool = false
     var returnErr error = nil
     //检查session 是否合法
+    isTokenVaildate, err := Session.IsSessionTokenVailate(sessionToken)
+    returnErr = err
+    if err == nil {
+        if isTokenVaildate {
+            base64Decode,err := Encryption.Base64Decode(newPsw)
+            returnErr = err
+            if err  == nil {
+                rawData, RSADecryptionErr := Encryption.RsaDecryption(base64Decode)
+                returnErr = RSADecryptionErr
+                if RSADecryptionErr == nil {
+                    newPsw := string(rawData)
+                    if newPsw != "" {
+                        verifyCodeRes,err := MerchantVerifyCode(cellphone,scene,verifyCode)
+                        
 
-    sessionRPCConn,sessionRPCErr := grpc.Dial(sessionRPCAddress,grpc.WithInsecure())
-    if sessionRPCErr == nil {
-        sessionRPCConnClient := sessionServicePB.NewSessionServiceClient(sessionRPCConn)
-
-        sessionRPCConnClientCtx, sessionRPCConnClientCancel := context.WithTimeout(context.Background(), time.Second)
-
-        defer sessionRPCConnClientCancel()
-        var isSessionTokenOK bool = false
-        isSessionTokenVailate, isSessionTokenVailateErr := sessionRPCConnClient.IsSessionTokenVailate(sessionRPCConnClientCtx, &sessionServicePB.IsSessionTokenVailateRequest{SessionToken:sessionToken})
-        if isSessionTokenVailateErr == nil {
-            isSessionTokenOK = isSessionTokenVailate.Successed
-
-            if isSessionTokenOK {
-                encyptRPCConn,encyptRPCErr := grpc.Dial(encyptRPCAddress,grpc.WithInsecure())
-                if encyptRPCErr == nil {
-                    encyptRPCClient := encryptionServicePB.NewEncryptionServiceClient(encyptRPCConn)
-                    encyptRPCClientCtx, encyptRPCClientCancel := context.WithTimeout(context.Background(), time.Second)
-                    defer encyptRPCClientCancel()
-                    base64DecodeRes, base64DecodeErr := encyptRPCClient.Base64Decode(encyptRPCClientCtx,&encryptionServicePB.EncryptionBase64DecodeRequest{DecodedStr:newPsw})
-                    if base64DecodeErr == nil {
-                        rawData, RSADecryptionErr := encyptRPCClient.RsaDecryption(encyptRPCClientCtx, &encryptionServicePB.DecryptionRSARequest{EncryptedStr:base64DecodeRes.RawValue})
-                        if RSADecryptionErr == nil {
-                            newPsw := string(rawData.RawValue)
-                            if newPsw != "" {
-                                    //获取到最新的密码 验证 验证码是否正常
-                                    verifyCodeRes ,verifyCodeResErr := sessionRPCConnClient.MerchantVerifyCode(sessionRPCConnClientCtx,&sessionServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
-                                    if verifyCodeRes.Successed {
-                                        db, dbOpenErr := sql.Open("mysql", mysqlDSN)
-                                        defer db.Close()
-                                        dbOpenErr = db.Ping()
-                                        if dbOpenErr == nil {
-                                            stmtIns, stmtInsErr := db.Prepare("update `merchant_account` set psw = ? where cellphone = ? limit 1") // ? = placeholder
-                                            if stmtInsErr == nil {
-                                                updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone)
-                                                if updateErr == nil {
-                                                    afftectedRow, afftectedRowErr := updateResult.RowsAffected()
-                                                    if afftectedRow != 1 || afftectedRowErr != nil {
-                                                        returnErr = afftectedRowErr
-                                                    } else {
-                                                        //成功
-                                                        operatorSuccess = true
-                                                    }
-                                                } else {
-                                                    returnErr = updateErr
-                                                }
-                                            } else {
-
-                                                returnErr = stmtInsErr
-                                            }
-                                            defer stmtIns.Close()
+                        verifyCodeRes ,verifyCodeResErr := sessionRPCConnClient.MerchantVerifyCode(sessionRPCConnClientCtx,&sessionServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
+                        if verifyCodeRes.Successed {
+                            db, dbOpenErr := sql.Open("mysql", mysqlDSN)
+                            defer db.Close()
+                            dbOpenErr = db.Ping()
+                            if dbOpenErr == nil {
+                                stmtIns, stmtInsErr := db.Prepare("update `merchant_account` set psw = ? where cellphone = ? limit 1") // ? = placeholder
+                                if stmtInsErr == nil {
+                                    updateResult, updateErr := stmtIns.Exec(pswEncryption(newPsw),cellphone)
+                                    if updateErr == nil {
+                                        afftectedRow, afftectedRowErr := updateResult.RowsAffected()
+                                        if afftectedRow != 1 || afftectedRowErr != nil {
+                                            returnErr = afftectedRowErr
                                         } else {
-                                            returnErr = dbOpenErr
+                                            //成功
+                                            operatorSuccess = true
                                         }
                                     } else {
-                                        returnErr = verifyCodeResErr
+                                        returnErr = updateErr
                                     }
+                                } else {
+
+                                    returnErr = stmtInsErr
+                                }
+                                defer stmtIns.Close()
                             } else {
-                                returnErr = AphroError.New(AphroError.BizError,"解析密码错误")
+                                returnErr = dbOpenErr
                             }
                         } else {
-                           returnErr = RSADecryptionErr
+                            returnErr = verifyCodeResErr
                         }
                     } else {
-                        returnErr = base64DecodeErr
+                        returnErr = AphroError.New(AphroError.BizError,"解析密码错误")
                     }
-                } else {
-                    returnErr = encyptRPCErr
                 }
-                defer encyptRPCConn.Close()
 
-            } else {
-                returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
             }
         } else {
-            returnErr = isSessionTokenVailateErr
+            returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
         }
     } else {
-        returnErr = sessionRPCErr
+        returnErr = isSessionTokenVailateErr
     }
-    defer sessionRPCConn.Close()
+
 
     return &merchantServicePB.MerchantChangePswResponse{Successed:operatorSuccess},returnErr
 }
@@ -309,7 +290,7 @@ func (s *merchantService) MerchantRoomInfo(ctx context.Context, in *merchantServ
     return nil,nil
 }
 //  新增商户服务信息
-func (s *merchantService) MerchantWaiterCreate(ctx context.Context, in *merchantServicePB.MerchantWaiterCreateRequest) (*merchantServicePB.MerchantWaiterCreateRespone, error) {
+func (s *merchantService) MerchantWaiterCreate(ctx context.Context, in *merchantServicePB.MerchantWaiterCreateRequest) (*Aphro.CommonBiz.Response, error) {
     token := in.Token
     merchantID := in.MerchantID
     name := in.Waiter.Name
@@ -400,7 +381,7 @@ func (s *merchantService) MerchantWaiterDelete(ctx context.Context, in *merchant
     return &merchantServicePB.MerchantWaiterDeleteRespone{Successed:success},returnErr
 }
 
-func (s *merchantService) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (*merchantServicePB.MerchantVerifyCodeResponse, error) {
+func (s *merchantService) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (*Aphro_CommonBiz.Response, error) {
 
     conn,err := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
     if err != nil {

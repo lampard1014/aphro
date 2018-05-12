@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9228a757-b1d2-4ade-9e3c-14e297403ef8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Biz/merchant/pb/merchant.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/merchant/pb/merchant.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Biz/merchant/pb/merchant.proto" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/merchant/pb/merchant.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Biz/merchant/rpc/merchant-rpc.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/merchant/rpc/merchant-rpc.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CommonBiz/Response/CommonBizResponse.go" beforeDir="false" afterPath="$PROJECT_DIR$/CommonBiz/Response/CommonBizResponse.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CommonBiz/Response/PB/common.pb.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CommonBiz/Response/PB/common.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PersistentStore/IPersistentStore.go" beforeDir="false" afterPath="$PROJECT_DIR$/PersistentStore/IPersistentStore.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PersistentStore/MySQL/MySQLPersistentStore.go" beforeDir="false" afterPath="$PROJECT_DIR$/PersistentStore/MySQL/MySQLPersistentStore.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,10 +16,12 @@
       <file leaf-file-name="merchant-rpc.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Biz/merchant/rpc/merchant-rpc.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-745">
-              <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
+            <state relative-caret-position="278">
+              <caret line="150" column="24" selection-start-line="150" selection-start-column="24" selection-end-line="150" selection-end-column="24" />
               <folding>
                 <element signature="e#15#587#0" expanded="true" />
+                <element signature="e#1075#2658#0" />
+                <element signature="e#2134#9623#0" />
               </folding>
             </state>
           </provider>
@@ -79,11 +73,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="room_charge_rule.proto" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Biz/room/pb/room_charge_rule.proto">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
       <file leaf-file-name="RedisPersistentStore.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PersistentStore/Redis/RedisPersistentStore.go">
           <provider selected="true" editor-type-id="text-editor">
@@ -93,11 +82,23 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="session.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CommonBiz/Session/session.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="409">
+              <caret line="120" column="59" selection-start-line="120" selection-start-column="49" selection-end-line="120" selection-end-column="59" />
+              <folding>
+                <element signature="e#16#170#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="encryption.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Encryption/encryption.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="494">
-              <caret line="101" column="5" selection-start-line="101" selection-start-column="5" selection-end-line="101" selection-end-column="5" />
+            <state relative-caret-position="167">
+              <caret line="45" column="5" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -125,9 +126,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>SessionTokenCreateRequest</find>
-      <find>DeleteSessionTokenRequest</find>
-      <find>RenewSessionTokenRequest</find>
       <find>IsSessionTokenVailateRequest</find>
       <find>MerchantSendCodeRequest</find>
       <find>redisPb</find>
@@ -154,7 +152,10 @@
       <find>insert</find>
       <find>MerchantWaiterCreateRespone</find>
       <find>MerchantWaiterDeleteResponse</find>
+      <find>scene</find>
+      <find>MerchantVerifyCodeRequest</find>
       <find>MerchantOpenRequest</find>
+      <find>MerchantVerifyCode</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/Cellar/go/1.9.2/libexec" />
@@ -273,6 +274,12 @@
               <item name="aphro" type="462c0819:PsiDirectoryNode" />
               <item name="CommonBiz" type="462c0819:PsiDirectoryNode" />
               <item name="Response" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="aphro" type="b2602c69:ProjectViewProjectNode" />
+              <item name="aphro" type="462c0819:PsiDirectoryNode" />
+              <item name="CommonBiz" type="462c0819:PsiDirectoryNode" />
+              <item name="Session" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="aphro" type="b2602c69:ProjectViewProjectNode" />
@@ -655,16 +662,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CommonBiz/Session/session.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1455">
-          <caret line="105" column="5" selection-start-line="100" selection-end-line="105" selection-end-column="5" />
-          <folding>
-            <element signature="e#16#170#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vendor/github.com/go-redis/redis/redis.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2655">
@@ -738,13 +735,6 @@
     <entry file="file://$PROJECT_DIR$/CommonBiz/Response/response.proto">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Biz/merchant/pb/merchant.proto">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="111" column="8" selection-start-line="111" selection-start-column="8" selection-end-line="111" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Biz/merchant/pb/merchant.pb.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
@@ -786,19 +776,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/CommonBiz/Session/session.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="409">
+          <caret line="120" column="59" selection-start-line="120" selection-start-column="49" selection-end-line="120" selection-end-column="59" />
+          <folding>
+            <element signature="e#16#170#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Encryption/encryption.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="101" column="5" selection-start-line="101" selection-start-column="5" selection-end-line="101" selection-end-column="5" />
+        <state relative-caret-position="167">
+          <caret line="45" column="5" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Biz/merchant/pb/merchant.proto">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="111" column="8" selection-start-line="111" selection-start-column="8" selection-end-line="111" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Biz/merchant/rpc/merchant-rpc.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-745">
-          <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
+        <state relative-caret-position="278">
+          <caret line="150" column="24" selection-start-line="150" selection-start-column="24" selection-end-line="150" selection-end-column="24" />
           <folding>
             <element signature="e#15#587#0" expanded="true" />
+            <element signature="e#1075#2658#0" />
+            <element signature="e#2134#9623#0" />
           </folding>
         </state>
       </provider>
