@@ -31,11 +31,6 @@ func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 	return uid,merchantID,returnErr
 }
 
-
-
-
-
-
 func  GetRandomString(l int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyz"
 	bytes := []byte(str)
@@ -52,6 +47,8 @@ func QuerySessionToken(sessionToken string) (token string, ttl int64,  err error
 	if err != nil {
 		return "",0,err
 	} else {
+		redis.Connect()
+		defer redis.Close()
 		var returnErr error = nil
 		qr,err1 := redis.Query(sessionToken)
 		qtr, err2 := redis.QueryTTL(sessionToken)
@@ -87,6 +84,8 @@ func CreateSessionToken(sessionTokenRequestStr string,uid uint32, merchantID uin
 	if err != nil{
 		return "",0,err
 	}  else {
+		redis.Connect()
+		defer redis.Close()
 		_ ,err := redis.Set(tokenKey,tokenValue,int64(tokenDuration))
 		if err != nil {
 			return "",0,err
@@ -101,6 +100,8 @@ func DeleteSessionToken(sessionToken string) (error) {
 	redis ,err := Redis.NewAPSRedis(nil)
 	returnErr = err
 	if err == nil{
+		redis.Connect()
+		defer redis.Close()
 		_,err := redis.Delete(sessionToken)
 		returnErr = err
 	}
@@ -112,6 +113,8 @@ func RenewSessionToken(sessionToken string) (ttl int64,err error) {
 	if err != nil{
 		return 0,err
 	} else {
+		redis.Connect()
+		defer redis.Close()
 		ttl := int64(time.Now().Add(tokenDuration).Unix())
 		_,err := redis.ExpireAt(sessionToken,ttl)
 		return ttl, err
@@ -124,6 +127,8 @@ func IsSessionTokenVailate(sessionToken string) (bool,error) {
 	if err != nil{
 		return false,err
 	} else {
+		redis.Connect()
+		defer redis.Close()
 		isExists,err := redis.IsExists(sessionToken)
 		//res, err := c.IsExists(ctx, &redisPb.IsExistsRequest{Key:token})
 		return isExists,err

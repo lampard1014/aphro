@@ -148,7 +148,8 @@ func (s *merchantService) MerchantChangePsw(ctx context.Context, in *merchantSer
                     newPsw := string(rawData)
                     if newPsw != "" {
                         verifyCodeRes,err := MerchantVerifyCode(cellphone,scene,verifyCode)
-                        
+                        returnErr = err
+
 
                         verifyCodeRes ,verifyCodeResErr := sessionRPCConnClient.MerchantVerifyCode(sessionRPCConnClientCtx,&sessionServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
                         if verifyCodeRes.Successed {
@@ -383,30 +384,24 @@ func (s *merchantService) MerchantWaiterDelete(ctx context.Context, in *merchant
 
 func (s *merchantService) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (*Aphro_CommonBiz.Response, error) {
 
-    conn,err := grpc.Dial(redisRPCAddress,grpc.WithInsecure())
-    if err != nil {
-        panic(err)
+    redis ,err := Redis.NewAPSRedis(nil)
+    var res *Aphro_CommonBiz.Response = nil
+
+    if err != nil{
+        return res,err
+    } else {
+        redis.Connect()
+        defer redis.Close()
+
+        cellphone :=  in.Cellphone
+        scene :=  strconv.Itoa(int(in.Scene))
+        smsCode := in.SmsCode
+        checkKey := "_verify_sms_"+ cellphone + "@" + scene
+        value,err := redis.Query(checkKey)
+        isVaildate := value == smsCode
+        res,err = Response.NewCommonBizResponse(0,err.Error(),&merchantServicePB.MerchantVerifyCodeResponse{Success:isVaildate})
+        return res,err
     }
-    defer conn.Close()
-    c := redisPb.NewRedisServiceClient(conn)
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-    defer cancel()
-
-    cellphone :=  in.Cellphone
-    scene :=  strconv.Itoa(int(in.Scene))
-    smsCode := in.SmsCode
-    checkKey := "_verify_sms_"+ cellphone + "@" + scene
-    queryRes, err := c.Query(ctx, &redisPb.QueryRedisRequest{Key: checkKey})
-
-    fmt.Println("xxx",queryRes, err)
-
-    if err != nil {
-        panic(err)
-    }
-
-    return &merchantServicePB.MerchantVerifyCodeResponse{
-        Successed:queryRes.Value == smsCode,
-    },err
 }
 
 func (s *merchantService) MerchantSendCode(ctx context.Context, in *merchantServicePB.MerchantSendCodeRequest) (*merchantServicePB.MerchantSendCodeResponse, error) {
