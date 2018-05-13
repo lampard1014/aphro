@@ -222,7 +222,25 @@ func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 	return this.lastError
 }
 
-func (this *APSMySQLResult)FetchAll(dest...interface{})(error) {
+//type APSMySQLResultEnumerator func(dest...interface{}){};
+// todo checkout : is golang pass by value ?
+func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...interface{})(error) {
+	d,ok := this.rawResult.(*sql.Rows)
+	if ok {
+		for d.Next() {
+			 err := d.Scan(in)
+			if err != nil {
+				break
+			} else {
+				if callFunc != nil{
+					callFunc(in...)
+				}
+			}
+			this.lastError = err
+		}
+	} else {
+		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+	}
 	return this.lastError
 }
 
@@ -599,9 +617,9 @@ const (
 )
 
 type APSMySQLCondition struct {
-	operator APSMySQLOperator
-	operand1 interface{}
-	operand2 interface{}
+	Operator APSMySQLOperator
+	Operand1 interface{}
+	Operand2 interface{}
 }
 
 //&aphro_mysql.APSMysqlCondition{operator:"AND",operand1:[],operand2:[]}
@@ -622,9 +640,9 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 	var conditionClause string = "1"
 	if condition != nil {
 		//提取 operator
-		operator := condition.operator
-		operand1 := condition.operand1
-		operand2 := condition.operand1
+		operator := condition.Operator
+		operand1 := condition.Operand1
+		operand2 := condition.Operand1
 
 		var parseO1 string = ""
 		var parseO2 string = ""

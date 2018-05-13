@@ -60,7 +60,7 @@ type IAphroPersistentStoreResult interface {
 	LastInsertId() (int64, error)
 	RowsAffected() (int64, error)
 	FetchRow(dest...interface{}) (error)
-	FetchAll(dest...interface{}) (error)
+	FetchAll(func(...interface {}), ...interface {}) (error)
 }
 
 ///////////////////////////////////////////////
