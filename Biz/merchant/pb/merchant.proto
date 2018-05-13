@@ -86,27 +86,21 @@ service MerchantService {
             }
 }
 
-message MerchantWaiterInfo{
-	string name = 1;
-	double imageID = 2;
-}
 
 message MerchantWaiterCreateRequest {
 	string token = 1;
 	string merchantID = 2;
-	MerchantWaiterInfo waiter = 3;
-	
+	string name = 3;
+    string reserve = 4;
 }
 
 message MerchantWaiterCreateResponse {
 	bool success = 1;
-
 }
 
 message MerchantWaiterDeleteRequest {
 	string token = 1;
-	string merchantID = 2;
-	uint64 waiterid = 3;
+	uint64 waiterid = 2;
 }
 
 message MerchantWaiterDeleteResponse {

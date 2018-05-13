@@ -7,15 +7,26 @@ import (
 	"log"
 	"golang.org/x/net/context"
 	"github.com/lampard1014/aphro/CommonBiz/Response/PB"
+	"github.com/golang/protobuf/ptypes/any"
 )
 
 
 
 func NewCommonBizResponse(code int64, message string,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
-	     any, err := ptypes.MarshalAny(resultMsg)
+	     any, err := MarshalAny(resultMsg)
 	     r := &Aphro_CommonBiz.Response{Code:code,Message:message,Result:any}
 	     return r,err
 }
+
+func MarshalAny(protoMsg proto.Message)(*any.Any, error) {
+	any, err := ptypes.MarshalAny(protoMsg)
+	return any,err
+}
+
+func UnmarshalAny(any *any.Any, pb proto.Message)(error) {
+	return ptypes.UnmarshalAny(any,pb)
+}
+
 
 func UnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	log.Printf("before handling. Info: %+v", info)

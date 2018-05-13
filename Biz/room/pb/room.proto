@@ -1,13 +1,14 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-import "room_charge_rule.proto";
+import "github.com/lampard1014/aphro/CommonBiz/Response/PB/response.proto";
+
 package Aphro.Room.pb;
 
 service RoomService {
 
 		//绑定二维码终端信息
-		rpc terminalBind(RSTerminalBindRequest) returns (RSTerminalBindResponse) {
+		rpc terminalBind(RSTerminalBindRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/room/terminal/bind"
 				body:"*"
@@ -15,7 +16,7 @@ service RoomService {
 		}
 	
 		//解绑二维码终端信息
-		rpc terminalUnbind(RSTerminalUnbindRequest) returns (RSTerminalUnindResponse) {
+		rpc terminalUnbind(RSTerminalUnbindRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/room/terminal/unbind"
 				body:"*"
@@ -23,7 +24,7 @@ service RoomService {
 		}
 
 		//直接创建房间 同时绑定二维码
-		rpc create(RSCreateRequest) returns (RSCreateResponse) {
+		rpc createRoom(RSCreateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/room/create"
 				body:"*"
@@ -31,7 +32,7 @@ service RoomService {
 		}
 
 		//更新房间的信息 同时更新计费方式
-		rpc update(RSUpdateRequest) returns (RSUpdateResponse) {
+		rpc updateRoom(RSUpdateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				post: "/room/update"
 				body:"*"
@@ -39,7 +40,7 @@ service RoomService {
 		}
 
 		//删除房间
-		rpc delete(RSDeleteRequest) returns (RSDeleteResponse) {
+		rpc deleteRoom(RSDeleteRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				put: "/room/delete/{roomID}"
 				body:"*"
@@ -47,11 +48,42 @@ service RoomService {
 		}
 
 		//查询房间
-		rpc query(RSQueryRequest) returns (RSQueryResponse) {
+		rpc queryRoom(RSQueryRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
 				get: "/room/query"
 			};
 		}
+
+
+		//创建计费方式
+        	rpc createRoomChargeRule(RCRCreateRequest) returns (Aphro.CommonBiz.Response) {
+        		option (google.api.http) = {
+        			post: "/room/charge_rule/create"
+        			body:"*"
+        		};
+        	}
+
+        	rpc updateRoomChargeRule(RCRUpdateRequest) returns (Aphro.CommonBiz.Response) {
+        		option (google.api.http) = {
+        			post: "/room/charge_rule/update"
+        			body:"*"
+        		};
+        	}
+
+        	rpc queryRoomChargeRule(RCRQueryRequest) returns (Aphro.CommonBiz.Response) {
+        		option (google.api.http) = {
+        			post: "/room/charge_rule/query"
+        			body:"*"
+        		};
+        	}
+
+        	rpc deleteRoomChargeRule(RCRDeleteRequest) returns (Aphro.CommonBiz.Response) {
+        		option (google.api.http) = {
+        			post: "/room/charge_rule/delete"
+        			body:"*"
+        		};
+        	}
+
 }
 
 message RSDeleteRequest {
@@ -59,7 +91,7 @@ message RSDeleteRequest {
 }
 
 message RSDeleteResponse {
-	bool successed = 1;
+	bool success = 1;
 }
 
 message RSResult {
@@ -69,7 +101,7 @@ message RSResult {
 	RSLocation location = 4;
 	uint32 status = 5;
 	string roomName = 6;
-	repeated Aphro.RoomChargeRule.RCRResult chargeRules = 7;
+	repeated RCRResult chargeRules = 7;
 }
 
 message RSQueryRequest {
@@ -79,7 +111,7 @@ message RSQueryRequest {
 }
  
 message RSQueryResponse {
-	bool successed = 1;
+	bool success = 1;
 	repeated RSResult results = 2;
 }
 
@@ -92,7 +124,7 @@ message RSCreateRequest {
 
 message RSCreateResponse {
 	uint32 roomID = 1;
-	bool successed = 2;
+	bool success = 2;
 }
 
 message RSUpdateRequest {
@@ -104,11 +136,11 @@ message RSUpdateRequest {
 	uint32 status = 5;
 	string roomName = 7;
 
-	repeated Aphro.RoomChargeRule.RCRCreateRequest chargeRules = 6;
+	repeated RCRCreateRequest chargeRules = 6;
 }
 
 message RSUpdateResponse {
-	bool successed = 2;
+	bool success = 2;
 }
 
 message RSLocation {
@@ -124,7 +156,7 @@ message RSTerminalBindRequest {
 }
 
 message RSTerminalBindResponse {
-	bool successed = 1;
+	bool success = 1;
 }
 
 message RSTerminalUnbindRequest {
@@ -132,7 +164,74 @@ message RSTerminalUnbindRequest {
 	string sessionToken = 2;
 }
 
-message RSTerminalUnindResponse {
+message RSTerminalUnbindResponse {
+	bool success = 1;
+}
+
+
+
+//房间计费方式
+message RCRResult {
+	uint32 merchantID = 1;
+	uint32 RCRID = 7;
+	float	fee	=	2;
+	string	start	=3;
+	string	end	=	4;
+	uint32 interval = 5;
+	uint32 intervalUnit = 6;
+	uint32 roomID = 8;
+	uint32 flag = 9;
+}
+
+message RCRDeleteRequest {
+	uint32 merchantID = 1;
+	uint32 RCRID = 7;
+	uint32 roomID = 8;
+}
+
+message RCRDeleteResponse {
+	bool success = 1;
+}
+
+message RCRQueryRequest {
+	uint32 RCRID = 1;
+	uint32 merchantID = 2;
+	uint32 roomID = 3;
+}
+
+message RCRQueryResponse {
+	bool success = 1;
+	repeated RCRResult results = 2;
+}
+
+message RCRUpdateRequest {
+	uint32 merchantID = 1;
+	uint32 RCRID = 7;
+
+	float	fee	=	2;
+	string	start	=3;
+	string	end	=	4;
+	uint32 interval = 5;
+	uint32 intervalUnit = 6;
+	uint32 roomID = 8;
+
+}
+
+message RCRUpdateResponse {
 	bool successed = 1;
 }
 
+message RCRCreateRequest {
+	float	fee	=	2;
+	string	start	=3;
+	string	end	=	4;
+	uint32 interval = 5;
+	uint32 intervalUnit = 6;
+	uint32 merchantID = 7;
+	uint32 roomID = 8;
+}
+
+message RCRCreateResponse {
+	bool successed = 1;
+	uint32 recodeID = 2;
+}

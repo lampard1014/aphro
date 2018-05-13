@@ -21,7 +21,16 @@ It has these top-level messages:
 	RSTerminalBindRequest
 	RSTerminalBindResponse
 	RSTerminalUnbindRequest
-	RSTerminalUnindResponse
+	RSTerminalUnbindResponse
+	RCRResult
+	RCRDeleteRequest
+	RCRDeleteResponse
+	RCRQueryRequest
+	RCRQueryResponse
+	RCRUpdateRequest
+	RCRUpdateResponse
+	RCRCreateRequest
+	RCRCreateResponse
 */
 package Aphro_Room_pb
 
@@ -29,7 +38,7 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import Aphro_RoomChargeRule "."
+import Aphro_CommonBiz "github.com/lampard1014/aphro/CommonBiz/Response/PB"
 
 import (
 	context "golang.org/x/net/context"
@@ -64,7 +73,7 @@ func (m *RSDeleteRequest) GetRoomID() uint32 {
 }
 
 type RSDeleteResponse struct {
-	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
+	Success bool `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
 }
 
 func (m *RSDeleteResponse) Reset()                    { *m = RSDeleteResponse{} }
@@ -72,21 +81,21 @@ func (m *RSDeleteResponse) String() string            { return proto.CompactText
 func (*RSDeleteResponse) ProtoMessage()               {}
 func (*RSDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *RSDeleteResponse) GetSuccessed() bool {
+func (m *RSDeleteResponse) GetSuccess() bool {
 	if m != nil {
-		return m.Successed
+		return m.Success
 	}
 	return false
 }
 
 type RSResult struct {
-	RoomID       uint32                            `protobuf:"varint,1,opt,name=roomID" json:"roomID,omitempty"`
-	MerchantID   uint32                            `protobuf:"varint,2,opt,name=merchantID" json:"merchantID,omitempty"`
-	TerminalCode string                            `protobuf:"bytes,3,opt,name=terminalCode" json:"terminalCode,omitempty"`
-	Location     *RSLocation                       `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
-	Status       uint32                            `protobuf:"varint,5,opt,name=status" json:"status,omitempty"`
-	RoomName     string                            `protobuf:"bytes,6,opt,name=roomName" json:"roomName,omitempty"`
-	ChargeRules  []*Aphro_RoomChargeRule.RCRResult `protobuf:"bytes,7,rep,name=chargeRules" json:"chargeRules,omitempty"`
+	RoomID       uint32       `protobuf:"varint,1,opt,name=roomID" json:"roomID,omitempty"`
+	MerchantID   uint32       `protobuf:"varint,2,opt,name=merchantID" json:"merchantID,omitempty"`
+	TerminalCode string       `protobuf:"bytes,3,opt,name=terminalCode" json:"terminalCode,omitempty"`
+	Location     *RSLocation  `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
+	Status       uint32       `protobuf:"varint,5,opt,name=status" json:"status,omitempty"`
+	RoomName     string       `protobuf:"bytes,6,opt,name=roomName" json:"roomName,omitempty"`
+	ChargeRules  []*RCRResult `protobuf:"bytes,7,rep,name=chargeRules" json:"chargeRules,omitempty"`
 }
 
 func (m *RSResult) Reset()                    { *m = RSResult{} }
@@ -136,7 +145,7 @@ func (m *RSResult) GetRoomName() string {
 	return ""
 }
 
-func (m *RSResult) GetChargeRules() []*Aphro_RoomChargeRule.RCRResult {
+func (m *RSResult) GetChargeRules() []*RCRResult {
 	if m != nil {
 		return m.ChargeRules
 	}
@@ -176,8 +185,8 @@ func (m *RSQueryRequest) GetMerchantID() uint32 {
 }
 
 type RSQueryResponse struct {
-	Successed bool        `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
-	Results   []*RSResult `protobuf:"bytes,2,rep,name=results" json:"results,omitempty"`
+	Success bool        `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+	Results []*RSResult `protobuf:"bytes,2,rep,name=results" json:"results,omitempty"`
 }
 
 func (m *RSQueryResponse) Reset()                    { *m = RSQueryResponse{} }
@@ -185,9 +194,9 @@ func (m *RSQueryResponse) String() string            { return proto.CompactTextS
 func (*RSQueryResponse) ProtoMessage()               {}
 func (*RSQueryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
-func (m *RSQueryResponse) GetSuccessed() bool {
+func (m *RSQueryResponse) GetSuccess() bool {
 	if m != nil {
-		return m.Successed
+		return m.Success
 	}
 	return false
 }
@@ -240,8 +249,8 @@ func (m *RSCreateRequest) GetRoomName() string {
 }
 
 type RSCreateResponse struct {
-	RoomID    uint32 `protobuf:"varint,1,opt,name=roomID" json:"roomID,omitempty"`
-	Successed bool   `protobuf:"varint,2,opt,name=successed" json:"successed,omitempty"`
+	RoomID  uint32 `protobuf:"varint,1,opt,name=roomID" json:"roomID,omitempty"`
+	Success bool   `protobuf:"varint,2,opt,name=success" json:"success,omitempty"`
 }
 
 func (m *RSCreateResponse) Reset()                    { *m = RSCreateResponse{} }
@@ -256,21 +265,21 @@ func (m *RSCreateResponse) GetRoomID() uint32 {
 	return 0
 }
 
-func (m *RSCreateResponse) GetSuccessed() bool {
+func (m *RSCreateResponse) GetSuccess() bool {
 	if m != nil {
-		return m.Successed
+		return m.Success
 	}
 	return false
 }
 
 type RSUpdateRequest struct {
-	SessionToken string                                   `protobuf:"bytes,1,opt,name=sessionToken" json:"sessionToken,omitempty"`
-	RoomID       uint32                                   `protobuf:"varint,2,opt,name=roomID" json:"roomID,omitempty"`
-	TerminalCode string                                   `protobuf:"bytes,3,opt,name=terminalCode" json:"terminalCode,omitempty"`
-	Location     *RSLocation                              `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
-	Status       uint32                                   `protobuf:"varint,5,opt,name=status" json:"status,omitempty"`
-	RoomName     string                                   `protobuf:"bytes,7,opt,name=roomName" json:"roomName,omitempty"`
-	ChargeRules  []*Aphro_RoomChargeRule.RCRCreateRequest `protobuf:"bytes,6,rep,name=chargeRules" json:"chargeRules,omitempty"`
+	SessionToken string              `protobuf:"bytes,1,opt,name=sessionToken" json:"sessionToken,omitempty"`
+	RoomID       uint32              `protobuf:"varint,2,opt,name=roomID" json:"roomID,omitempty"`
+	TerminalCode string              `protobuf:"bytes,3,opt,name=terminalCode" json:"terminalCode,omitempty"`
+	Location     *RSLocation         `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
+	Status       uint32              `protobuf:"varint,5,opt,name=status" json:"status,omitempty"`
+	RoomName     string              `protobuf:"bytes,7,opt,name=roomName" json:"roomName,omitempty"`
+	ChargeRules  []*RCRCreateRequest `protobuf:"bytes,6,rep,name=chargeRules" json:"chargeRules,omitempty"`
 }
 
 func (m *RSUpdateRequest) Reset()                    { *m = RSUpdateRequest{} }
@@ -320,7 +329,7 @@ func (m *RSUpdateRequest) GetRoomName() string {
 	return ""
 }
 
-func (m *RSUpdateRequest) GetChargeRules() []*Aphro_RoomChargeRule.RCRCreateRequest {
+func (m *RSUpdateRequest) GetChargeRules() []*RCRCreateRequest {
 	if m != nil {
 		return m.ChargeRules
 	}
@@ -328,7 +337,7 @@ func (m *RSUpdateRequest) GetChargeRules() []*Aphro_RoomChargeRule.RCRCreateRequ
 }
 
 type RSUpdateResponse struct {
-	Successed bool `protobuf:"varint,2,opt,name=successed" json:"successed,omitempty"`
+	Success bool `protobuf:"varint,2,opt,name=success" json:"success,omitempty"`
 }
 
 func (m *RSUpdateResponse) Reset()                    { *m = RSUpdateResponse{} }
@@ -336,9 +345,9 @@ func (m *RSUpdateResponse) String() string            { return proto.CompactText
 func (*RSUpdateResponse) ProtoMessage()               {}
 func (*RSUpdateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
-func (m *RSUpdateResponse) GetSuccessed() bool {
+func (m *RSUpdateResponse) GetSuccess() bool {
 	if m != nil {
-		return m.Successed
+		return m.Success
 	}
 	return false
 }
@@ -408,7 +417,7 @@ func (m *RSTerminalBindRequest) GetRoomID() uint32 {
 }
 
 type RSTerminalBindResponse struct {
-	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
+	Success bool `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
 }
 
 func (m *RSTerminalBindResponse) Reset()                    { *m = RSTerminalBindResponse{} }
@@ -416,9 +425,9 @@ func (m *RSTerminalBindResponse) String() string            { return proto.Compa
 func (*RSTerminalBindResponse) ProtoMessage()               {}
 func (*RSTerminalBindResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-func (m *RSTerminalBindResponse) GetSuccessed() bool {
+func (m *RSTerminalBindResponse) GetSuccess() bool {
 	if m != nil {
-		return m.Successed
+		return m.Success
 	}
 	return false
 }
@@ -447,20 +456,381 @@ func (m *RSTerminalUnbindRequest) GetSessionToken() string {
 	return ""
 }
 
-type RSTerminalUnindResponse struct {
+type RSTerminalUnbindResponse struct {
+	Success bool `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+}
+
+func (m *RSTerminalUnbindResponse) Reset()                    { *m = RSTerminalUnbindResponse{} }
+func (m *RSTerminalUnbindResponse) String() string            { return proto.CompactTextString(m) }
+func (*RSTerminalUnbindResponse) ProtoMessage()               {}
+func (*RSTerminalUnbindResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+
+func (m *RSTerminalUnbindResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+// 房间计费方式
+type RCRResult struct {
+	MerchantID   uint32  `protobuf:"varint,1,opt,name=merchantID" json:"merchantID,omitempty"`
+	RCRID        uint32  `protobuf:"varint,7,opt,name=RCRID" json:"RCRID,omitempty"`
+	Fee          float32 `protobuf:"fixed32,2,opt,name=fee" json:"fee,omitempty"`
+	Start        string  `protobuf:"bytes,3,opt,name=start" json:"start,omitempty"`
+	End          string  `protobuf:"bytes,4,opt,name=end" json:"end,omitempty"`
+	Interval     uint32  `protobuf:"varint,5,opt,name=interval" json:"interval,omitempty"`
+	IntervalUnit uint32  `protobuf:"varint,6,opt,name=intervalUnit" json:"intervalUnit,omitempty"`
+	RoomID       uint32  `protobuf:"varint,8,opt,name=roomID" json:"roomID,omitempty"`
+	Flag         uint32  `protobuf:"varint,9,opt,name=flag" json:"flag,omitempty"`
+}
+
+func (m *RCRResult) Reset()                    { *m = RCRResult{} }
+func (m *RCRResult) String() string            { return proto.CompactTextString(m) }
+func (*RCRResult) ProtoMessage()               {}
+func (*RCRResult) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+
+func (m *RCRResult) GetMerchantID() uint32 {
+	if m != nil {
+		return m.MerchantID
+	}
+	return 0
+}
+
+func (m *RCRResult) GetRCRID() uint32 {
+	if m != nil {
+		return m.RCRID
+	}
+	return 0
+}
+
+func (m *RCRResult) GetFee() float32 {
+	if m != nil {
+		return m.Fee
+	}
+	return 0
+}
+
+func (m *RCRResult) GetStart() string {
+	if m != nil {
+		return m.Start
+	}
+	return ""
+}
+
+func (m *RCRResult) GetEnd() string {
+	if m != nil {
+		return m.End
+	}
+	return ""
+}
+
+func (m *RCRResult) GetInterval() uint32 {
+	if m != nil {
+		return m.Interval
+	}
+	return 0
+}
+
+func (m *RCRResult) GetIntervalUnit() uint32 {
+	if m != nil {
+		return m.IntervalUnit
+	}
+	return 0
+}
+
+func (m *RCRResult) GetRoomID() uint32 {
+	if m != nil {
+		return m.RoomID
+	}
+	return 0
+}
+
+func (m *RCRResult) GetFlag() uint32 {
+	if m != nil {
+		return m.Flag
+	}
+	return 0
+}
+
+type RCRDeleteRequest struct {
+	MerchantID uint32 `protobuf:"varint,1,opt,name=merchantID" json:"merchantID,omitempty"`
+	RCRID      uint32 `protobuf:"varint,7,opt,name=RCRID" json:"RCRID,omitempty"`
+	RoomID     uint32 `protobuf:"varint,8,opt,name=roomID" json:"roomID,omitempty"`
+}
+
+func (m *RCRDeleteRequest) Reset()                    { *m = RCRDeleteRequest{} }
+func (m *RCRDeleteRequest) String() string            { return proto.CompactTextString(m) }
+func (*RCRDeleteRequest) ProtoMessage()               {}
+func (*RCRDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+
+func (m *RCRDeleteRequest) GetMerchantID() uint32 {
+	if m != nil {
+		return m.MerchantID
+	}
+	return 0
+}
+
+func (m *RCRDeleteRequest) GetRCRID() uint32 {
+	if m != nil {
+		return m.RCRID
+	}
+	return 0
+}
+
+func (m *RCRDeleteRequest) GetRoomID() uint32 {
+	if m != nil {
+		return m.RoomID
+	}
+	return 0
+}
+
+type RCRDeleteResponse struct {
+	Success bool `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+}
+
+func (m *RCRDeleteResponse) Reset()                    { *m = RCRDeleteResponse{} }
+func (m *RCRDeleteResponse) String() string            { return proto.CompactTextString(m) }
+func (*RCRDeleteResponse) ProtoMessage()               {}
+func (*RCRDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+
+func (m *RCRDeleteResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type RCRQueryRequest struct {
+	RCRID      uint32 `protobuf:"varint,1,opt,name=RCRID" json:"RCRID,omitempty"`
+	MerchantID uint32 `protobuf:"varint,2,opt,name=merchantID" json:"merchantID,omitempty"`
+	RoomID     uint32 `protobuf:"varint,3,opt,name=roomID" json:"roomID,omitempty"`
+}
+
+func (m *RCRQueryRequest) Reset()                    { *m = RCRQueryRequest{} }
+func (m *RCRQueryRequest) String() string            { return proto.CompactTextString(m) }
+func (*RCRQueryRequest) ProtoMessage()               {}
+func (*RCRQueryRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+
+func (m *RCRQueryRequest) GetRCRID() uint32 {
+	if m != nil {
+		return m.RCRID
+	}
+	return 0
+}
+
+func (m *RCRQueryRequest) GetMerchantID() uint32 {
+	if m != nil {
+		return m.MerchantID
+	}
+	return 0
+}
+
+func (m *RCRQueryRequest) GetRoomID() uint32 {
+	if m != nil {
+		return m.RoomID
+	}
+	return 0
+}
+
+type RCRQueryResponse struct {
+	Success bool         `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+	Results []*RCRResult `protobuf:"bytes,2,rep,name=results" json:"results,omitempty"`
+}
+
+func (m *RCRQueryResponse) Reset()                    { *m = RCRQueryResponse{} }
+func (m *RCRQueryResponse) String() string            { return proto.CompactTextString(m) }
+func (*RCRQueryResponse) ProtoMessage()               {}
+func (*RCRQueryResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+
+func (m *RCRQueryResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+func (m *RCRQueryResponse) GetResults() []*RCRResult {
+	if m != nil {
+		return m.Results
+	}
+	return nil
+}
+
+type RCRUpdateRequest struct {
+	MerchantID   uint32  `protobuf:"varint,1,opt,name=merchantID" json:"merchantID,omitempty"`
+	RCRID        uint32  `protobuf:"varint,7,opt,name=RCRID" json:"RCRID,omitempty"`
+	Fee          float32 `protobuf:"fixed32,2,opt,name=fee" json:"fee,omitempty"`
+	Start        string  `protobuf:"bytes,3,opt,name=start" json:"start,omitempty"`
+	End          string  `protobuf:"bytes,4,opt,name=end" json:"end,omitempty"`
+	Interval     uint32  `protobuf:"varint,5,opt,name=interval" json:"interval,omitempty"`
+	IntervalUnit uint32  `protobuf:"varint,6,opt,name=intervalUnit" json:"intervalUnit,omitempty"`
+	RoomID       uint32  `protobuf:"varint,8,opt,name=roomID" json:"roomID,omitempty"`
+}
+
+func (m *RCRUpdateRequest) Reset()                    { *m = RCRUpdateRequest{} }
+func (m *RCRUpdateRequest) String() string            { return proto.CompactTextString(m) }
+func (*RCRUpdateRequest) ProtoMessage()               {}
+func (*RCRUpdateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+
+func (m *RCRUpdateRequest) GetMerchantID() uint32 {
+	if m != nil {
+		return m.MerchantID
+	}
+	return 0
+}
+
+func (m *RCRUpdateRequest) GetRCRID() uint32 {
+	if m != nil {
+		return m.RCRID
+	}
+	return 0
+}
+
+func (m *RCRUpdateRequest) GetFee() float32 {
+	if m != nil {
+		return m.Fee
+	}
+	return 0
+}
+
+func (m *RCRUpdateRequest) GetStart() string {
+	if m != nil {
+		return m.Start
+	}
+	return ""
+}
+
+func (m *RCRUpdateRequest) GetEnd() string {
+	if m != nil {
+		return m.End
+	}
+	return ""
+}
+
+func (m *RCRUpdateRequest) GetInterval() uint32 {
+	if m != nil {
+		return m.Interval
+	}
+	return 0
+}
+
+func (m *RCRUpdateRequest) GetIntervalUnit() uint32 {
+	if m != nil {
+		return m.IntervalUnit
+	}
+	return 0
+}
+
+func (m *RCRUpdateRequest) GetRoomID() uint32 {
+	if m != nil {
+		return m.RoomID
+	}
+	return 0
+}
+
+type RCRUpdateResponse struct {
 	Successed bool `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
 }
 
-func (m *RSTerminalUnindResponse) Reset()                    { *m = RSTerminalUnindResponse{} }
-func (m *RSTerminalUnindResponse) String() string            { return proto.CompactTextString(m) }
-func (*RSTerminalUnindResponse) ProtoMessage()               {}
-func (*RSTerminalUnindResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (m *RCRUpdateResponse) Reset()                    { *m = RCRUpdateResponse{} }
+func (m *RCRUpdateResponse) String() string            { return proto.CompactTextString(m) }
+func (*RCRUpdateResponse) ProtoMessage()               {}
+func (*RCRUpdateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
-func (m *RSTerminalUnindResponse) GetSuccessed() bool {
+func (m *RCRUpdateResponse) GetSuccessed() bool {
 	if m != nil {
 		return m.Successed
 	}
 	return false
+}
+
+type RCRCreateRequest struct {
+	Fee          float32 `protobuf:"fixed32,2,opt,name=fee" json:"fee,omitempty"`
+	Start        string  `protobuf:"bytes,3,opt,name=start" json:"start,omitempty"`
+	End          string  `protobuf:"bytes,4,opt,name=end" json:"end,omitempty"`
+	Interval     uint32  `protobuf:"varint,5,opt,name=interval" json:"interval,omitempty"`
+	IntervalUnit uint32  `protobuf:"varint,6,opt,name=intervalUnit" json:"intervalUnit,omitempty"`
+	MerchantID   uint32  `protobuf:"varint,7,opt,name=merchantID" json:"merchantID,omitempty"`
+	RoomID       uint32  `protobuf:"varint,8,opt,name=roomID" json:"roomID,omitempty"`
+}
+
+func (m *RCRCreateRequest) Reset()                    { *m = RCRCreateRequest{} }
+func (m *RCRCreateRequest) String() string            { return proto.CompactTextString(m) }
+func (*RCRCreateRequest) ProtoMessage()               {}
+func (*RCRCreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+
+func (m *RCRCreateRequest) GetFee() float32 {
+	if m != nil {
+		return m.Fee
+	}
+	return 0
+}
+
+func (m *RCRCreateRequest) GetStart() string {
+	if m != nil {
+		return m.Start
+	}
+	return ""
+}
+
+func (m *RCRCreateRequest) GetEnd() string {
+	if m != nil {
+		return m.End
+	}
+	return ""
+}
+
+func (m *RCRCreateRequest) GetInterval() uint32 {
+	if m != nil {
+		return m.Interval
+	}
+	return 0
+}
+
+func (m *RCRCreateRequest) GetIntervalUnit() uint32 {
+	if m != nil {
+		return m.IntervalUnit
+	}
+	return 0
+}
+
+func (m *RCRCreateRequest) GetMerchantID() uint32 {
+	if m != nil {
+		return m.MerchantID
+	}
+	return 0
+}
+
+func (m *RCRCreateRequest) GetRoomID() uint32 {
+	if m != nil {
+		return m.RoomID
+	}
+	return 0
+}
+
+type RCRCreateResponse struct {
+	Successed bool   `protobuf:"varint,1,opt,name=successed" json:"successed,omitempty"`
+	RecodeID  uint32 `protobuf:"varint,2,opt,name=recodeID" json:"recodeID,omitempty"`
+}
+
+func (m *RCRCreateResponse) Reset()                    { *m = RCRCreateResponse{} }
+func (m *RCRCreateResponse) String() string            { return proto.CompactTextString(m) }
+func (*RCRCreateResponse) ProtoMessage()               {}
+func (*RCRCreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+
+func (m *RCRCreateResponse) GetSuccessed() bool {
+	if m != nil {
+		return m.Successed
+	}
+	return false
+}
+
+func (m *RCRCreateResponse) GetRecodeID() uint32 {
+	if m != nil {
+		return m.RecodeID
+	}
+	return 0
 }
 
 func init() {
@@ -477,7 +847,16 @@ func init() {
 	proto.RegisterType((*RSTerminalBindRequest)(nil), "Aphro.Room.pb.RSTerminalBindRequest")
 	proto.RegisterType((*RSTerminalBindResponse)(nil), "Aphro.Room.pb.RSTerminalBindResponse")
 	proto.RegisterType((*RSTerminalUnbindRequest)(nil), "Aphro.Room.pb.RSTerminalUnbindRequest")
-	proto.RegisterType((*RSTerminalUnindResponse)(nil), "Aphro.Room.pb.RSTerminalUnindResponse")
+	proto.RegisterType((*RSTerminalUnbindResponse)(nil), "Aphro.Room.pb.RSTerminalUnbindResponse")
+	proto.RegisterType((*RCRResult)(nil), "Aphro.Room.pb.RCRResult")
+	proto.RegisterType((*RCRDeleteRequest)(nil), "Aphro.Room.pb.RCRDeleteRequest")
+	proto.RegisterType((*RCRDeleteResponse)(nil), "Aphro.Room.pb.RCRDeleteResponse")
+	proto.RegisterType((*RCRQueryRequest)(nil), "Aphro.Room.pb.RCRQueryRequest")
+	proto.RegisterType((*RCRQueryResponse)(nil), "Aphro.Room.pb.RCRQueryResponse")
+	proto.RegisterType((*RCRUpdateRequest)(nil), "Aphro.Room.pb.RCRUpdateRequest")
+	proto.RegisterType((*RCRUpdateResponse)(nil), "Aphro.Room.pb.RCRUpdateResponse")
+	proto.RegisterType((*RCRCreateRequest)(nil), "Aphro.Room.pb.RCRCreateRequest")
+	proto.RegisterType((*RCRCreateResponse)(nil), "Aphro.Room.pb.RCRCreateResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -492,17 +871,22 @@ const _ = grpc.SupportPackageIsVersion4
 
 type RoomServiceClient interface {
 	// 绑定二维码终端信息
-	TerminalBind(ctx context.Context, in *RSTerminalBindRequest, opts ...grpc.CallOption) (*RSTerminalBindResponse, error)
+	TerminalBind(ctx context.Context, in *RSTerminalBindRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 	// 解绑二维码终端信息
-	TerminalUnbind(ctx context.Context, in *RSTerminalUnbindRequest, opts ...grpc.CallOption) (*RSTerminalUnindResponse, error)
+	TerminalUnbind(ctx context.Context, in *RSTerminalUnbindRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 	// 直接创建房间 同时绑定二维码
-	Create(ctx context.Context, in *RSCreateRequest, opts ...grpc.CallOption) (*RSCreateResponse, error)
+	CreateRoom(ctx context.Context, in *RSCreateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 	// 更新房间的信息 同时更新计费方式
-	Update(ctx context.Context, in *RSUpdateRequest, opts ...grpc.CallOption) (*RSUpdateResponse, error)
+	UpdateRoom(ctx context.Context, in *RSUpdateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 	// 删除房间
-	Delete(ctx context.Context, in *RSDeleteRequest, opts ...grpc.CallOption) (*RSDeleteResponse, error)
+	DeleteRoom(ctx context.Context, in *RSDeleteRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 	// 查询房间
-	Query(ctx context.Context, in *RSQueryRequest, opts ...grpc.CallOption) (*RSQueryResponse, error)
+	QueryRoom(ctx context.Context, in *RSQueryRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
+	// 创建计费方式
+	CreateRoomChargeRule(ctx context.Context, in *RCRCreateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
+	UpdateRoomChargeRule(ctx context.Context, in *RCRUpdateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
+	QueryRoomChargeRule(ctx context.Context, in *RCRQueryRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
+	DeleteRoomChargeRule(ctx context.Context, in *RCRDeleteRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error)
 }
 
 type roomServiceClient struct {
@@ -513,8 +897,8 @@ func NewRoomServiceClient(cc *grpc.ClientConn) RoomServiceClient {
 	return &roomServiceClient{cc}
 }
 
-func (c *roomServiceClient) TerminalBind(ctx context.Context, in *RSTerminalBindRequest, opts ...grpc.CallOption) (*RSTerminalBindResponse, error) {
-	out := new(RSTerminalBindResponse)
+func (c *roomServiceClient) TerminalBind(ctx context.Context, in *RSTerminalBindRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
 	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/terminalBind", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -522,8 +906,8 @@ func (c *roomServiceClient) TerminalBind(ctx context.Context, in *RSTerminalBind
 	return out, nil
 }
 
-func (c *roomServiceClient) TerminalUnbind(ctx context.Context, in *RSTerminalUnbindRequest, opts ...grpc.CallOption) (*RSTerminalUnindResponse, error) {
-	out := new(RSTerminalUnindResponse)
+func (c *roomServiceClient) TerminalUnbind(ctx context.Context, in *RSTerminalUnbindRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
 	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/terminalUnbind", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -531,36 +915,72 @@ func (c *roomServiceClient) TerminalUnbind(ctx context.Context, in *RSTerminalUn
 	return out, nil
 }
 
-func (c *roomServiceClient) Create(ctx context.Context, in *RSCreateRequest, opts ...grpc.CallOption) (*RSCreateResponse, error) {
-	out := new(RSCreateResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/create", in, out, c.cc, opts...)
+func (c *roomServiceClient) CreateRoom(ctx context.Context, in *RSCreateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/createRoom", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *roomServiceClient) Update(ctx context.Context, in *RSUpdateRequest, opts ...grpc.CallOption) (*RSUpdateResponse, error) {
-	out := new(RSUpdateResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/update", in, out, c.cc, opts...)
+func (c *roomServiceClient) UpdateRoom(ctx context.Context, in *RSUpdateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/updateRoom", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *roomServiceClient) Delete(ctx context.Context, in *RSDeleteRequest, opts ...grpc.CallOption) (*RSDeleteResponse, error) {
-	out := new(RSDeleteResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/delete", in, out, c.cc, opts...)
+func (c *roomServiceClient) DeleteRoom(ctx context.Context, in *RSDeleteRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/deleteRoom", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *roomServiceClient) Query(ctx context.Context, in *RSQueryRequest, opts ...grpc.CallOption) (*RSQueryResponse, error) {
-	out := new(RSQueryResponse)
-	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/query", in, out, c.cc, opts...)
+func (c *roomServiceClient) QueryRoom(ctx context.Context, in *RSQueryRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/queryRoom", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *roomServiceClient) CreateRoomChargeRule(ctx context.Context, in *RCRCreateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/createRoomChargeRule", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *roomServiceClient) UpdateRoomChargeRule(ctx context.Context, in *RCRUpdateRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/updateRoomChargeRule", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *roomServiceClient) QueryRoomChargeRule(ctx context.Context, in *RCRQueryRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/queryRoomChargeRule", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *roomServiceClient) DeleteRoomChargeRule(ctx context.Context, in *RCRDeleteRequest, opts ...grpc.CallOption) (*Aphro_CommonBiz.Response, error) {
+	out := new(Aphro_CommonBiz.Response)
+	err := grpc.Invoke(ctx, "/Aphro.Room.pb.RoomService/deleteRoomChargeRule", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -571,17 +991,22 @@ func (c *roomServiceClient) Query(ctx context.Context, in *RSQueryRequest, opts 
 
 type RoomServiceServer interface {
 	// 绑定二维码终端信息
-	TerminalBind(context.Context, *RSTerminalBindRequest) (*RSTerminalBindResponse, error)
+	TerminalBind(context.Context, *RSTerminalBindRequest) (*Aphro_CommonBiz.Response, error)
 	// 解绑二维码终端信息
-	TerminalUnbind(context.Context, *RSTerminalUnbindRequest) (*RSTerminalUnindResponse, error)
+	TerminalUnbind(context.Context, *RSTerminalUnbindRequest) (*Aphro_CommonBiz.Response, error)
 	// 直接创建房间 同时绑定二维码
-	Create(context.Context, *RSCreateRequest) (*RSCreateResponse, error)
+	CreateRoom(context.Context, *RSCreateRequest) (*Aphro_CommonBiz.Response, error)
 	// 更新房间的信息 同时更新计费方式
-	Update(context.Context, *RSUpdateRequest) (*RSUpdateResponse, error)
+	UpdateRoom(context.Context, *RSUpdateRequest) (*Aphro_CommonBiz.Response, error)
 	// 删除房间
-	Delete(context.Context, *RSDeleteRequest) (*RSDeleteResponse, error)
+	DeleteRoom(context.Context, *RSDeleteRequest) (*Aphro_CommonBiz.Response, error)
 	// 查询房间
-	Query(context.Context, *RSQueryRequest) (*RSQueryResponse, error)
+	QueryRoom(context.Context, *RSQueryRequest) (*Aphro_CommonBiz.Response, error)
+	// 创建计费方式
+	CreateRoomChargeRule(context.Context, *RCRCreateRequest) (*Aphro_CommonBiz.Response, error)
+	UpdateRoomChargeRule(context.Context, *RCRUpdateRequest) (*Aphro_CommonBiz.Response, error)
+	QueryRoomChargeRule(context.Context, *RCRQueryRequest) (*Aphro_CommonBiz.Response, error)
+	DeleteRoomChargeRule(context.Context, *RCRDeleteRequest) (*Aphro_CommonBiz.Response, error)
 }
 
 func RegisterRoomServiceServer(s *grpc.Server, srv RoomServiceServer) {
@@ -624,74 +1049,146 @@ func _RoomService_TerminalUnbind_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomService_CreateRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RSCreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServiceServer).Create(ctx, in)
+		return srv.(RoomServiceServer).CreateRoom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Room.pb.RoomService/Create",
+		FullMethod: "/Aphro.Room.pb.RoomService/CreateRoom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServiceServer).Create(ctx, req.(*RSCreateRequest))
+		return srv.(RoomServiceServer).CreateRoom(ctx, req.(*RSCreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomService_UpdateRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RSUpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServiceServer).Update(ctx, in)
+		return srv.(RoomServiceServer).UpdateRoom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Room.pb.RoomService/Update",
+		FullMethod: "/Aphro.Room.pb.RoomService/UpdateRoom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServiceServer).Update(ctx, req.(*RSUpdateRequest))
+		return srv.(RoomServiceServer).UpdateRoom(ctx, req.(*RSUpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomService_DeleteRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RSDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServiceServer).Delete(ctx, in)
+		return srv.(RoomServiceServer).DeleteRoom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Room.pb.RoomService/Delete",
+		FullMethod: "/Aphro.Room.pb.RoomService/DeleteRoom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServiceServer).Delete(ctx, req.(*RSDeleteRequest))
+		return srv.(RoomServiceServer).DeleteRoom(ctx, req.(*RSDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomService_Query_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomService_QueryRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RSQueryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServiceServer).Query(ctx, in)
+		return srv.(RoomServiceServer).QueryRoom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Aphro.Room.pb.RoomService/Query",
+		FullMethod: "/Aphro.Room.pb.RoomService/QueryRoom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServiceServer).Query(ctx, req.(*RSQueryRequest))
+		return srv.(RoomServiceServer).QueryRoom(ctx, req.(*RSQueryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoomService_CreateRoomChargeRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RCRCreateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoomServiceServer).CreateRoomChargeRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Room.pb.RoomService/CreateRoomChargeRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoomServiceServer).CreateRoomChargeRule(ctx, req.(*RCRCreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoomService_UpdateRoomChargeRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RCRUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoomServiceServer).UpdateRoomChargeRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Room.pb.RoomService/UpdateRoomChargeRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoomServiceServer).UpdateRoomChargeRule(ctx, req.(*RCRUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoomService_QueryRoomChargeRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RCRQueryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoomServiceServer).QueryRoomChargeRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Room.pb.RoomService/QueryRoomChargeRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoomServiceServer).QueryRoomChargeRule(ctx, req.(*RCRQueryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoomService_DeleteRoomChargeRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RCRDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoomServiceServer).DeleteRoomChargeRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Aphro.Room.pb.RoomService/DeleteRoomChargeRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoomServiceServer).DeleteRoomChargeRule(ctx, req.(*RCRDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -709,20 +1206,36 @@ var _RoomService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _RoomService_TerminalUnbind_Handler,
 		},
 		{
-			MethodName: "create",
-			Handler:    _RoomService_Create_Handler,
+			MethodName: "createRoom",
+			Handler:    _RoomService_CreateRoom_Handler,
 		},
 		{
-			MethodName: "update",
-			Handler:    _RoomService_Update_Handler,
+			MethodName: "updateRoom",
+			Handler:    _RoomService_UpdateRoom_Handler,
 		},
 		{
-			MethodName: "delete",
-			Handler:    _RoomService_Delete_Handler,
+			MethodName: "deleteRoom",
+			Handler:    _RoomService_DeleteRoom_Handler,
 		},
 		{
-			MethodName: "query",
-			Handler:    _RoomService_Query_Handler,
+			MethodName: "queryRoom",
+			Handler:    _RoomService_QueryRoom_Handler,
+		},
+		{
+			MethodName: "createRoomChargeRule",
+			Handler:    _RoomService_CreateRoomChargeRule_Handler,
+		},
+		{
+			MethodName: "updateRoomChargeRule",
+			Handler:    _RoomService_UpdateRoomChargeRule_Handler,
+		},
+		{
+			MethodName: "queryRoomChargeRule",
+			Handler:    _RoomService_QueryRoomChargeRule_Handler,
+		},
+		{
+			MethodName: "deleteRoomChargeRule",
+			Handler:    _RoomService_DeleteRoomChargeRule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -732,52 +1245,71 @@ var _RoomService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("room.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 741 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x41, 0x6f, 0xd3, 0x30,
-	0x14, 0x56, 0xd2, 0xad, 0xeb, 0x5e, 0xb7, 0x01, 0x9e, 0xb6, 0x85, 0x68, 0x74, 0x95, 0x05, 0x53,
-	0xe1, 0xd0, 0xc2, 0x10, 0x20, 0x71, 0x1b, 0x9d, 0xd0, 0x26, 0x21, 0x24, 0xdc, 0xed, 0xc4, 0x61,
-	0x4a, 0x5b, 0xab, 0x8b, 0x96, 0xc6, 0x5d, 0x9c, 0x20, 0xa1, 0x89, 0xcb, 0xfe, 0x02, 0xfc, 0x01,
-	0x2e, 0x9c, 0x10, 0x7f, 0x86, 0xbf, 0xc0, 0x0f, 0x41, 0xb6, 0x93, 0x26, 0x4e, 0x93, 0xad, 0xe3,
-	0xc2, 0xd1, 0xcf, 0x2f, 0xef, 0x7b, 0xef, 0xfb, 0x3e, 0x3b, 0x06, 0x08, 0x18, 0x1b, 0xb7, 0x27,
-	0x01, 0x0b, 0x19, 0x5a, 0xdd, 0x9f, 0x9c, 0x05, 0xac, 0x4d, 0x64, 0xa4, 0x6f, 0x6f, 0x8f, 0x18,
-	0x1b, 0x79, 0xb4, 0xe3, 0x4c, 0xdc, 0x8e, 0xe3, 0xfb, 0x2c, 0x74, 0x42, 0x97, 0xf9, 0x5c, 0x25,
-	0xdb, 0x9b, 0xe2, 0xc3, 0xd3, 0xc1, 0x99, 0x13, 0x8c, 0xe8, 0x69, 0x10, 0x79, 0x54, 0xc5, 0xf1,
-	0x63, 0xb8, 0x43, 0x7a, 0x07, 0xd4, 0xa3, 0x21, 0x25, 0xf4, 0x22, 0xa2, 0x3c, 0x44, 0x9b, 0x50,
-	0x15, 0xc9, 0x47, 0x07, 0x96, 0xd1, 0x34, 0x5a, 0xab, 0x24, 0x5e, 0xe1, 0xa7, 0x70, 0x37, 0x4d,
-	0xe5, 0x13, 0xe6, 0x73, 0x8a, 0xb6, 0x61, 0x99, 0x47, 0x83, 0x01, 0xe5, 0x9c, 0x0e, 0x65, 0x7a,
-	0x8d, 0xa4, 0x01, 0xfc, 0xcd, 0x84, 0x1a, 0xe9, 0x11, 0xca, 0x23, 0xaf, 0xb4, 0x2c, 0x6a, 0x00,
-	0x8c, 0x69, 0x30, 0x38, 0x73, 0xfc, 0xf0, 0xe8, 0xc0, 0x32, 0xe5, 0x5e, 0x26, 0x82, 0x30, 0xac,
-	0x84, 0x34, 0x18, 0xbb, 0xbe, 0xe3, 0x75, 0xd9, 0x90, 0x5a, 0x95, 0xa6, 0xd1, 0x5a, 0x26, 0x5a,
-	0x0c, 0xbd, 0x80, 0x9a, 0xc7, 0x06, 0x72, 0x60, 0x6b, 0xa1, 0x69, 0xb4, 0xea, 0x7b, 0xf7, 0xdb,
-	0x1a, 0x3b, 0x6d, 0xd2, 0x7b, 0x17, 0x27, 0x90, 0x69, 0xaa, 0x68, 0x89, 0x87, 0x4e, 0x18, 0x71,
-	0x6b, 0x51, 0xb5, 0xa4, 0x56, 0xc8, 0x86, 0x9a, 0x68, 0xee, 0xbd, 0x33, 0xa6, 0x56, 0x55, 0xc2,
-	0x4d, 0xd7, 0x68, 0x1f, 0xea, 0x8a, 0x45, 0x12, 0x79, 0x94, 0x5b, 0x4b, 0xcd, 0x4a, 0xab, 0xbe,
-	0xb7, 0x93, 0x41, 0xeb, 0x4e, 0x77, 0xdb, 0xa4, 0x4b, 0xd4, 0xf0, 0x24, 0xfb, 0x0d, 0xf6, 0x60,
-	0x8d, 0xf4, 0x3e, 0x44, 0x34, 0xf8, 0x9c, 0x50, 0x8e, 0x61, 0x85, 0x53, 0xce, 0x5d, 0xe6, 0x1f,
-	0xb3, 0x73, 0xea, 0x4b, 0x86, 0x96, 0x89, 0x16, 0xcb, 0xf0, 0x67, 0x5e, 0xc3, 0x5f, 0x25, 0xcf,
-	0x1f, 0xee, 0x0b, 0x85, 0x63, 0xb4, 0x79, 0x54, 0x43, 0xcf, 0x60, 0x29, 0x90, 0x5d, 0x73, 0xcb,
-	0x94, 0xd3, 0x6d, 0xcd, 0x70, 0x19, 0x4f, 0x95, 0xe4, 0xe1, 0x9f, 0x86, 0x00, 0xe9, 0x06, 0xd4,
-	0x49, 0x6d, 0x94, 0xd7, 0xcd, 0x28, 0xd0, 0x2d, 0x3f, 0xb7, 0x59, 0x30, 0x77, 0x56, 0xdb, 0xca,
-	0xfc, 0xda, 0x66, 0x35, 0x5c, 0xd0, 0x35, 0xc4, 0x87, 0xc2, 0xc9, 0x49, 0xb7, 0x31, 0x27, 0x65,
-	0xf6, 0xd4, 0xb8, 0x32, 0xf3, 0x0e, 0xff, 0x61, 0x8a, 0xc1, 0x4f, 0x26, 0x43, 0x7d, 0xf0, 0x7f,
-	0x16, 0xf3, 0x3f, 0x9b, 0x7d, 0x29, 0x67, 0xf6, 0x43, 0xdd, 0xec, 0x55, 0x69, 0x87, 0xdd, 0x52,
-	0xb3, 0x6b, 0x06, 0xd0, 0x3d, 0x2f, 0x2f, 0x8f, 0x84, 0xa7, 0x22, 0x1b, 0xce, 0x50, 0xfb, 0x16,
-	0x20, 0x9d, 0x43, 0xe4, 0x7a, 0xcc, 0x1f, 0xb9, 0x61, 0x34, 0xb5, 0x52, 0x1a, 0x10, 0x33, 0x78,
-	0x4e, 0xa8, 0x36, 0x95, 0x87, 0xa6, 0x6b, 0xfc, 0xcb, 0x80, 0x0d, 0xd2, 0x3b, 0x8e, 0x19, 0x7c,
-	0xe3, 0xfa, 0xc3, 0xdb, 0x08, 0x95, 0x17, 0xc4, 0xbc, 0x41, 0x90, 0xca, 0xad, 0x04, 0x89, 0x3d,
-	0xb0, 0xa0, 0xdd, 0xb3, 0x2f, 0x61, 0x33, 0xdf, 0xef, 0x5c, 0xb7, 0xed, 0x09, 0x6c, 0xa5, 0xdf,
-	0x9d, 0xf8, 0xfd, 0xcc, 0xa4, 0x65, 0xe6, 0x9e, 0xe3, 0xfc, 0xe1, 0x57, 0x7a, 0xd9, 0xb9, 0xfb,
-	0xd9, 0xfb, 0xbe, 0x08, 0x75, 0x41, 0x40, 0x8f, 0x06, 0x9f, 0xdc, 0x01, 0x45, 0x97, 0x29, 0x95,
-	0x62, 0x2a, 0xf4, 0x70, 0x86, 0xa4, 0x02, 0x91, 0xec, 0x47, 0x37, 0x64, 0xa9, 0x56, 0x70, 0xe3,
-	0xea, 0xf7, 0x9f, 0xaf, 0xa6, 0x85, 0xd7, 0x3b, 0x62, 0xb4, 0x4e, 0x02, 0xd4, 0x11, 0x2c, 0xbc,
-	0x36, 0x9e, 0xa0, 0x2b, 0x03, 0xd6, 0x42, 0x8d, 0x1b, 0xb4, 0x5b, 0x5a, 0x59, 0x23, 0xcf, 0xbe,
-	0x2e, 0x2f, 0xdb, 0x42, 0x53, 0xb6, 0x60, 0xe3, 0x8d, 0x5c, 0x0b, 0x91, 0x9f, 0x34, 0xd1, 0x87,
-	0xea, 0x40, 0x1e, 0x11, 0xd4, 0x98, 0xa9, 0xa9, 0x9d, 0x1d, 0x7b, 0xa7, 0x74, 0x3f, 0x06, 0xdb,
-	0x92, 0x60, 0xf7, 0xf0, 0x8a, 0x02, 0x53, 0x65, 0x63, 0x8c, 0x48, 0x1e, 0xb3, 0x02, 0x0c, 0xed,
-	0x9e, 0x2a, 0xc0, 0xd0, 0xcf, 0x67, 0x1e, 0x43, 0x95, 0x15, 0x18, 0xe7, 0x50, 0x1d, 0xca, 0x77,
-	0x40, 0x01, 0x86, 0xf6, 0x96, 0x28, 0xc0, 0xd0, 0x1f, 0x10, 0x09, 0x69, 0x76, 0x4c, 0x9a, 0x2a,
-	0xdb, 0xb9, 0x54, 0xfe, 0xfc, 0x22, 0xc0, 0x3e, 0xc2, 0xe2, 0x85, 0xf8, 0x7b, 0xa1, 0x07, 0x33,
-	0xb5, 0xb2, 0xff, 0x50, 0xbb, 0x51, 0xb6, 0x1d, 0x23, 0xad, 0x4b, 0xa4, 0x55, 0x54, 0x57, 0x48,
-	0xb2, 0x66, 0xbf, 0x2a, 0x5f, 0x41, 0xcf, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x73, 0xb1, 0x8a,
-	0x89, 0x58, 0x09, 0x00, 0x00,
+	// 1048 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x57, 0xcf, 0x6e, 0xe3, 0x44,
+	0x1c, 0x96, 0x9d, 0x6e, 0x93, 0xfc, 0xd2, 0xec, 0x76, 0xa7, 0xdd, 0xad, 0x89, 0xba, 0x25, 0x1a,
+	0x10, 0x2a, 0x2b, 0x88, 0x69, 0x58, 0x2e, 0xbd, 0xb5, 0x89, 0x90, 0x2a, 0x01, 0x82, 0xc9, 0xf6,
+	0xc2, 0x81, 0x5d, 0x37, 0x99, 0x4d, 0x2d, 0x6c, 0x4f, 0xd6, 0x1e, 0xef, 0x0a, 0x10, 0x17, 0xee,
+	0x9c, 0x78, 0x00, 0x5e, 0x00, 0xf1, 0x14, 0xbc, 0x01, 0x37, 0x6e, 0x48, 0x48, 0xbc, 0x06, 0x9a,
+	0x19, 0xff, 0x1b, 0x3b, 0x71, 0xd2, 0xbd, 0x54, 0xe2, 0xe6, 0x99, 0x4c, 0xe7, 0xfb, 0xfd, 0xbe,
+	0xef, 0xf3, 0xf7, 0x73, 0x01, 0x42, 0xc6, 0xfc, 0xc1, 0x22, 0x64, 0x9c, 0xa1, 0xee, 0xd9, 0xe2,
+	0x3a, 0x64, 0x03, 0x22, 0x77, 0xae, 0x7a, 0x87, 0x73, 0xc6, 0xe6, 0x1e, 0xb5, 0x9d, 0x85, 0x6b,
+	0x3b, 0x41, 0xc0, 0xb8, 0xc3, 0x5d, 0x16, 0x44, 0xea, 0x70, 0xef, 0x6c, 0xee, 0xf2, 0xeb, 0xf8,
+	0x6a, 0x30, 0x65, 0xbe, 0xed, 0x39, 0xfe, 0xc2, 0x09, 0x67, 0x27, 0x1f, 0x9d, 0x3c, 0xb1, 0x1d,
+	0x71, 0x87, 0x3d, 0x62, 0xbe, 0xcf, 0x82, 0x73, 0xf7, 0x7b, 0x9b, 0xd0, 0x68, 0xc1, 0x82, 0x88,
+	0xda, 0x5f, 0x9e, 0xdb, 0x61, 0xf2, 0xac, 0xae, 0xc0, 0xef, 0xc3, 0x3d, 0x32, 0x19, 0x53, 0x8f,
+	0x72, 0x4a, 0xe8, 0xcb, 0x98, 0x46, 0x1c, 0x3d, 0x84, 0x6d, 0x51, 0xd0, 0xc5, 0xd8, 0x32, 0xfa,
+	0xc6, 0x71, 0x97, 0x24, 0x2b, 0xfc, 0x01, 0xec, 0xe6, 0x47, 0xd5, 0x25, 0xc8, 0x82, 0x66, 0x14,
+	0x4f, 0xa7, 0x34, 0x8a, 0xe4, 0xe1, 0x16, 0x49, 0x97, 0xf8, 0x67, 0x13, 0x5a, 0x64, 0x42, 0x68,
+	0x14, 0x7b, 0x2b, 0xaf, 0x44, 0x47, 0x00, 0x3e, 0x0d, 0xa7, 0xd7, 0x4e, 0xc0, 0x2f, 0xc6, 0x96,
+	0x29, 0x7f, 0x2b, 0xec, 0x20, 0x0c, 0x3b, 0x9c, 0x86, 0xbe, 0x1b, 0x38, 0xde, 0x88, 0xcd, 0xa8,
+	0xd5, 0xe8, 0x1b, 0xc7, 0x6d, 0xa2, 0xed, 0xa1, 0x4f, 0xa0, 0xe5, 0xb1, 0xa9, 0xe4, 0xc5, 0xda,
+	0xea, 0x1b, 0xc7, 0x9d, 0xe1, 0x5b, 0x03, 0x8d, 0xc4, 0x01, 0x99, 0x7c, 0x96, 0x1c, 0x20, 0xd9,
+	0x51, 0x51, 0x52, 0xc4, 0x1d, 0x1e, 0x47, 0xd6, 0x1d, 0x55, 0x92, 0x5a, 0xa1, 0x1e, 0xb4, 0x44,
+	0x71, 0x5f, 0x38, 0x3e, 0xb5, 0xb6, 0x25, 0x5c, 0xb6, 0x46, 0xa7, 0xd0, 0x99, 0x5e, 0x3b, 0xe1,
+	0x9c, 0x92, 0xd8, 0xa3, 0x91, 0xd5, 0xec, 0x37, 0x8e, 0x3b, 0x43, 0xab, 0x8c, 0x36, 0x22, 0xaa,
+	0x6b, 0x52, 0x3c, 0x8c, 0x3d, 0xb8, 0x4b, 0x26, 0x5f, 0xc5, 0x34, 0xfc, 0x2e, 0xe5, 0x19, 0xc3,
+	0x4e, 0x44, 0xa3, 0xc8, 0x65, 0xc1, 0x53, 0xf6, 0x2d, 0x0d, 0x24, 0x35, 0x6d, 0xa2, 0xed, 0x15,
+	0x88, 0x33, 0x6b, 0x88, 0x6b, 0x94, 0x89, 0xc3, 0xdf, 0x08, 0x59, 0x13, 0xb4, 0x75, 0x52, 0xa1,
+	0x13, 0x68, 0x86, 0xb2, 0xe2, 0xc8, 0x32, 0x65, 0x4b, 0x07, 0x15, 0x02, 0x93, 0x8e, 0xd2, 0x73,
+	0xf8, 0x37, 0x43, 0x00, 0x8c, 0x42, 0xea, 0xe4, 0xbe, 0x29, 0x8b, 0x65, 0x2c, 0x11, 0xab, 0xdc,
+	0xb3, 0xb9, 0xa4, 0xe7, 0xa2, 0xa0, 0x8d, 0xcd, 0x05, 0x2d, 0x0a, 0xb7, 0xa5, 0x0b, 0x87, 0xc7,
+	0xc2, 0xba, 0x69, 0xb5, 0x09, 0x1f, 0xab, 0x3c, 0x59, 0xe0, 0xc9, 0xd4, 0x2d, 0xfd, 0xab, 0x29,
+	0x9a, 0xbe, 0x5c, 0xcc, 0xf4, 0xa6, 0xdf, 0x58, 0xc4, 0x5b, 0x76, 0x77, 0xb3, 0xe4, 0xee, 0x33,
+	0xdd, 0xdd, 0xdb, 0xd2, 0x0a, 0x6f, 0x57, 0xdd, 0xad, 0xa9, 0xae, 0x9b, 0x5c, 0x46, 0x44, 0x4a,
+	0x50, 0xd5, 0x77, 0x25, 0x3e, 0x3f, 0x05, 0xc8, 0x8b, 0x47, 0x87, 0xd0, 0xf6, 0x58, 0x30, 0x77,
+	0x79, 0x9c, 0x79, 0x27, 0xdf, 0x10, 0x85, 0x7b, 0x0e, 0x57, 0x3f, 0x2a, 0xd3, 0x64, 0x6b, 0xfc,
+	0xbb, 0x01, 0x0f, 0xc8, 0xe4, 0x69, 0x42, 0xdb, 0xb9, 0x1b, 0xcc, 0x6e, 0xa2, 0x4e, 0x59, 0x05,
+	0x73, 0x8d, 0x0a, 0x8d, 0x1b, 0xa9, 0x90, 0x08, 0xbf, 0xa5, 0x25, 0xe9, 0x10, 0x1e, 0x96, 0xeb,
+	0x5d, 0x9b, 0xa7, 0x97, 0x70, 0x90, 0xff, 0xcd, 0x65, 0x70, 0x55, 0xe8, 0x72, 0x95, 0x93, 0x37,
+	0x78, 0xd9, 0xf0, 0x13, 0xb0, 0xaa, 0xd7, 0xae, 0x2d, 0xe6, 0x5f, 0x03, 0xda, 0x59, 0xce, 0x95,
+	0xc2, 0xc8, 0xa8, 0xa4, 0xf8, 0x3e, 0xdc, 0x21, 0x23, 0x72, 0x31, 0x96, 0x8e, 0xeb, 0x12, 0xb5,
+	0x40, 0xbb, 0xd0, 0x78, 0x41, 0x15, 0xdd, 0x26, 0x11, 0x8f, 0xe2, 0x5c, 0xc4, 0x9d, 0x90, 0x27,
+	0x2f, 0x82, 0x5a, 0x88, 0x73, 0x34, 0x98, 0x25, 0xaf, 0xb4, 0x78, 0x14, 0x5e, 0x70, 0x03, 0x4e,
+	0xc3, 0x57, 0x8e, 0x97, 0xd8, 0x3b, 0x5b, 0x8b, 0x9e, 0xd3, 0xe7, 0xcb, 0xc0, 0xe5, 0x32, 0xc2,
+	0xbb, 0x44, 0xdb, 0x2b, 0xf0, 0xd5, 0xd2, 0xf8, 0x42, 0xb0, 0xf5, 0xc2, 0x73, 0xe6, 0x56, 0x5b,
+	0xee, 0xca, 0x67, 0xfc, 0x1c, 0x76, 0xc9, 0x88, 0xe8, 0x03, 0xf2, 0xcd, 0xfa, 0x5d, 0x81, 0x8a,
+	0x3f, 0x84, 0xfb, 0x05, 0x84, 0xb5, 0xd4, 0x3f, 0x83, 0x7b, 0x64, 0x44, 0xb4, 0x41, 0x92, 0xe1,
+	0x19, 0x45, 0xbc, 0x75, 0xb3, 0x35, 0xaf, 0xa7, 0xa1, 0xd5, 0xa3, 0x3a, 0xde, 0x74, 0x76, 0x0c,
+	0xcb, 0xb3, 0x63, 0xf5, 0x38, 0xcc, 0x86, 0xc7, 0x5f, 0x86, 0x84, 0xd0, 0x83, 0xf4, 0x7f, 0x62,
+	0x22, 0x7c, 0x22, 0xe5, 0x2c, 0x65, 0xe0, 0x21, 0xb4, 0x13, 0xc2, 0xe8, 0x2c, 0x61, 0x30, 0xdf,
+	0xc0, 0x7f, 0x28, 0x3e, 0xf4, 0x69, 0x7a, 0x7b, 0x9d, 0xe9, 0x4a, 0x34, 0x6b, 0x8c, 0xa3, 0x77,
+	0xfe, 0xb9, 0xec, 0xbc, 0x34, 0x65, 0x6b, 0x3b, 0x97, 0xe3, 0x88, 0x4e, 0xd9, 0x8c, 0x66, 0x0e,
+	0xcd, 0xd6, 0xc3, 0xbf, 0x5b, 0xd0, 0x11, 0x26, 0x9a, 0xd0, 0xf0, 0x95, 0x3b, 0xa5, 0x88, 0xe5,
+	0x39, 0x2d, 0x22, 0x13, 0xbd, 0x5b, 0x49, 0xe0, 0x25, 0x13, 0xa0, 0x97, 0xe6, 0x74, 0xf6, 0x31,
+	0x3c, 0x48, 0x4b, 0xc3, 0x47, 0x3f, 0xfd, 0xf9, 0xcf, 0x2f, 0xa6, 0x85, 0xf7, 0x6c, 0xd1, 0x80,
+	0x9d, 0x5e, 0x6e, 0x8b, 0x0c, 0x3c, 0x35, 0x1e, 0xa3, 0x18, 0xee, 0x72, 0x2d, 0x18, 0xd1, 0x7b,
+	0x2b, 0x21, 0xb5, 0x40, 0xae, 0x03, 0xed, 0x4b, 0xd0, 0x1e, 0x7e, 0x50, 0x02, 0x8d, 0x83, 0x14,
+	0xf6, 0x39, 0xc0, 0x54, 0x71, 0xc8, 0x98, 0x8f, 0x8e, 0x2a, 0x90, 0x9a, 0x4d, 0xea, 0xa0, 0x0e,
+	0x24, 0xd4, 0x7d, 0xbc, 0xa3, 0xa0, 0xd4, 0xa5, 0x09, 0x42, 0xac, 0xfc, 0xb9, 0x1c, 0x41, 0x7b,
+	0x31, 0x6f, 0x80, 0xa0, 0x2e, 0x15, 0x08, 0x2e, 0xc0, 0x4c, 0x05, 0xda, 0x72, 0x04, 0x2d, 0x4f,
+	0x37, 0xa0, 0xab, 0x97, 0xd0, 0xa5, 0x2e, 0xb5, 0x7f, 0x50, 0x8e, 0xfb, 0x51, 0x40, 0x7d, 0x0d,
+	0xed, 0x97, 0x32, 0xab, 0x04, 0xd2, 0xa3, 0x0a, 0x52, 0x31, 0x28, 0xeb, 0x80, 0xf6, 0x24, 0x50,
+	0x17, 0x75, 0x14, 0x90, 0xbc, 0x12, 0xbd, 0x86, 0xfd, 0x5c, 0x8a, 0x51, 0xf6, 0x9d, 0x83, 0xd6,
+	0x7d, 0x14, 0xd5, 0x01, 0xbd, 0x23, 0x81, 0x1e, 0x61, 0x2b, 0x51, 0x45, 0xde, 0xfa, 0x2c, 0x8c,
+	0x3d, 0x5a, 0x50, 0xe8, 0x35, 0xec, 0xe7, 0x0a, 0xd5, 0x03, 0x6f, 0x2c, 0x56, 0x0d, 0x70, 0x2e,
+	0x1c, 0x87, 0xbd, 0x8c, 0xcd, 0x02, 0xee, 0x51, 0x15, 0x77, 0x53, 0x62, 0xb1, 0x84, 0x3d, 0xc4,
+	0x07, 0x55, 0x58, 0x89, 0x94, 0xb4, 0x9b, 0xdb, 0xa5, 0xbe, 0xdd, 0x8d, 0x9d, 0x53, 0xd3, 0xae,
+	0xc2, 0x3a, 0x35, 0x1e, 0x5f, 0x6d, 0xcb, 0x7f, 0x82, 0x3f, 0xfe, 0x2f, 0x00, 0x00, 0xff, 0xff,
+	0xa2, 0x32, 0xfe, 0x41, 0x82, 0x0f, 0x00, 0x00,
 }

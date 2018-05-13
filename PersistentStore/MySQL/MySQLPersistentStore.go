@@ -22,8 +22,11 @@ const (
 	RIGHT_BRACKETS = ")"
 
 	SELECT_ALL = "*"
+	)
 
-)
+func ISErrorNoRows(err error)bool {
+	return err == sql.ErrNoRows
+}
 
 //SQL : select a AS a1,b AS b1 from table1 AS  where c=3 and d =4 order by f limit 5
 /// mysql := NewAPSMySQL(nil)
@@ -222,7 +225,6 @@ func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 func (this *APSMySQLResult)FetchAll(dest...interface{})(error) {
 	return this.lastError
 }
-
 
 type APSMySQL struct {
 
