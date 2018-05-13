@@ -54,7 +54,6 @@ service RoomService {
 			};
 		}
 
-
 		//创建计费方式
         	rpc createRoomChargeRule(RCRCreateRequest) returns (Aphro.CommonBiz.Response) {
         		option (google.api.http) = {
@@ -83,6 +82,55 @@ service RoomService {
         			body:"*"
         		};
         	}
+
+
+            //开始一个房间的事务
+        	rpc roomTransactionBegin(RSTransactionBeginRequest) returns (Aphro.CommonBiz.Response) {
+                option (google.api.http) = {
+                    post: "/room/transaction/begin"
+                    body:"*"
+                 };
+            }
+
+            //挂起一个房间的事务
+        	rpc roomTransactionSuspend(RSTransactionSuspendRequest) returns (Aphro.CommonBiz.Response) {
+                option (google.api.http) = {
+                    post: "/room/transaction/suspend"
+                    body:"*"
+                 };
+            }
+
+            //结束一个房间的事务
+        	rpc roomTransactionEnd(RSTransactionEndRequest) returns (Aphro.CommonBiz.Response) {
+                option (google.api.http) = {
+                    post: "/room/transaction/end"
+                    body:"*"
+                 };
+            }
+
+            //创建一个房间的房费
+        	rpc roomTransactionCreateRoomFee(RSTransactionCreateRoomFeeRequest) returns (Aphro.CommonBiz.Response) {
+                option (google.api.http) = {
+                    post: "/room/transaction/createRoomFee"
+                    body:"*"
+                 };
+            }
+
+            //查询一个房间的房费
+         	rpc roomTransactionQueryRoomFee(RSTransactionQueryRoomFeeRequest) returns (Aphro.CommonBiz.Response) {
+                 option (google.api.http) = {
+                     post: "/room/transaction/createRoomFee"
+                     body:"*"
+                  };
+             }
+
+            //更新一个房间的房费信息
+ //        	rpc roomTransactionUpdateRoomFee(RSTransactionUpdateRoomFeeRequest) returns (Aphro.CommonBiz.Response) {
+ //                option (google.api.http) = {
+  //                   post: "/room/transaction/createRoomFee"
+    //                 body:"*"
+      //            };
+        //     }
 
 }
 
@@ -239,4 +287,83 @@ message RCRCreateRequest {
 message RCRCreateResponse {
 	bool success = 1;
 	uint32 recodeID = 2;
+}
+
+message RSTransactionBeginRequest {
+	string  sessionToken = 1;
+	uint32  roomID  =   2;
+    uint32  roomChargeRuleID = 3;
+}
+
+message RSTransactionBeginResponse {
+    bool success = 1;
+    uint32 transactionID = 2;
+}
+
+message RSTransactionSuspendRequest {
+	string  sessionToken = 1;
+	uint32  roomID  =   2;
+    uint32  transactionID = 3;
+   // uint32  merchantID =4;
+}
+
+message RSTransactionSuspendResponse {
+    bool success = 1;
+}
+
+message RSTransactionEndRequest {
+	string  sessionToken = 1;
+	uint32  roomID  =   2;
+    uint32 transactionID = 3;
+    uint32  merchantID =4;
+
+}
+
+message RSTransactionEndResponse {
+    bool success = 1;
+}
+
+message RSTransactionCreateRoomFeeRequest {
+	string  sessionToken = 1;
+	float   fee	=	2;
+	string	start	=3;
+	string	end	=	4;
+	uint32 interval = 5;
+	uint32 intervalUnit = 6;
+	uint32 merchantID = 7;
+	uint32 roomID = 8;
+	uint32 transactionID = 9;
+	uint32 flag = 10;
+}
+
+message RSTransactionCreateRoomFeeResponse {
+    bool success = 1;
+}
+
+message RSTransactionQueryRoomFeeRequest {
+	string  sessionToken = 1;
+	uint32 transactionID = 9;
+	uint32  transactionRoomFeeID = 2;
+	uint32 roomID = 8;
+}
+
+message RSTransactionQueryRoomFeeResponse {
+    bool success = 1;
+    repeated RSTransactionRoomFeeResult roomFees = 2;
+}
+
+message RSTransactionRoomFeeResult {
+	uint32  transactionRoomFeeID = 1;
+	float   fee	=	2;
+	uint32  createTime = 12;
+	uint32  endTime = 13;
+		float   feePerInterval = 11;
+	string	start	=3;
+	string	end	=	4;
+	uint32 interval = 5;
+	uint32 intervalUnit = 6;
+	uint32 merchantID = 7;
+	uint32 roomID = 8;
+	uint32 transactionID = 9;
+	uint32 flag = 10;
 }

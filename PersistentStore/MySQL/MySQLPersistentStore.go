@@ -195,7 +195,6 @@ func (this *APSMySQLResult)LastInsertId() (int64, error) {
 	} else {
 		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
 	}
-
 	return lastInsertId,this.lastError
 }
 
@@ -335,7 +334,7 @@ func (this *APSMySQL)Reset()(PersistentStore.IAphroPersistentStore) {
 
 
 func (this *APSMySQL) Select(columnsAs map[string]string)(PersistentStore.IAphroSQLPersistentStore) {
-	//this.Reset()
+	this.Reset()
 	this.token = APSMySQLToken_SELECT
 	if columnsAs == nil {
 		this.columns = nil
@@ -369,7 +368,7 @@ func (this *APSMySQL)From(entity string, entityAlias string)(PersistentStore.IAp
 }
 
 func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{})(PersistentStore.IAphroSQLPersistentStore) {
-	//this.Reset()
+	this.Reset()
 	this.token = APSMySQLToken_INSERT
 	//entity
 	e := new(APSEntity)
@@ -389,7 +388,7 @@ func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{
 
 
 func (this *APSMySQL)Update(entity string,columnValues map[string]interface{})(PersistentStore.IAphroSQLPersistentStore) {
-	//this.Reset()
+	this.Reset()
 	this.token = APSMySQLToken_UPDATE
 	//entity
 	e := new(APSEntity)
@@ -401,7 +400,7 @@ func (this *APSMySQL)Update(entity string,columnValues map[string]interface{})(P
 }
 
 func (this *APSMySQL)Delete()(PersistentStore.IAphroSQLPersistentStore) {
-	//this.Reset()
+	this.Reset()
 	this.token = APSMySQLToken_DELETE
 	return this
 }
@@ -456,7 +455,7 @@ func (this *APSMySQL)RightJoin(entity string,entityAlais string) (PersistentStor
 }
 
 func (this *APSMySQL)Query(querySQL string, bindsValues...interface{})(PersistentStore.IAphroPersistentStoreResult) {
-	//this.Reset()
+	this.Reset()
 	this.prepareStatement = querySQL
 	this.bindValues = bindsValues
 

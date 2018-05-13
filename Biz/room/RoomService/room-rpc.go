@@ -10,11 +10,12 @@ import (
     "github.com/lampard1014/aphro/Gateway/error"
     "strconv"
     "strings"
+    "time"
 )
 
-const (
-	port  = ":10090"
-)
+//const (
+//	port  = ":10090"
+//)
 
 
 const (
@@ -26,6 +27,11 @@ const (
     RoomStatusDisable = 2
 
     RCRIDDelimiter  = "&"
+
+    RoomTransactionBegin = 0
+    RoomTransactionSuspend = 1
+    RoomTransactionEnd = 2
+
 )
 
 type RoomServiceImp struct{}
@@ -554,17 +560,355 @@ func (s *RoomServiceImp) DeleteRoomChargeRule(ctx context.Context, in *Aphro_Roo
 
 }
 
+func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Room_pb.RSTransactionBeginRequest) (*Aphro_CommonBiz.Response, error) {
+    roomChargeRuleID := in.RoomChargeRuleID
+    roomId := in.RoomID
+    sessionToken := in.SessionToken
 
-//func main() {
-//    defer deferFunc()
-//    lis, err := net.Listen("tcp", port)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//    s := grpc.NewServer()
-//    merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
-//    err = s.Serve(lis)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//}
+    var returnErr error = nil
+    var res *Aphro_CommonBiz.Response = nil
+    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    if sessionTokenError == nil {
+        mysql,err := MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+                //先检查房间是否可用
+                querySQL := "SELECT `room_name`,`status`,`terminal_code` FROM `merchant_room` WHERE `ID` = ? LIMIT 1"
+                var (
+                    room_name string
+                    status int
+                    terminal_code string
+                )
+                err := m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
+                if err == nil && status == RoomStatusEnable {
+                    //新增一个事务
+                    querySQL := "INSERT  INTO `transaction_room` (`room_id`,`room_name`,`start_time`,`update_time`,`status`,`terminal_code`) VALUES (?,?,?,?,?,?)"
+                    startTime := time.Now()
+                    transactionId,err := m.Query(querySQL,roomId,room_name,startTime,startTime,RoomTransactionBegin,terminal_code).LastInsertId()
+                    if err == nil {
+
+                        rcrRequest := &Aphro_Room_pb.RCRQueryRequest{}
+                        rcrRequest.RCRID = roomChargeRuleID
+                        rcrRequest.SessionToken = sessionToken
+                        rcr,err := s.QueryRoomChargeRule(ctx,rcrRequest)
+                        if err == nil {
+                            var rcrRes *Aphro_Room_pb.RCRQueryResponse
+                            err := Response.UnmarshalAny(rcr.Result,rcrRes)
+                            if err == nil && rcrRes.Success{
+                                rcr := rcrRes.Results[0]
+                                _,err := s.RoomTransactionCreateRoomFee(ctx,&Aphro_Room_pb.RSTransactionCreateRoomFeeRequest{
+                                    SessionToken:sessionToken,
+                                    Fee:rcr.Fee,
+                                    Start:rcr.Start,
+                                    End:rcr.End,
+                                    IntervalUnit:rcr.IntervalUnit,
+                                    Interval:rcr.Interval,
+                                    MerchantID:rcr.MerchantID,
+                                    RoomID:roomId,
+                                    TransactionID:uint32(transactionId),
+                                    Flag:0,
+                                })
+                                if err == nil {
+                                    querySQL := "UPDATE `merchant_room` SET `status` = ?  WHERE `ID` = ? LIMIT 1"
+                                    _,err := m.Query(querySQL,RoomStatusInUse,roomId).RowsAffected()
+                                    if err == nil {
+                                        res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionBeginResponse{Success:true,TransactionID:uint32(transactionId)})
+                                        return res,err
+                                    } else {
+                                        return res,err
+                                    }
+                                } else {
+                                    return res,err
+                                }
+
+                            } else {
+                                return res, err
+                            }
+                        } else {
+                            return res,err
+                        }
+
+                    } else {
+                        return res,err
+                    }
+                } else if status != RoomStatusEnable {
+                    return res, AphroError.New(AphroError.BizError,"房间不可用")
+                } else {
+                    return res,err
+                }
+
+            } else {
+                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            }
+        } else {
+            returnErr = err
+        }
+    } else {
+        returnErr = sessionTokenError
+    }
+    return res,returnErr
+}
+// 挂起一个房间的事务
+func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_Room_pb.RSTransactionSuspendRequest) (*Aphro_CommonBiz.Response, error){
+    transactionID := in.TransactionID
+    roomId := in.RoomID
+    sessionToken := in.SessionToken
+    //merchantID := in.MerchantID
+
+    var returnErr error = nil
+    var res *Aphro_CommonBiz.Response = nil
+    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    if sessionTokenError == nil {
+        mysql,err := MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+                //先检查房间是否可用
+                querySQL := "SELECT `room_name`,`status`,`terminal_code` FROM `merchant_room` WHERE `ID` = ? LIMIT 1"
+                var (
+                    room_name string
+                    status int
+                    terminal_code string
+                )
+                err := m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
+                if err == nil && status == RoomStatusInUse {
+                    //更新一个事务
+                    var whereCondition []string = []string{}
+                    var binds []interface{} = []interface{}{}
+                    startTime := time.Now()
+                    binds = append(binds,startTime,RoomTransactionSuspend)
+                    if roomId != 0 {
+                        whereCondition = append(whereCondition, "`room_id` =  ?")
+                        binds = append(binds,roomId)
+                    }
+
+                    if transactionID != 0 {
+                        whereCondition = append(whereCondition, "`transaction_id` =  ?")
+                        binds = append(binds,transactionID)
+                    }
+
+                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
+                    _,err := m.Query(querySQL,binds...).RowsAffected()
+                    if err == nil {
+                        res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionSuspendResponse{Success:true})
+                        return res ,err
+                    } else {
+                        return res,nil
+                    }
+                } else if err == nil {
+                    return res, AphroError.New(AphroError.BizError,"房间不可用")
+                } else {
+                    return res,err
+                }
+
+            } else {
+                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            }
+        } else {
+            returnErr = err
+        }
+    } else {
+        returnErr = sessionTokenError
+    }
+    return res,returnErr
+}
+
+// 结束一个房间的事务
+func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_pb.RSTransactionEndRequest) (*Aphro_CommonBiz.Response, error) {
+    transactionID := in.TransactionID
+    roomId := in.RoomID
+    sessionToken := in.SessionToken
+    //merchantID := in.MerchantID
+
+    var returnErr error = nil
+    var res *Aphro_CommonBiz.Response = nil
+    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    if sessionTokenError == nil {
+        mysql,err := MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+                //先检查房间是否可用
+                querySQL := "SELECT `room_name`,`status`,`terminal_code` FROM `merchant_room` WHERE `ID` = ? LIMIT 1"
+                var (
+                    room_name string
+                    status int
+                    terminal_code string
+                )
+                err := m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
+                if err == nil && status == RoomStatusInUse {
+                    //更新一个事务
+                    var whereCondition []string = []string{}
+                    var binds []interface{} = []interface{}{}
+                    startTime := time.Now()
+                    binds = append(binds,startTime,RoomTransactionEnd)
+                    if roomId != 0 {
+                        whereCondition = append(whereCondition, "`room_id` =  ?")
+                        binds = append(binds,roomId)
+                    }
+
+                    if transactionID != 0 {
+                        whereCondition = append(whereCondition, "`transaction_id` =  ?")
+                        binds = append(binds,transactionID)
+                    }
+
+                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
+                    _,err := m.Query(querySQL,binds...).RowsAffected()
+                    if err == nil {
+                        querySQL := "UPDATE `merchant_room` SET `status` = ?  WHERE `ID` = ? LIMIT 1"
+                        _,err := m.Query(querySQL,RoomStatusEnable,roomId).RowsAffected()
+                        if err == nil {
+                            res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionSuspendResponse{Success:true})
+                            return res ,err
+                        }  else {
+                            return res, err
+                        }
+                    } else {
+                        return res,nil
+                    }
+                } else if err == nil {
+                    return res, AphroError.New(AphroError.BizError,"房间不可用")
+                } else {
+                    return res,err
+                }
+            } else {
+                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            }
+        } else {
+            returnErr = err
+        }
+    } else {
+        returnErr = sessionTokenError
+    }
+    return res,returnErr
+}
+// 创建一个房间的房费
+func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionCreateRoomFeeRequest) (*Aphro_CommonBiz.Response, error) {
+
+    sessionToken := in.SessionToken
+    fee := in.Fee
+    start := in.Start
+    end := in.End
+    interval := in.Interval
+    intervalUnit := in.IntervalUnit
+    merchant_id := in.MerchantID
+    roomID := in.RoomID
+    transactionID := in.TransactionID
+    flag := in.Flag
+    var returnErr error = nil
+    var res *Aphro_CommonBiz.Response = nil
+    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    if sessionTokenError == nil {
+        mysql,err := MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+                startTime := time.Now()
+                querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`create_time`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+                _,err := m.Query(querySQL,
+                    0,
+                    startTime,
+                    fee,
+                    start,
+                    end,
+                    interval,
+                    intervalUnit,
+                    merchant_id,
+                    roomID,
+                    transactionID,
+                    flag).LastInsertId()
+                if err == nil {
+                    res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionCreateRoomFeeResponse{Success:true})
+                    return res,err
+                } else {
+                    return res,err
+                }
+            }
+        } else {
+            returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+        }
+    } else {
+        returnErr = sessionTokenError
+    }
+    return res,returnErr
+}
+// 查询一个房间的房费
+func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionQueryRoomFeeRequest) (*Aphro_CommonBiz.Response, error) {
+    transactionID := in.TransactionID
+    roomId := in.RoomID
+    sessionToken := in.SessionToken
+    transactionRoomFeeID := in.TransactionRoomFeeID
+    //merchantID := in.MerchantID
+    var returnErr error = nil
+    var res *Aphro_CommonBiz.Response = nil
+    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    if sessionTokenError == nil {
+        mysql,err := MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+
+                //更新一个事务
+                var whereCondition []string = []string{}
+                var binds []interface{} = []interface{}{}
+                if transactionRoomFeeID != 0 {
+                    whereCondition = append(whereCondition, "`ID` =  ?")
+                    binds = append(binds,transactionRoomFeeID)
+                }
+                if roomId != 0 {
+                    whereCondition = append(whereCondition, "`room_id` =  ?")
+                    binds = append(binds,roomId)
+                }
+                if transactionID != 0 {
+                    whereCondition = append(whereCondition, "`transaction_id` =  ?")
+                    binds = append(binds,transactionID)
+                }
+                querySQL := "SELECT `ID`,`fee`,`create_time`,`end_time`,`fee_per_interval`,`start`,`end`, `interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag` FROM `transaction_roomfee` WHERE " + strings.Join(whereCondition," AND ")
+                var (
+                    ID uint32
+                    fee float32
+                    create_time uint32
+                    end_time uint32
+                    fee_per_interval float32
+                    start string
+                    end string
+                    interval uint32
+                    interval_unit uint32
+                    merchant_id uint32
+                    room_id uint32
+                    transaction_id uint32
+                    flag uint32
+                )
+
+                var roomFeeResultList []*Aphro_Room_pb.RSTransactionRoomFeeResult;
+
+                err := m.Query(querySQL,binds...).FetchAll(func(dest...interface{}){
+                    t := &Aphro_Room_pb.RSTransactionRoomFeeResult{
+                        ID,fee,create_time,end_time,fee_per_interval,
+                        start,end,interval,interval_unit,merchant_id,
+                        room_id,transaction_id,flag,}
+                    roomFeeResultList = append(roomFeeResultList,t)
+                },&ID,&fee,&create_time,&end_time,&fee_per_interval,&start,&end,&interval,&interval_unit,&merchant_id,&room_id,&transaction_id,&flag)
+                if err == nil {
+                    res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionQueryRoomFeeResponse{Success:true,RoomFees:roomFeeResultList})
+                    return res ,err
+                }  else {
+                    return res, err
+                }
+            } else {
+                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            }
+        } else {
+            returnErr = err
+        }
+    } else {
+        returnErr = sessionTokenError
+    }
+    return res,returnErr
+}

@@ -3,9 +3,9 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "github.com/lampard1014/aphro/CommonBiz/Response/PB/response.proto";
 
-package Aphro.Room.pb;
+package Aphro.Order.PB;
 
-service RoomService {
+service OrderService {
 
 		//绑定二维码终端信息
 		rpc terminalBind(RSTerminalBindRequest) returns (Aphro.CommonBiz.Response) {
