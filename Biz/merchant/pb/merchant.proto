@@ -38,6 +38,14 @@ service MerchantService {
 			};
 		}
 
+		//商户下的手机号是否唯一
+		rpc merchantAccountCellphoneUnquie(MerchantAccountCellphoneUnquieReqeuest) returns (Aphro.CommonBiz.Response) {
+			option (google.api.http) = {
+				post: "/merchant/account/isUnique"
+				body:"*"
+			};
+		}
+
 		//商户app 信息
 		rpc merchantInfo(MerchantInfoRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
@@ -140,10 +148,9 @@ message MerchantRegisterResponse {
 }
 
 message MerchantChangePswRequest {
-	string newPsw = 1;
+	string key = 1;
 	string sessionToken = 2;
 	string verifyCode = 3;
-	string cellphone = 4;
 }
 
 message MerchantChangePswResponse {
@@ -153,7 +160,8 @@ message MerchantChangePswResponse {
 message MerchantLoginRequest {
 	string key = 1;
 	string tokenRequest = 2;
-	uint32 merchantID = 3;
+	string sessionToken = 3;
+
 }
 
 message MerchantLoginResponse {
@@ -193,4 +201,13 @@ message MerchantVerifyCodeRequest {
 
 message MerchantVerifyCodeResponse {
 	bool 	success = 1;
+}
+
+message MerchantAccountCellphoneUnquieReqeuest {
+        string cellphone = 1;
+        uint32 role = 2;
+}
+
+message MerchantAccountCellphoneUnquieResponse {
+    bool isExisted = 1;
 }

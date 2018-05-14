@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"github.com/lampard1014/aphro/PersistentStore"
+	"github.com/go-sql-driver/mysql"
+	"github.com/lampard1014/aphro/Gateway/error"
 )
 
 const (
@@ -27,6 +29,8 @@ const (
 func ISErrorNoRows(err error)bool {
 	return err == sql.ErrNoRows
 }
+
+//type MySQLErr *mysql.MySQLError
 
 //SQL : select a AS a1,b AS b1 from table1 AS  where c=3 and d =4 order by f limit 5
 /// mysql := NewAPSMySQL(nil)
@@ -188,59 +192,100 @@ type APSMySQLResult struct {
 }
 
 func (this *APSMySQLResult)LastInsertId() (int64, error) {
-	d,ok := this.rawResult.(sql.Result)
-	var lastInsertId int64 = 0
-	if  ok {
-		lastInsertId , this.lastError = d.LastInsertId()
+
+	if this.lastError != nil {
+		e , ok := this.lastError.(*mysql.MySQLError)
+		if  ok {
+			number := e.Number
+			message := e.Message
+			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+		}
+		return 0,this.lastError
 	} else {
-		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		d,ok := this.rawResult.(sql.Result)
+		var lastInsertId int64 = 0
+		if  ok {
+			lastInsertId , this.lastError = d.LastInsertId()
+		} else {
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		}
+		return lastInsertId,this.lastError
 	}
-	return lastInsertId,this.lastError
 }
 
 func (this *APSMySQLResult)RowsAffected() (int64, error) {
 
-	d,ok := this.rawResult.(sql.Result)
-	var rowsAffected int64 = 0
-	if  ok {
-		rowsAffected , this.lastError = d.RowsAffected()
+	if this.lastError != nil {
+		e , ok := this.lastError.(*mysql.MySQLError)
+		if  ok {
+			number := e.Number
+			message := e.Message
+			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+		}
+		return 0,this.lastError
 	} else {
-		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		d,ok := this.rawResult.(sql.Result)
+		var rowsAffected int64 = 0
+		if  ok {
+			rowsAffected , this.lastError = d.RowsAffected()
+		} else {
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		}
+		return rowsAffected,this.lastError
 	}
-	return rowsAffected,this.lastError
 }
 
 func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 
-	d,ok := this.rawResult.(*sql.Row)
-	if ok {
-		this.lastError = d.Scan(dest...)
+	if this.lastError != nil {
+		e , ok := this.lastError.(*mysql.MySQLError)
+		if  ok {
+			number := e.Number
+			message := e.Message
+			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+		}
+		return this.lastError
 	} else {
-		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		d,ok := this.rawResult.(*sql.Row)
+		if ok {
+			this.lastError = d.Scan(dest...)
+		} else {
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		}
+		return this.lastError
 	}
-	return this.lastError
 }
 
 //type APSMySQLResultEnumerator func(dest...interface{}){};
 // todo checkout : is golang pass by value ?
 func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...interface{})(error) {
-	d,ok := this.rawResult.(*sql.Rows)
-	if ok {
-		for d.Next() {
-			 err := d.Scan(in)
-			if err != nil {
-				break
-			} else {
-				if callFunc != nil{
-					callFunc(in...)
-				}
-			}
-			this.lastError = err
+	if this.lastError != nil {
+		e , ok := this.lastError.(*mysql.MySQLError)
+		if  ok {
+			number := e.Number
+			message := e.Message
+			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
 		}
+		return this.lastError
 	} else {
-		this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		d,ok := this.rawResult.(*sql.Rows)
+		if ok {
+			for d.Next() {
+				err := d.Scan(in)
+				if err != nil {
+					break
+				} else {
+					if callFunc != nil{
+						callFunc(in...)
+					}
+				}
+				this.lastError = err
+			}
+		} else {
+			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
+		}
+		return this.lastError
 	}
-	return this.lastError
 }
 
 type APSMySQL struct {
@@ -543,15 +588,9 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 
 func (this *APSMySQL) query()(*APSMySQL) {
 	if this.token ==  APSMySQLToken_SELECT {
-		//Query Row
-		if len(this.limit) == 1 && "1" == this.limit[0] {
-			this.result = &APSMySQLResult{}
-			rawResult := this.client.mysqlClient.QueryRow(this.prepareStatement,this.bindValues...)
-			this.result.rawResult = rawResult
-			//queryRowErr :=.Scan(&uid,&name,&role,&merchantID)
-		} else {
-			//Query All
-		}
+		this.result = &APSMySQLResult{}
+		rawResult := this.client.mysqlClient.QueryRow(this.prepareStatement,this.bindValues...)
+		this.result.rawResult = rawResult
 	} else {
 		stmtIns, stmtInsErr := this.client.mysqlClient.Prepare(this.prepareStatement)
 		if stmtInsErr != nil {

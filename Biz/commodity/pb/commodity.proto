@@ -1,6 +1,6 @@
-
 syntax = "proto3";
 import "google/api/annotations.proto";
+import "github.com/lampard1014/aphro/CommonBiz/Response/PB/response.proto";
 
 
 package Aphro.Commodity.pb;
@@ -8,7 +8,7 @@ package Aphro.Commodity.pb;
 service CommodityService {
 
 		//增加商品
-		rpc commodityCreate(CommodityCreateRequest) returns (CommodityCreateResponse) {
+		rpc commodityCreate(CommodityCreateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
         post: "/merchant/commodity/create"
         body: "*"
@@ -16,7 +16,7 @@ service CommodityService {
 		}
 
     //删除商品
-    rpc commodityDelete(CommodityDeleteRequest) returns (CommodityDeleteResponse) {
+    rpc commodityDelete(CommodityDeleteRequest) returns (Aphro.CommonBiz.Response) {
       option (google.api.http) = {
         post: "/merchant/commodity/delete"
         body: "*"
@@ -24,7 +24,7 @@ service CommodityService {
     }
 
     //更新商品
-    rpc commodityUpdate(CommodityUpdateRequest) returns (CommodityUpdateResponse) {
+    rpc commodityUpdate(CommodityUpdateRequest) returns (Aphro.CommonBiz.Response) {
       option (google.api.http) = {
         post: "/merchant/commodity/update"
         body: "*"
@@ -32,7 +32,7 @@ service CommodityService {
 
     }
       // 查看商品
-    rpc commodityQuery(CommodityQueryRequest) returns (CommodityQueryResponse) {
+    rpc commodityQuery(CommodityQueryRequest) returns (Aphro.CommonBiz.Response) {
        option (google.api.http) = {
          post: "/merchant/commodity/query"
          body: "*"
@@ -42,51 +42,53 @@ service CommodityService {
 
 message InnerComodityInfo {
   string name = 1;
-  double price = 2;
-  uint32 count = 3;
+  float price = 2;
+  uint32 merchantID = 3;
   uint32 id = 4;
 }
-message CommodityCreateRequest {
-  
-  string token = 1;
-  string merchantID = 2;
-  InnerComodityInfo good = 3;
 
+message CommodityCreateRequest {
+    string sessionToken = 7;
+    InnerComodityInfo good = 1;
 }
 
 message CommodityCreateResponse {
-  
   bool successed = 1;
 }
 
-
 message CommodityDeleteRequest {
-  string token = 1;
-  string merchant = 2;
-  InnerComodityInfo good = 3;
+  string sessionToken = 7;
+
+  uint32 merchantID = 3;
+  uint32 id = 4;
 }
 
 message CommodityDeleteResponse {
- 
   bool successed = 1;
 }
 
-
 message CommodityUpdateRequest {
-  string token = 1;
-  string merchantID = 2;
-  InnerComodityInfo good = 3;
+  string sessionToken = 7;
+
+    uint32 id = 1;
+
+  uint32 merchantID = 3;
+    string name = 4;
+    float price = 2;
 }
 
 message CommodityUpdateResponse {
-  bool successed = 1;
+  bool success = 1;
 }
 
 message CommodityQueryRequest {
-  string token = 1;
-  string merchantID = 2;
+  string sessionToken = 1;
+
+  uint32 merchantID = 2;
+  uint32 id = 3;
 }
 
 message CommodityQueryResponse {
+    bool     success  = 2;
     repeated InnerComodityInfo goods = 1;
 }

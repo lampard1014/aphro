@@ -30,7 +30,11 @@ func (e *CustomGRPCError) Error() string {
 
 func (e *CustomGRPCError) GRPCStatus() *status.Status {
 	fmt.Println("called!!!!!!!!!!")
-	return status.New(codes.Code(BizError),e.Message)
+	var c codes.Code = codes.Code(BizError)
+	if e.Code != 0 {
+		c = codes.Code(e.Code)
+	}
+	return status.New(c,e.Message)
 }
 
 //自定义new方法
