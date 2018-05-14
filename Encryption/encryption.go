@@ -12,6 +12,7 @@ import (
     "crypto/sha256"
     "strings"
     "github.com/lampard1014/aphro/Gateway/error"
+    "path/filepath"
 )
 
 /*
@@ -48,11 +49,13 @@ func RsaDecryption(encryptedStr []byte) ([]byte, error) {
     return decryptedData,err
 }
 
-var pemMap = map[string]string{"public": "./rsa/public.pem", "private": "./rsa/private.pem"}
+var pemMap = map[string]string{"public": "./Encryption/rsa/public.pem", "private": "./Encryption/rsa/private.pem"}
 
 func GetBlockFromPem(key string) []byte {
+    //fmt.Println("f:,e:",f)
     path := pemMap[key]
-    fi, err := os.Open(path)
+    f,_ := filepath.Abs(path)
+    fi, err := os.Open(f)
     if err != nil {
         panic(err)
     }

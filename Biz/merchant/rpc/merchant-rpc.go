@@ -74,7 +74,6 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
 
     //step1 验证码检查
 
-    Redis.NewAPSRedis(nil)
     redis ,err := Redis.NewAPSRedis(nil)
     returnErr = err
     if err != nil{
@@ -103,10 +102,9 @@ func (s *merchantService) MerchantRegister(ctx context.Context, in *merchantServ
                         lastInsertID , err := m.Query(querySQL,name, cellphone, Encryption.PswEncryption(psw), role,merchantID).LastInsertId()
                         returnErr = err
                         if err == nil && lastInsertID > 0 {
-                            res,returnErr = Response.NewCommonBizResponse(0,err.Error(),&merchantServicePB.MerchantRegisterResponse{Success:true})
+                            res,returnErr = Response.NewCommonBizResponseWithError(0,err,&merchantServicePB.MerchantRegisterResponse{Success:true})
                         }
                     }
-
                     defer m.Close()
                 } else {
                     returnErr = AphroError.New(AphroError.BizError,"类型断言错误")
@@ -366,7 +364,8 @@ func (s *merchantService) MerchantSendCode(ctx context.Context, in *merchantServ
         smsCodeTmp := "123456"
         ttl := uint64(verifyCodeDuration * time.Second)//60秒过期
         success,err :=redis.Set(checkKey,smsCodeTmp,int64(ttl))
-        res,err = Response.NewCommonBizResponse(0,err.Error(),&merchantServicePB.MerchantSendCodeResponse{Success:success})
+
+        res,err = Response.NewCommonBizResponseWithError(0,err,&merchantServicePB.MerchantSendCodeResponse{Success:success})
         return res,err
     }
 }
@@ -427,8 +426,8 @@ func main() {
     // }
     // opts = append(opts, grpc.UnaryInterceptor(interceptor))
 
-
-    s := grpc.NewServer(grpc.UnaryInterceptor(Response.UnaryServerInterceptor))//opts...)
+	//grpc.UnaryInterceptor(Response.UnaryServerInterceptor)
+    s := grpc.NewServer()//opts...)
     merchantServicePB.RegisterMerchantServiceServer(s, new(merchantService))
     err = s.Serve(lis)
     if err != nil {

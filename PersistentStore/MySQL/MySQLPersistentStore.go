@@ -105,18 +105,18 @@ type APSMySQLClient struct{
 }
 
 
-func (this APSMySQLClient)FetchClient()(interface{}) {
+func (this *APSMySQLClient)FetchClient()(interface{}) {
 	return this.mysqlClient
 }
 
-func (this APSMySQLClient)FetchConfiguration()(PersistentStore.IAphroPersistentStoreClientConfiguration) {
+func (this *APSMySQLClient)FetchConfiguration()(PersistentStore.IAphroPersistentStoreClientConfiguration) {
 	 return this.config
 }
 
-func (this APSMySQLClient)SetConfiguration(c PersistentStore.IAphroPersistentStoreClientConfiguration)(error) {
+func (this *APSMySQLClient)SetConfiguration(c PersistentStore.IAphroPersistentStoreClientConfiguration)(error) {
 	var returnErr error = nil
-	d,b := c.(*APSMySQLClientConfiguration)
-	if !b {
+	d,ok := c.(*APSMySQLClientConfiguration)
+	if ok {
 		this.config = d
 	} else {
 		returnErr = PersistentStore.NewPSErrC(PersistentStore.ConfigurationErr)
@@ -276,9 +276,13 @@ func NewAPSMySQL(userConfig map[string]string ) (*APSMySQL,error) {
 	var ok bool = false
 	if drivername,ok = userConfig[KConfigKey_DriverName]; ok {
 		drivername = userConfig[KConfigKey_DriverName]
+	} else {
+		drivername = vConfigKey_DriverName
 	}
 	if DSN,ok = userConfig[KConfigKey_DSN]; ok {
-		DSN = userConfig[KConfigKey_DriverName]
+		DSN = userConfig[KConfigKey_DSN]
+	} else {
+		DSN = vConfigKey_DSN
 	}
 	c := map[string]interface{} {
 		KConfigKey_DriverName:drivername,

@@ -57,18 +57,18 @@ type APSRedisClient struct{
 }
 
 
-func (this APSRedisClient)FetchClient()(interface{}) {
+func (this *APSRedisClient)FetchClient()(interface{}) {
 	return this.redisClient
 }
 
-func (this APSRedisClient)FetchConfiguration()(PersistentStore.IAphroPersistentStoreClientConfiguration) {
+func (this *APSRedisClient)FetchConfiguration()(PersistentStore.IAphroPersistentStoreClientConfiguration) {
 	return this.config
 }
 
-func (this APSRedisClient)SetConfiguration(c PersistentStore.IAphroPersistentStoreClientConfiguration)(error) {
+func (this *APSRedisClient)SetConfiguration(c PersistentStore.IAphroPersistentStoreClientConfiguration)(error) {
 	var returnErr error = nil
-	d,b := c.(*APSRedisClientConfiguration)
-	if !b {
+	d,ok := c.(*APSRedisClientConfiguration)
+	if ok {
 		this.config = d
 	} else {
 		returnErr = PersistentStore.NewPSErrC(PersistentStore.ConfigurationErr)
@@ -131,6 +131,13 @@ func (this *APSRedis) Reset()(PersistentStore.IAphroPersistentStore) {
 
 func (this *APSRedis) Connect() (PersistentStore.IAphroPersistentStore) {
 	c := this.client.config.GetOptions()
+	//
+	//x := c[kConfigKey_Addr]
+	//y := c[kConfigKey_PSW]
+	//z := c[kConfigKey_DB]
+	//
+	//fmt.Println("kConfigKey_Addr", "kConfigKey_PSW", "kConfigKey_DB",x,y,z)
+
 	redisCli := r.NewClient(&r.Options{
 		Addr:     c[kConfigKey_Addr].(string),
 		Password: c[kConfigKey_PSW].(string), // no password set

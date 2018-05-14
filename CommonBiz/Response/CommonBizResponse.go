@@ -18,6 +18,18 @@ func NewCommonBizResponse(code int64, message string,resultMsg proto.Message )(*
 	     return r,err
 }
 
+func NewCommonBizResponseWithError(code int64, err error,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
+	any, err := MarshalAny(resultMsg)
+
+	var errMsg string = ""
+	if err != nil {
+		errMsg = err.Error()
+	}
+
+	r := &Aphro_CommonBiz.Response{Code:code,Message:errMsg,Result:any}
+	return r,err
+}
+
 func MarshalAny(protoMsg proto.Message)(*any.Any, error) {
 	any, err := ptypes.MarshalAny(protoMsg)
 	return any,err
