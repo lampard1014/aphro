@@ -141,10 +141,12 @@ message MerchantRegisterRequest {
 	string verifyCode = 3;
 	uint32 role = 5;
 	uint32 merchantID = 6;
+	string tokenRequest = 7;
 }
 
 message MerchantRegisterResponse {
 	bool success = 1;
+	string sessionToken = 2;
 }
 
 message MerchantChangePswRequest {
@@ -170,7 +172,7 @@ message MerchantLoginResponse {
 }
 
 message MerchantInfoRequest {
-	string token = 1;
+	string sessionToken = 1;
 	string merchantID = 2;
 }
 
@@ -181,6 +183,7 @@ message InnerMerchantAccount {
 
 message MerchantInfoResponse {
 	string merchantName = 1;
+	uint32 merchantID = 3;
 	InnerMerchantAccount merchantAccount = 2;
 }
 

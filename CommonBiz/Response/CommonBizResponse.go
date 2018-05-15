@@ -8,26 +8,61 @@ import (
 	"golang.org/x/net/context"
 	"github.com/lampard1014/aphro/CommonBiz/Response/PB"
 	"github.com/golang/protobuf/ptypes/any"
+	"github.com/lampard1014/aphro/Gateway/error"
+	"strconv"
 )
 
 
+const (
+	//NoError
+	NoError  = iota + 100
+	//验签错误
+	AuthError
+	//业务逻辑错误
+	BizError
+	//  common biz error //
+	//session过期
+	SessionExpired
+
+)
 
 func NewCommonBizResponse(code int64, message string,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
-	     any, err := MarshalAny(resultMsg)
-	     r := &Aphro_CommonBiz.Response{Code:code,Message:message,Result:any}
-	     return r,err
+
+	if resultMsg == nil {
+		return &Aphro_CommonBiz.Response{code,message,nil},nil
+	} else {
+		any, err := MarshalAny(resultMsg)
+		r := &Aphro_CommonBiz.Response{code,message,any}
+		return r,err
+	}
 }
 
-func NewCommonBizResponseWithError(code int64, err error,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
-	any, err := MarshalAny(resultMsg)
-
+func NewCommonBizResponseWithCodeWithError(code int64, err error,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
 	var errMsg string = ""
 	if err != nil {
 		errMsg = err.Error()
 	}
+	return NewCommonBizResponse(code,errMsg,resultMsg)
+}
 
-	r := &Aphro_CommonBiz.Response{Code:code,Message:errMsg,Result:any}
-	return r,err
+func NewCommonBizResponseWithError(err error,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
+
+	var msg  string
+	var code int64 = int64(BizError)
+	if d,ok := err.(*AphroError.CustomGRPCError); ok {
+		code = int64(d.Code)
+		msg = d.Message
+	} else {
+
+		if err != nil {
+			msg = err.Error()
+		}
+		if tmpCode, ok := strconv.Atoi(msg); ok == nil  && tmpCode != 0 {
+			code = int64(tmpCode)
+		}
+	}
+	return NewCommonBizResponse(code,msg,resultMsg)
+
 }
 
 func MarshalAny(protoMsg proto.Message)(*any.Any, error) {

@@ -4,7 +4,6 @@ import (
 	"golang.org/x/net/context"
     "strings"
     _ "github.com/go-sql-driver/mysql"
-    "github.com/lampard1014/aphro/gateway/error"
     "github.com/lampard1014/aphro/Biz/commodity/pb"
 
     "github.com/lampard1014/aphro/CommonBiz/Response/PB"
@@ -39,7 +38,7 @@ func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                returnError = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnError = err
@@ -87,7 +86,7 @@ func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                returnError = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnError = err
@@ -129,7 +128,7 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                returnError = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnError = err
@@ -196,7 +195,7 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
                 }
                 defer m.Close()
             } else {
-                returnError = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnError = err
@@ -206,25 +205,3 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
     }
     return res , returnError
 }
-
-//func deferFunc() {
-//    if err := recover(); err != nil {
-//        fmt.Println("error happend:")
-//        fmt.Println(err)
-//    }
-//}
-
-//func main()  {
-//    defer deferFunc()
-//    lis, err := net.Listen("tcp", port)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//    s := grpc.NewServer()//opts...)
-//    commodityServicePB.RegisterCommodityServiceServer(s,new(commodityService))
-//    err = s.Serve(lis)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//
-//}

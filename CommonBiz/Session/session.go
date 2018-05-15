@@ -7,12 +7,19 @@ import (
 	"strings"
 	"github.com/lampard1014/aphro/Gateway/error"
 
+	"github.com/lampard1014/aphro/Encryption"
 )
 
 const (
 	tokenDuration = 24 * 3600 * time.Second //1 day
 )
 
+const (
+	//  common biz error //
+	SessionServiceError = iota + 200
+	//session过期
+	SessionServiceError_SessionExpired
+)
 
 func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string, err error) {
 	var returnErr error = nil
@@ -66,19 +73,34 @@ func QuerySessionToken(sessionToken string) (token string, ttl int64,  err error
 	}
 }
 
+func DecodeSessionTokenRequestStr(sessionTokenRequestStr string)(string ,error) {
+	data , err := Encryption.Base64Decode(sessionTokenRequestStr)
+	if err == nil {
+		rsadata,err := Encryption.RsaDecryption(data)
+		return string(rsadata),err
+	} else {
+		return "",err
+	}
+}
+
 func CreateSessionToken(sessionTokenRequestStr string,uid uint32, merchantID uint32) (token string, ttl int64,  err error) {
 	_uid := strconv.FormatUint(uint64(uid),36)
 	_merchantID := strconv.FormatUint(uint64(merchantID),36)
-	_encryptionkey := sessionTokenRequestStr
 
 	//general key
 	t :=  time.Now().Unix()
+	var tokenKey string
 	tokenKeyPrefix := _uid
-	tokenKey := strconv.FormatUint(uint64(t),36)
+	tokenKey = strconv.FormatUint(uint64(t),36)
 	tokenKeySuffix := _merchantID
-	tokenKey = tokenKeyPrefix + tokenKey + tokenKeySuffix
+	tokenKey = tokenKeyPrefix + tokenKey + tokenKeySuffix + sessionTokenRequestStr //uid + timestamp + mid + sessionTokenRequestStr
+	tokenKey = Encryption.PswEncryption(tokenKey) //sha256 encryption
+	//xxteaTokenKey,err := Encryption.XxteaEncryption(_encryptionkey,tokenKey)
+	if err != nil {
+		return
+	}
 	//general value
-	tokenValue := _uid + "@" + _merchantID + "#" + _encryptionkey
+	tokenValue := _uid + "@" + _merchantID + "#" + sessionTokenRequestStr
 
 	redis ,err := Redis.NewAPSRedis(nil)
 	if err != nil{

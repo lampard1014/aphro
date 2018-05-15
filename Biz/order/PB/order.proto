@@ -7,86 +7,40 @@ package Aphro.Order.PB;
 
 service OrderService {
 
-		//绑定二维码终端信息
-		rpc terminalBind(RSTerminalBindRequest) returns (Aphro.CommonBiz.Response) {
+		//创建订单
+		rpc createOrder(OSCreateOrderRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				post: "/room/terminal/bind"
+				post: "/order/create"
 				body:"*"
 			};
 		}
 	
-		//解绑二维码终端信息
-		rpc terminalUnbind(RSTerminalUnbindRequest) returns (Aphro.CommonBiz.Response) {
+		//更新订单
+		rpc updateOrder(OSUpdateOrderRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				post: "/room/terminal/unbind"
+				post: "/order/update"
 				body:"*"
 			};
 		}
 
-		//直接创建房间 同时绑定二维码
-		rpc createRoom(RSCreateRequest) returns (Aphro.CommonBiz.Response) {
+		//删除订单
+		rpc deleteOrder(OSDeleteOrderRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				post: "/room/create"
+				post: "/order/delete"
 				body:"*"
 			};
 		}
 
-		//更新房间的信息 同时更新计费方式
-		rpc updateRoom(RSUpdateRequest) returns (Aphro.CommonBiz.Response) {
+		//查询订单
+		rpc queryOrder(OSQueryOrderRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				post: "/room/update"
+				post: "/order/query"
 				body:"*"
 			};
 		}
-
-		//删除房间
-		rpc deleteRoom(RSDeleteRequest) returns (Aphro.CommonBiz.Response) {
-			option (google.api.http) = {
-				put: "/room/delete/{roomID}"
-				body:"*"
-			};
-		}
-
-		//查询房间
-		rpc queryRoom(RSQueryRequest) returns (Aphro.CommonBiz.Response) {
-			option (google.api.http) = {
-				get: "/room/query"
-			};
-		}
-
-
-		//创建计费方式
-        	rpc createRoomChargeRule(RCRCreateRequest) returns (Aphro.CommonBiz.Response) {
-        		option (google.api.http) = {
-        			post: "/room/charge_rule/create"
-        			body:"*"
-        		};
-        	}
-        //更新计费方式
-        	rpc updateRoomChargeRule(RCRUpdateRequest) returns (Aphro.CommonBiz.Response) {
-        		option (google.api.http) = {
-        			post: "/room/charge_rule/update"
-        			body:"*"
-        		};
-        	}
-        //查询计费方式
-        	rpc queryRoomChargeRule(RCRQueryRequest) returns (Aphro.CommonBiz.Response) {
-        		option (google.api.http) = {
-        			post: "/room/charge_rule/query"
-        			body:"*"
-        		};
-        	}
-        //删除计费方式
-        	rpc deleteRoomChargeRule(RCRDeleteRequest) returns (Aphro.CommonBiz.Response) {
-        		option (google.api.http) = {
-        			post: "/room/charge_rule/delete"
-        			body:"*"
-        		};
-        	}
-
 }
 
-message RSDeleteRequest {
+message OSCreateOrderRequest {
 	uint32 roomID = 1;
 	string sessionToken = 2;
 

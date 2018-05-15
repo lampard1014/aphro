@@ -63,12 +63,11 @@ func (s *RoomServiceImp) TerminalBind(ctx context.Context, in *Aphro_Room_pb.RST
                     returnErr = err
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnErr = err
         }
-
     } else {
         returnErr = checkSessionError
     }
@@ -97,7 +96,7 @@ func (s *RoomServiceImp) TerminalUnbind(ctx context.Context, in *Aphro_Room_pb.R
                     returnErr = err
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnErr = err
@@ -144,7 +143,8 @@ func (s *RoomServiceImp) CreateRoom(ctx context.Context, in *Aphro_Room_pb.RSCre
                     returnErr = err
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                //returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnErr = err
@@ -208,16 +208,16 @@ func (s *RoomServiceImp) UpdateRoom(ctx context.Context, in *Aphro_Room_pb.RSUpd
                         returnErr = err
                     }
                 } else {
-                    returnErr = AphroError.New(AphroError.BizError,"计费模式不能为空")
+                    res,returnErr = Response.NewCommonBizResponse(Response.BizError,"计费模式不能为空",nil)
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
             }
         } else {
             returnErr = err
         }
     } else {
-        returnErr = sessionTokenError
+        res,returnErr = Response.NewCommonBizResponseWithError(Response.BizError,sessionTokenError,nil)
     }
     return res,returnErr
 

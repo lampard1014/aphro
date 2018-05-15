@@ -13,6 +13,12 @@ import (
     "strings"
     "github.com/lampard1014/aphro/Gateway/error"
     "path/filepath"
+    "time"
+    mathRand "math/rand"
+)
+
+const (
+    Delimiter_PSW_USERNAME = "@|@"
 )
 
 /*
@@ -116,7 +122,7 @@ func ParseUsernameAndPsw(key string)(username string ,psw string, err error) {
         rawData, RSADecryptionErr := RsaDecryption(base64DecodeRes)
         if RSADecryptionErr == nil {
             usernameAndPsw := string(rawData)
-            tmpSplit := strings.Split(usernameAndPsw,"@|@")
+            tmpSplit := strings.Split(usernameAndPsw,Delimiter_PSW_USERNAME)
             if 2 == len(tmpSplit) {
                 username = tmpSplit[0]
                 psw = tmpSplit[1]
@@ -130,4 +136,51 @@ func ParseUsernameAndPsw(key string)(username string ,psw string, err error) {
         err = base64DecodeErr
     }
     return username,psw,err
+}
+
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const digitalBytes = "1234567890"
+
+const (
+    letterIdxBits = 6                    // 6 bits to represent a letter index
+    letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+    letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
+var src = mathRand.NewSource(time.Now().UnixNano())
+
+func RandNumberBytesMaskImprSrc(n int) string {
+    b := make([]byte, n)
+    // A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+    for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+        if remain == 0 {
+            cache, remain = src.Int63(), letterIdxMax
+        }
+        if idx := int(cache & letterIdxMask); idx < len(digitalBytes) {
+            b[i] = digitalBytes[idx]
+            i--
+        }
+        cache >>= letterIdxBits
+        remain--
+    }
+
+    return string(b)
+}
+
+func RandStringBytesMaskImprSrc(n int) string {
+    b := make([]byte, n)
+    // A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+    for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+        if remain == 0 {
+            cache, remain = src.Int63(), letterIdxMax
+        }
+        if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+            b[i] = letterBytes[idx]
+            i--
+        }
+        cache >>= letterIdxBits
+        remain--
+    }
+
+    return string(b)
 }

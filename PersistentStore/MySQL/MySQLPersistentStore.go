@@ -26,6 +26,17 @@ const (
 	SELECT_ALL = "*"
 	)
 
+var (
+	MysqlServiceError int
+	MysqlServiceError_PersistentError = MysqlServiceError + 1
+	//MysqlServiceError_PersistentError2 = MysqlServiceError +2
+)
+
+func init() {
+	_MysqlServiceError ,_ := strconv.Atoi("MysqlServiceError")
+	MysqlServiceError = _MysqlServiceError
+}
+
 func ISErrorNoRows(err error)bool {
 	return err == sql.ErrNoRows
 }
