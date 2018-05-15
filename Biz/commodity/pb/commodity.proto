@@ -53,7 +53,8 @@ message CommodityCreateRequest {
 }
 
 message CommodityCreateResponse {
-  bool successed = 1;
+  bool success = 1;
+  uint32 commodityID = 2;
 }
 
 message CommodityDeleteRequest {
@@ -64,7 +65,7 @@ message CommodityDeleteRequest {
 }
 
 message CommodityDeleteResponse {
-  bool successed = 1;
+  bool success = 1;
 }
 
 message CommodityUpdateRequest {

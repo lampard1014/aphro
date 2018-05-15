@@ -8,6 +8,8 @@ import (
 	"github.com/lampard1014/aphro/PersistentStore"
 	"github.com/go-sql-driver/mysql"
 	"github.com/lampard1014/aphro/Gateway/error"
+	"bytes"
+	"encoding/binary"
 )
 
 const (
@@ -28,13 +30,22 @@ const (
 
 var (
 	MysqlServiceError int
-	MysqlServiceError_PersistentError = MysqlServiceError + 1
+	MysqlServiceError_PersistentError int
 	//MysqlServiceError_PersistentError2 = MysqlServiceError +2
 )
 
+func BytesToInt(b []byte) int {
+	bytesBuffer := bytes.NewBuffer(b)
+	var tmp int32
+	binary.Read(bytesBuffer, binary.BigEndian, &tmp)
+	return int(tmp)
+}
+
 func init() {
-	_MysqlServiceError ,_ := strconv.Atoi("MysqlServiceError")
+	_MysqlServiceError := BytesToInt([]byte("MysqlServiceError"))
 	MysqlServiceError = _MysqlServiceError
+	_MysqlServiceError++
+	MysqlServiceError_PersistentError =  _MysqlServiceError
 }
 
 func ISErrorNoRows(err error)bool {

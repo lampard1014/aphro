@@ -10,6 +10,7 @@ import (
     "github.com/lampard1014/aphro/CommonBiz/Session"
     "github.com/lampard1014/aphro/PersistentStore/MySQL"
     "github.com/lampard1014/aphro/CommonBiz/Response"
+    "github.com/lampard1014/aphro/CommonBiz/Error"
 )
 
 const (
@@ -17,11 +18,8 @@ const (
 )
 type CommodityServiceImp struct{}
 
-func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Commodity_pb.CommodityCreateRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Commodity_pb.CommodityCreateRequest) (res *Aphro_CommonBiz.Response,err error) {
     commodityInfo := in.Good;
-    var returnError error
-    var res *Aphro_CommonBiz.Response
-
     _, merchantID ,err := Session.FetchSessionTokenValue(in.SessionToken)
     if err == nil {
         mysql,err := MySQL.NewAPSMySQL(nil)
@@ -29,36 +27,29 @@ func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Com
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "INSERT INTO `merchant_commodity` (`name`,`price`,`merchant_id`) VALUES( ?, ?, ?)"
-                _,err := m.Query(querySQL,commodityInfo.Name,commodityInfo.Price,merchantID).LastInsertId()
+                lastInsertID,err := m.Query(querySQL,commodityInfo.Name,commodityInfo.Price,merchantID).LastInsertId()
                 if err == nil {
-                    //制作 令牌
-                    res,returnError = Response.NewCommonBizResponseWithError(0,err,&Aphro_Commodity_pb.CommodityCreateResponse{Successed:true})
-                } else {
-                    returnError = err
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityCreateResponse{true,uint32(lastInsertID)})
                 }
                 defer m.Close()
             } else {
-                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnError = err
         }
-    } else {
-        returnError = err
     }
-   return res, returnError
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+   return
 }
 
     
-func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Commodity_pb.CommodityDeleteRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Commodity_pb.CommodityDeleteRequest) (res *Aphro_CommonBiz.Response, err error) {
 
     inMerchantID := in.MerchantID
     inCommodityID := in.Id
 
-    var returnError error
-    var res *Aphro_CommonBiz.Response
-
-    _, _ ,err := Session.FetchSessionTokenValue(in.SessionToken)
+    _, _ ,err = Session.FetchSessionTokenValue(in.SessionToken)
 
     if err == nil {
         mysql,err := MySQL.NewAPSMySQL(nil)
@@ -80,35 +71,30 @@ func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Com
                 _,err := m.Query(querySQL,binds...).RowsAffected()
                 if err == nil {
                     //制作 令牌
-                    res,returnError = Response.NewCommonBizResponseWithError(0,err,&Aphro_Commodity_pb.CommodityDeleteResponse{Successed:true})
-                } else {
-                    returnError = err
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityDeleteResponse{true})
                 }
                 defer m.Close()
             } else {
-                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnError = err
         }
-    } else {
-        returnError = err
     }
-   return res, returnError
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
 }
 
 
 
-func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Commodity_pb.CommodityUpdateRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Commodity_pb.CommodityUpdateRequest) (res *Aphro_CommonBiz.Response, err error) {
 
     sessionToken := in.SessionToken
     commodityID := in.Id
     merchantID := in.MerchantID
     name := in.Name
     price := in.Price
-    var res *Aphro_CommonBiz.Response
 
-    var returnError error
     //验证token的合法性
     _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
 
@@ -122,32 +108,26 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
                 querySQL := "UPDATE `merchant_commodity` SET `name`= ? AND `price` = ? AND `merchant_id` = ? WHERE ID = ?"
                 _,err := m.Query(querySQL,name,price,merchantID,commodityID).RowsAffected()
                 if err == nil {
-                    res,returnError = Response.NewCommonBizResponseWithError(0,err,&Aphro_Commodity_pb.CommodityUpdateResponse{Success:true})
-                } else {
-                    returnError = err
+                    res,err  = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityUpdateResponse{true})
                 }
                 defer m.Close()
             } else {
-                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnError = err
         }
-    } else {
-        returnError = sessionTokenError
     }
-   return res, returnError
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
 }
 
-func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Commodity_pb.CommodityQueryRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Commodity_pb.CommodityQueryRequest) (res *Aphro_CommonBiz.Response, err error) {
     sessionToken := in.SessionToken
     merchantID := in.MerchantID
     commdityID := in.Id
     // commodityInfo := in.Goods;
     var goodRes *Aphro_Commodity_pb.CommodityQueryResponse = &Aphro_Commodity_pb.CommodityQueryResponse{}
-
-    var res *Aphro_CommonBiz.Response
-    var returnError error
 
     _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
     if sessionTokenError == nil {
@@ -189,19 +169,16 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
 
                 if err == nil {
                     goodRes.Success = true
-                    res,returnError = Response.NewCommonBizResponseWithError(0,err,goodRes)
-                } else {
-                    returnError = err
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,goodRes)
                 }
                 defer m.Close()
             } else {
-                res,returnError = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+				err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnError = err
         }
-    } else {
-        returnError = sessionTokenError
     }
-    return res , returnError
+	if err != nil {
+		res,err = Response.NewCommonBizResponseWithError(err,nil)
+	}
+    return
 }

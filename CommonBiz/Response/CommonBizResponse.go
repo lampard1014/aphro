@@ -8,23 +8,23 @@ import (
 	"golang.org/x/net/context"
 	"github.com/lampard1014/aphro/CommonBiz/Response/PB"
 	"github.com/golang/protobuf/ptypes/any"
-	"github.com/lampard1014/aphro/Gateway/error"
+	"github.com/lampard1014/aphro/CommonBiz/Error"
 	"strconv"
 )
 
 
-const (
-	//NoError
-	NoError  = iota + 100
-	//验签错误
-	AuthError
-	//业务逻辑错误
-	BizError
-	//  common biz error //
-	//session过期
-	SessionExpired
-
-)
+//const (
+//	//NoError
+//	NoError  = iota + 100
+//	//验签错误
+//	AuthError
+//	//业务逻辑错误
+//	BizError
+//	//  common biz error //
+//	//session过期
+//	SessionExpired
+//
+//)
 
 func NewCommonBizResponse(code int64, message string,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
 
@@ -48,8 +48,8 @@ func NewCommonBizResponseWithCodeWithError(code int64, err error,resultMsg proto
 func NewCommonBizResponseWithError(err error,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
 
 	var msg  string
-	var code int64 = int64(BizError)
-	if d,ok := err.(*AphroError.CustomGRPCError); ok {
+	var code int64 = int64(Error.BizError)
+	if d,ok := err.(*Error.CustomError); ok {
 		code = int64(d.Code)
 		msg = d.Message
 	} else {

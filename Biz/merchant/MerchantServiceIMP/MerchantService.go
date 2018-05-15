@@ -298,13 +298,11 @@ func (s *MerchantServiceIMP) MerchantWaiterCreate(ctx context.Context, in *merch
 }
 
 // 删除商户服务信息
-func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merchantServicePB.MerchantWaiterDeleteRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merchantServicePB.MerchantWaiterDeleteRequest) (res *Aphro_CommonBiz.Response, err error) {
     token := in.Token
     waiterid := in.Waiterid
     //验证token合法性
-    isVaildate, sessionTokenError := Session.IsSessionTokenVailate(token)
-    var returnErr error = nil
-    var res *Aphro_CommonBiz.Response = nil
+    isVaildate, err := Session.IsSessionTokenVailate(token)
     if isVaildate {
         mysql,err := MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -314,34 +312,27 @@ func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merch
                 _,err := m.Query(querySQL,waiterid).RowsAffected()
                 if err == nil {
                     //制作 令牌
-                    res,returnErr = Response.NewCommonBizResponseWithError(0,err,&merchantServicePB.MerchantWaiterDeleteResponse{Success:true})
-                } else {
-                    returnErr = err
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantWaiterDeleteResponse{Success:true})
                 }
                 defer m.Close()
             } else {
-                res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnErr = err
         }
-    } else {
-        returnErr =  sessionTokenError
     }
 
-    return res,returnErr
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+
+    return
 }
 
-func (s *MerchantServiceIMP) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *MerchantServiceIMP) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (res *Aphro_CommonBiz.Response, err error) {
     redis ,err := Redis.NewAPSRedis(nil)
-    var res *Aphro_CommonBiz.Response = nil
-
-    if err != nil{
-        return res,err
-    } else {
+    if err == nil {
         redis.Connect()
         defer redis.Close()
-
         cellphone :=  in.Cellphone
         scene :=  strconv.Itoa(int(in.Scene))
         smsCode := in.SmsCode
@@ -356,17 +347,18 @@ func (s *MerchantServiceIMP) MerchantVerifyCode(ctx context.Context, in *merchan
             errMsg = "验证码验证错误"
         }
         res,err = Response.NewCommonBizResponse(0,errMsg,&merchantServicePB.MerchantVerifyCodeResponse{Success:isVaildate})
-        return res,err
     }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
+
 }
 
-func (s *MerchantServiceIMP) MerchantSendCode(ctx context.Context, in *merchantServicePB.MerchantSendCodeRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *MerchantServiceIMP) MerchantSendCode(ctx context.Context, in *merchantServicePB.MerchantSendCodeRequest) (res *Aphro_CommonBiz.Response, err error) {
     redis ,err := Redis.NewAPSRedis(nil)
-    var res *Aphro_CommonBiz.Response = nil
 
-    if err != nil{
-        return res,err
-    } else {
+    if err == nil {
         redis.Connect()
         defer redis.Close()
         cellphone :=  in.Cellphone
@@ -375,17 +367,17 @@ func (s *MerchantServiceIMP) MerchantSendCode(ctx context.Context, in *merchantS
         smsCodeTmp := Encryption.RandNumberBytesMaskImprSrc(4)
         ttl := uint64(verifyCodeDuration * time.Minute)//60秒过期
         success,err :=redis.Set(checkKey,smsCodeTmp,int64(ttl))
-
-        res,err = Response.NewCommonBizResponseWithError(0,err,&merchantServicePB.MerchantSendCodeResponse{Success:success})
-        return res,err
+        res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantSendCodeResponse{success})
     }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
 }
 
-func (s *MerchantServiceIMP) MerchantAccountCellphoneUnquie(ctx context.Context, in *merchantServicePB.MerchantAccountCellphoneUnquieReqeuest) (*Aphro_CommonBiz.Response, error) {
+func (s *MerchantServiceIMP) MerchantAccountCellphoneUnquie(ctx context.Context, in *merchantServicePB.MerchantAccountCellphoneUnquieReqeuest) (res *Aphro_CommonBiz.Response, err error) {
     cellphone := in.Cellphone
     role := in.Roles
-    var res *Aphro_CommonBiz.Response = nil
-    var returnErr error = nil
 
     mysql,err := MySQL.NewAPSMySQL(nil)
     if err == nil {
@@ -407,16 +399,15 @@ func (s *MerchantServiceIMP) MerchantAccountCellphoneUnquie(ctx context.Context,
             var bingo uint32 = 0
             err := m.Query(querySQL,binds...).FetchRow(&bingo)
             if err == nil {
-                res,returnErr = Response.NewCommonBizResponseWithError(0,err,&merchantServicePB.MerchantAccountCellphoneUnquieResponse{IsExisted:bingo > 0})
-            } else {
-                returnErr = err
+                res,err  = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantAccountCellphoneUnquieResponse{IsExisted:bingo > 0})
             }
             defer m.Close()
         } else {
-            res,returnErr = Response.NewCommonBizResponse(Response.BizError,"mysql类型断言错误",nil)
+            err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
         }
-    } else {
-        returnErr = err
     }
-    return res,returnErr
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
 }

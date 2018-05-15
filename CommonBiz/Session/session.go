@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"github.com/lampard1014/aphro/PersistentStore/Redis"
 	"strings"
-	"github.com/lampard1014/aphro/Gateway/error"
+	"github.com/lampard1014/aphro/CommonBiz/Error"
 
 	"github.com/lampard1014/aphro/Encryption"
 )
@@ -33,7 +33,7 @@ func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 		uid = uidAndMerchantID[0]
 		merchantID = uidAndMerchantID[1]
 	} else {
-		returnErr = AphroError.New(AphroError.BizError,"session 过期 请重新登录")
+		returnErr = Error.New(Error.BizError,"session 过期 请重新登录")
 	}
 	return uid,merchantID,returnErr
 }
