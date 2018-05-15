@@ -249,6 +249,9 @@ func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 		d,ok := this.rawResult.(*sql.Row)
 		if ok {
 			this.lastError = d.Scan(dest...)
+			if this.lastError == sql.ErrNoRows {
+				this.lastError = nil
+			}
 		} else {
 			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
 		}
@@ -280,6 +283,9 @@ func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...inte
 					}
 				}
 				this.lastError = err
+				if this.lastError == sql.ErrNoRows {
+					this.lastError = nil
+				}
 			}
 		} else {
 			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)

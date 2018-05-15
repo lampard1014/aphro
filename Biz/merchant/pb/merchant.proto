@@ -204,8 +204,14 @@ message MerchantVerifyCodeResponse {
 }
 
 message MerchantAccountCellphoneUnquieReqeuest {
-        string cellphone = 1;
-        uint32 role = 2;
+
+  enum Role {
+    Root = 0;
+    Administrator = 1;
+    Operator = 2;
+  }
+  string cellphone = 1;
+  repeated Role roles = 2;
 }
 
 message MerchantAccountCellphoneUnquieResponse {
