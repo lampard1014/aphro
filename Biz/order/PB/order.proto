@@ -41,9 +41,36 @@ service OrderService {
 }
 
 message OSCreateOrderRequest {
-	uint32 roomID = 1;
-	string sessionToken = 2;
+	string sessionToken = 1;
+	uint32 transactionID = 2;
+	uint32 roomID = 3;
 
+	float amount = 4;
+	string outterTransactionID = 5;
+	string userAgent = 6;
+	string comment = 7;
+	string propersalName = 8;
+	uint32 propersalID = 9;
+
+	enum E_propersalAccountType {
+	    SYSTEM = 0;
+	    C_ENDPOINT  =   1;
+	    B_ENDPOINT = 2;
+	}
+	E_propersalAccountType propersalAccountType = 10 [default = SYSTEM];
+	repeated InnerComodityInfo commodities = 11;
+}
+
+message OSCreateOrderResponse {
+    bool success = 1;
+    string orderNumber = 2;
+}
+
+message InnerComodityInfo {
+  string name = 1;
+  float price = 2;
+  uint32 merchantID = 3;
+  uint32 id = 4;
 }
 
 message RSDeleteResponse {
