@@ -13,11 +13,6 @@ import (
     "time"
 )
 
-//const (
-//	port  = ":10090"
-//)
-
-
 const (
     //房间状态 可用
     RoomStatusEnable = 0
@@ -72,7 +67,6 @@ func (s *RoomServiceImp) TerminalBind(ctx context.Context, in *Aphro_Room_pb.RST
 func (s *RoomServiceImp) TerminalUnbind(ctx context.Context, in *Aphro_Room_pb.RSTerminalUnbindRequest) (res *Aphro_CommonBiz.Response,err error) {
     sessionToken := in.SessionToken
     roomID := in.RoomID
-
     var isVaild bool
     isVaild, err = Session.IsSessionTokenVailate(sessionToken)
     if isVaild {
@@ -585,17 +579,15 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
     return
 }
 // 挂起一个房间的事务
-func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_Room_pb.RSTransactionSuspendRequest) (*Aphro_CommonBiz.Response, error){
+func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_Room_pb.RSTransactionSuspendRequest) (res *Aphro_CommonBiz.Response,err error){
     transactionID := in.TransactionID
     roomId := in.RoomID
     sessionToken := in.SessionToken
     //merchantID := in.MerchantID
-
-    var returnErr error = nil
-    var res *Aphro_CommonBiz.Response = nil
-    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
-    if sessionTokenError == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+    _,  err = Session.IsSessionTokenVailate(sessionToken)
+    if err == nil {
+    	var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
@@ -607,7 +599,7 @@ func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_R
                     status int
                     terminal_code string
                 )
-                err := m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
+                err = m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
                 if err == nil && status == RoomStatusInUse {
                     //更新一个事务
                     var whereCondition []string = []string{}
@@ -625,43 +617,34 @@ func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_R
                     }
 
                     querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
-                    _,err := m.Query(querySQL,binds...).RowsAffected()
+                    _,err = m.Query(querySQL,binds...).RowsAffected()
                     if err == nil {
-                        res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionSuspendResponse{Success:true})
-                        return res ,err
-                    } else {
-                        return res,nil
+                        res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionSuspendResponse{true})
                     }
                 } else if err == nil {
-                    return res, AphroError.New(AphroError.BizError,"房间不可用")
-                } else {
-                    return res,err
+					err = Error.NewCustomError(Error.BizError,"房间不可用")
                 }
-
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
-        } else {
-            returnErr = err
         }
-    } else {
-        returnErr = sessionTokenError
     }
-    return res,returnErr
+	if err != nil {
+		res,err = Response.NewCommonBizResponseWithError(err,nil)
+	}
+    return
 }
 
 // 结束一个房间的事务
-func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_pb.RSTransactionEndRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_pb.RSTransactionEndRequest) (res *Aphro_CommonBiz.Response,err error) {
     transactionID := in.TransactionID
     roomId := in.RoomID
     sessionToken := in.SessionToken
     //merchantID := in.MerchantID
-
-    var returnErr error = nil
-    var res *Aphro_CommonBiz.Response = nil
-    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
-    if sessionTokenError == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+    _,  err = Session.IsSessionTokenVailate(sessionToken)
+    if err == nil {
+    	var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
@@ -673,7 +656,7 @@ func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_
                     status int
                     terminal_code string
                 )
-                err := m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
+                err = m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
                 if err == nil && status == RoomStatusInUse {
                     //更新一个事务
                     var whereCondition []string = []string{}
@@ -691,37 +674,28 @@ func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_
                     }
 
                     querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
-                    _,err := m.Query(querySQL,binds...).RowsAffected()
+                    _,err = m.Query(querySQL,binds...).RowsAffected()
                     if err == nil {
                         querySQL := "UPDATE `merchant_room` SET `status` = ?  WHERE `ID` = ? LIMIT 1"
-                        _,err := m.Query(querySQL,RoomStatusEnable,roomId).RowsAffected()
+                        _,err = m.Query(querySQL,RoomStatusEnable,roomId).RowsAffected()
                         if err == nil {
-                            res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionSuspendResponse{Success:true})
-                            return res ,err
-                        }  else {
-                            return res, err
+                            res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionSuspendResponse{true})
                         }
-                    } else {
-                        return res,nil
                     }
                 } else if err == nil {
-                    return res, AphroError.New(AphroError.BizError,"房间不可用")
-                } else {
-                    return res,err
+					err = Error.NewCustomError(Error.BizError,"房间不可用")
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
-            }
-        } else {
-            returnErr = err
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")            }
         }
-    } else {
-        returnErr = sessionTokenError
     }
-    return res,returnErr
+	if err != nil {
+		res,err = Response.NewCommonBizResponseWithError(err,nil)
+	}
+    return
 }
 // 创建一个房间的房费
-func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionCreateRoomFeeRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionCreateRoomFeeRequest) (res *Aphro_CommonBiz.Response,err error) {
 
     sessionToken := in.SessionToken
     fee := in.Fee
@@ -733,18 +707,17 @@ func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *A
     roomID := in.RoomID
     transactionID := in.TransactionID
     flag := in.Flag
-    var returnErr error = nil
-    var res *Aphro_CommonBiz.Response = nil
-    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
-    if sessionTokenError == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+    _,  err = Session.IsSessionTokenVailate(sessionToken)
+    if err == nil {
+    	var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
                 startTime := time.Now()
                 querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`create_time`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
-                _,err := m.Query(querySQL,
+                _,err = m.Query(querySQL,
                     0,
                     startTime,
                     fee,
@@ -757,37 +730,33 @@ func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *A
                     transactionID,
                     flag).LastInsertId()
                 if err == nil {
-                    res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionCreateRoomFeeResponse{Success:true})
-                    return res,err
-                } else {
-                    return res,err
+                    res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionCreateRoomFeeResponse{true})
                 }
             }
         } else {
-            returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+			err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
         }
-    } else {
-        returnErr = sessionTokenError
     }
-    return res,returnErr
+	if err != nil {
+		res,err = Response.NewCommonBizResponseWithError(err,nil)
+	}
+    return
 }
 // 查询一个房间的房费
-func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionQueryRoomFeeRequest) (*Aphro_CommonBiz.Response, error) {
+func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Aphro_Room_pb.RSTransactionQueryRoomFeeRequest) (res *Aphro_CommonBiz.Response,err error) {
     transactionID := in.TransactionID
     roomId := in.RoomID
     sessionToken := in.SessionToken
     transactionRoomFeeID := in.TransactionRoomFeeID
     //merchantID := in.MerchantID
-    var returnErr error = nil
-    var res *Aphro_CommonBiz.Response = nil
-    _,  sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
-    if sessionTokenError == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+    _,  err = Session.IsSessionTokenVailate(sessionToken)
+    if err == nil {
+    	var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-
                 //更新一个事务
                 var whereCondition []string = []string{}
                 var binds []interface{} = []interface{}{}
@@ -822,7 +791,7 @@ func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Ap
 
                 var roomFeeResultList []*Aphro_Room_pb.RSTransactionRoomFeeResult;
 
-                err := m.QueryAll(querySQL,binds...).FetchAll(func(dest...interface{}){
+                err = m.QueryAll(querySQL,binds...).FetchAll(func(dest...interface{}){
                     t := &Aphro_Room_pb.RSTransactionRoomFeeResult{
                         ID,fee,create_time,end_time,fee_per_interval,
                         start,end,interval,interval_unit,merchant_id,
@@ -830,19 +799,15 @@ func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Ap
                     roomFeeResultList = append(roomFeeResultList,t)
                 },&ID,&fee,&create_time,&end_time,&fee_per_interval,&start,&end,&interval,&interval_unit,&merchant_id,&room_id,&transaction_id,&flag)
                 if err == nil {
-                    res ,err := Response.NewCommonBizResponse(0,err.Error(),&Aphro_Room_pb.RSTransactionQueryRoomFeeResponse{Success:true,RoomFees:roomFeeResultList})
-                    return res ,err
-                }  else {
-                    return res, err
+                    res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionQueryRoomFeeResponse{true,roomFeeResultList})
                 }
             } else {
-                returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
-            }
-        } else {
-            returnErr = err
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+			}
         }
-    } else {
-        returnErr = sessionTokenError
     }
-    return res,returnErr
+	if err != nil {
+		res,err = Response.NewCommonBizResponseWithError(err,nil)
+	}
+    return
 }
