@@ -11,7 +11,7 @@ import (
     "crypto/rand"
     "crypto/sha256"
     "strings"
-    "github.com/lampard1014/aphro/Gateway/error"
+    "github.com/lampard1014/aphro/CommonBiz/Error"
     "path/filepath"
     "time"
     mathRand "math/rand"
@@ -127,7 +127,7 @@ func ParseUsernameAndPsw(key string)(username string ,psw string, err error) {
                 username = tmpSplit[0]
                 psw = tmpSplit[1]
             } else {
-                err = AphroError.New(AphroError.BizError,"拆分用户名密码错误")
+                err = Error.NewCustomError(Error.BizError,"拆分用户名密码错误")
             }
         } else {
             err = RSADecryptionErr

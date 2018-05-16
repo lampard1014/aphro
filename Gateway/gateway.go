@@ -1,4 +1,4 @@
-package Gateway
+package main
 
 import (
   "fmt"
@@ -10,17 +10,20 @@ import (
   "golang.org/x/net/context"
   "github.com/grpc-ecosystem/grpc-gateway/runtime"
   "google.golang.org/grpc"
-  gw "github.com/lampard1014/aphro/Biz/merchant/pb"
+  merchantPB "github.com/lampard1014/aphro/Biz/merchant/pb"
+  commodityPB "github.com/lampard1014/aphro/Biz/commodity/pb"
+
   "github.com/golang/protobuf/proto"
   "google.golang.org/grpc/status"
   "google.golang.org/grpc/codes"
-  // spb "google.golang.org/genproto/googleapis/rpc/status"
-    "github.com/lampard1014/aphro/gateway/error"
+    "github.com/lampard1014/aphro/CommonBiz/Error"
     "encoding/json"
 )
 
 var (
-  echoEndpoint = flag.String("echo_endpoint", "localhost:10089", "endpoint of YourService")
+  merchantRPCEndpoints = flag.String("merchant RPC", "localhost:10089", "merchant RPC Endpoint")
+  commodityRPCEndpoints = flag.String("commodity RPC", "localhost:10085", "commodity RPC Endpoint")
+
 )
 
 type CustomError struct {
@@ -111,9 +114,8 @@ func CustomErrorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler ru
 
   buf, merr := marshaler.Marshal(s.Proto())
 
-  fmt.Println("AphroError.BizError",AphroError.BizError,codes.Code(AphroError.BizError),s.Code())
 
-  if s.Code() == codes.Code(AphroError.BizError) {
+  if s.Code() == codes.Code(Error.BizError) {
 
   } else {
     returnBuf = buf
@@ -171,11 +173,15 @@ func run() error {
 
   opts := []grpc.DialOption{grpc.WithInsecure()}
 
-  err := gw.RegisterMerchantServiceHandlerFromEndpoint(ctx, mux, *echoEndpoint,opts)
-    if err != nil {
-        return  err
-    }
+  err := merchantPB.RegisterMerchantServiceHandlerFromEndpoint(ctx, mux, *merchantRPCEndpoints,opts)
 
+  if err != nil {
+    return  err
+  }
+    err = commodityPB.RegisterCommodityServiceHandlerFromEndpoint(ctx,mux, *commodityRPCEndpoints,opts)
+  if err != nil {
+    return  err
+  }
   return http.ListenAndServe(":8089", mux)
 }
 

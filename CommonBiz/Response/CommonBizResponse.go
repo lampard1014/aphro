@@ -50,8 +50,8 @@ func NewCommonBizResponseWithError(err error,resultMsg proto.Message )(*Aphro_Co
 	var msg  string
 	var code int64 = int64(Error.BizError)
 	if d,ok := err.(*Error.CustomError); ok {
-		code = int64(d.Code)
-		msg = d.Message
+		code = int64(d.Code())
+		msg = d.Message()
 	} else {
 
 		if err != nil {

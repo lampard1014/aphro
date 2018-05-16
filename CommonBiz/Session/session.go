@@ -33,7 +33,7 @@ func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 		uid = uidAndMerchantID[0]
 		merchantID = uidAndMerchantID[1]
 	} else {
-		returnErr = Error.New(Error.BizError,"session 过期 请重新登录")
+		returnErr = Error.NewCustomError(Error.BizError,"session 过期 请重新登录")
 	}
 	return uid,merchantID,returnErr
 }

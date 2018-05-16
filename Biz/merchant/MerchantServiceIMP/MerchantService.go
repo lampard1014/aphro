@@ -15,7 +15,7 @@ import (
     "github.com/lampard1014/aphro/PersistentStore/MySQL"
     "github.com/lampard1014/aphro/CommonBiz/Session"
     "strings"
-    "github.com/lampard1014/aphro/Gateway/error"
+    "github.com/lampard1014/aphro/CommonBiz/Error"
 )
 
 const (
@@ -38,14 +38,14 @@ func (s *MerchantServiceIMP) MerchantOpen(ctx context.Context, in *merchantServi
     m,ok := mysql.Connect().(*MySQL.APSMySQL)
     if ok {
         querySQL := "INSERT INTO merchant (`merchant_name`,`merchant_address`,`payment_type`,`cellphone`) VALUES( ?, ?, ?, ?)"
-        lastInsertID , err := m.Query(querySQL,merchantName, address, paymentBit, cellphone).LastInsertId()
-        returnErr = err
-        if err == nil && lastInsertID > 0 {
-            res,returnErr = Response.NewCommonBizResponse(0,err.Error(),&merchantServicePB.MerchantOpenResponse{Success:true})
+        var lastInsertID int64
+        lastInsertID , returnErr = m.Query(querySQL,merchantName, address, paymentBit, cellphone).LastInsertId()
+        if returnErr == nil && lastInsertID > 0 {
+            res,returnErr = Response.NewCommonBizResponse(0,"开户成功",&merchantServicePB.MerchantOpenResponse{Success:true})
         }
         defer m.Close()
     } else {
-        returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+        returnErr = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
     }
     if returnErr != nil {
         res,returnErr = Response.NewCommonBizResponseWithError(returnErr,nil)
@@ -68,7 +68,8 @@ func (s *MerchantServiceIMP) MerchantRegister(ctx context.Context, in *merchantS
     queryRes, returnErr := redis.Query(checkKey)
 
     if returnErr == nil  && queryRes ==  verifyCode {
-        m,returnErr := MySQL.NewAPSMySQL(nil)
+        m,err1 := MySQL.NewAPSMySQL(nil)
+        returnErr = err1
         m,ok := m.Connect().(*MySQL.APSMySQL)
         if ok {
             var mid int64 = int64(merchantID)
@@ -80,24 +81,27 @@ func (s *MerchantServiceIMP) MerchantRegister(ctx context.Context, in *merchantS
                 //成功新建商户 继续 新建操作员，todo 事务回滚
                 querySQL := "INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`)VALUES(?,?,?,?,?)"
 
-                lastInsertID , returnErr := m.Query(querySQL,name, cellphone, Encryption.PswEncryption(psw), role,mid).LastInsertId()
+                lastInsertID , err1 := m.Query(querySQL,name, cellphone, Encryption.PswEncryption(psw), role,mid).LastInsertId()
+                returnErr = err1
+
                 if returnErr == nil && lastInsertID > 0 {
                     res,returnErr = Response.NewCommonBizResponseWithCodeWithError(0,returnErr,&merchantServicePB.MerchantRegisterResponse{true,""})
-
                     //获取新的session
                     if tokenRequest  != "" {
-                        rsa,returnErr := Encryption.RsaEncryption([]byte(strings.Join([]string{cellphone,psw},Encryption.Delimiter_PSW_USERNAME)))
+                        rsa,err1 := Encryption.RsaEncryption([]byte(strings.Join([]string{cellphone,psw},Encryption.Delimiter_PSW_USERNAME)))
+                        returnErr = err1
                         if returnErr == nil {
-                            requestKey ,returnErr := Encryption.Base64Encode(rsa)
+                            requestKey ,err1 := Encryption.Base64Encode(rsa)
+                            returnErr = err1
                             if returnErr == nil {
-                                merchantLoginResponse,returnErr := s.MerchantLogin(ctx,&merchantServicePB.MerchantLoginRequest{requestKey,tokenRequest,""})
+                                merchantLoginResponse,err1 := s.MerchantLogin(ctx,&merchantServicePB.MerchantLoginRequest{requestKey,tokenRequest,""})
+                                returnErr = err1
                                 if returnErr == nil {
                                     merchantLoginResponseResult := merchantLoginResponse.Result
                                     var loginResp merchantServicePB.MerchantLoginResponse = merchantServicePB.MerchantLoginResponse{}
-                                    returnErr := Response.UnmarshalAny(merchantLoginResponseResult,&loginResp)
+                                    returnErr = Response.UnmarshalAny(merchantLoginResponseResult,&loginResp)
                                     if returnErr == nil {
                                         res,returnErr = Response.NewCommonBizResponseWithCodeWithError(0,returnErr,&merchantServicePB.MerchantRegisterResponse{true,loginResp.SessionToken})
-
                                     }
                                 }
                             }
@@ -107,10 +111,10 @@ func (s *MerchantServiceIMP) MerchantRegister(ctx context.Context, in *merchantS
             }
             defer m.Close()
         } else {
-            returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            returnErr = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
         }
     } else {
-        returnErr = AphroError.New(Response.BizError,"验证码验证错误")
+        returnErr = Error.NewCustomError(Error.BizError,"验证码验证错误")
     }
     if returnErr != nil {
         res,returnErr = Response.NewCommonBizResponseWithError(returnErr,nil)
@@ -126,31 +130,32 @@ func (s *MerchantServiceIMP) MerchantChangePsw(ctx context.Context, in *merchant
     scene := uint32(Scene_ChangePsw)
 
     //检查session 是否合法
-    //isTokenVaildate, err := Session.IsSessionTokenVailate(sessionToken)
     if returnErr == nil {
         if newPsw != "" {
-            verifyCodeRes,returnErr := s.MerchantVerifyCode(ctx,&merchantServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
+            verifyCodeRes,err1 := s.MerchantVerifyCode(ctx,&merchantServicePB.MerchantVerifyCodeRequest{Cellphone:cellphone,Scene:scene,SmsCode:verifyCode})
+            returnErr = err1
             var vcr *merchantServicePB.MerchantVerifyCodeResponse = &merchantServicePB.MerchantVerifyCodeResponse{}
             returnErr = Response.UnmarshalAny(verifyCodeRes.Result,vcr)
             if returnErr == nil && vcr.Success {
-                mysql,returnErr := MySQL.NewAPSMySQL(nil)
+                mysql,err1 := MySQL.NewAPSMySQL(nil)
+                returnErr = err1
                 if returnErr == nil {
                     m, ok := mysql.Connect().(*MySQL.APSMySQL)
                     if ok {
                         querySQL := "update `merchant_account` set psw = ? where cellphone = ? limit 1"
                         psw := Encryption.PswEncryption(newPsw)
-                        _ , returnErr := m.Query(querySQL,psw,cellphone).RowsAffected()
+                        _ , returnErr = m.Query(querySQL,psw,cellphone).RowsAffected()
                         if returnErr == nil  {
                             res,returnErr = Response.NewCommonBizResponseWithCodeWithError(0,returnErr,&merchantServicePB.MerchantChangePswResponse{true})
                         }
                         defer m.Close()
                     } else {
-                        returnErr = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                        returnErr = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
                     }
                 }
             }
         } else {
-            returnErr = AphroError.New(Response.BizError,"解析密码错误")
+            returnErr = Error.NewCustomError(Error.BizError,"解析密码错误")
         }
     }
     if returnErr != nil {
@@ -169,43 +174,52 @@ func (s *MerchantServiceIMP) MerchantLogin(ctx context.Context, in *merchantServ
         merchantID uint32
     )
     if inSessionToken != ""{
-        ok,err := Session.IsSessionTokenVailate(inSessionToken)
+        var ok bool
+        ok,err = Session.IsSessionTokenVailate(inSessionToken)
 
         if ok {
            _,err = Session.RenewSessionToken(inSessionToken)
         }
         res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantLoginResponse{SessionToken:inSessionToken,Success:ok && err == nil})
     } else {
-        cellphone, psw, err:= Encryption.ParseUsernameAndPsw(in.Key)
-
+        var (
+            cellphone string
+            psw string
+        )
+        cellphone, psw, err = Encryption.ParseUsernameAndPsw(in.Key)
         //merchantID := in.MerchantID
+        var mysql * MySQL.APSMySQL
         mysql,err := MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "SELECT id as uid, name ,role,merchant_id FROM merchant_account WHERE cellphone = ? AND psw = ? LIMIT 1"
                 pswEncryption := Encryption.PswEncryption(psw)
-                err := m.Query(querySQL,cellphone, pswEncryption).FetchRow(&uid,&name,&role,&merchantID)
-                if err == nil && uid > 0  {
-
-                    encryptionkey,err := Session.DecodeSessionTokenRequestStr(tokenRequest)
+                err = m.Query(querySQL,cellphone, pswEncryption).FetchRow(&uid,&name,&role,&merchantID)
+                if err == nil && uid > 0 {
+                    var encryptionkey string
+                    encryptionkey,err = Session.DecodeSessionTokenRequestStr(tokenRequest)
                     if err == nil {
-                        token, _, err := Session.CreateSessionToken(encryptionkey,uid,merchantID)
+                        var token string
+                        token, _, err = Session.CreateSessionToken(encryptionkey,uid,merchantID)
                         if err == nil {
-                            encryptionToken,err := Encryption.XxteaEncryption(encryptionkey,token)
+                            var encryptionToken []byte
+                            encryptionToken,err = Encryption.XxteaEncryption(encryptionkey,token)
                             if err == nil {
-                                if base64EncryptionToken , err :=Encryption.Base64Encode(encryptionToken); err == nil {
+                                var base64EncryptionToken string
+                                base64EncryptionToken , err =Encryption.Base64Encode(encryptionToken);
+                                if err == nil {
                                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantLoginResponse{base64EncryptionToken,true})
                                 }
                             }
                         }
                     }
-                } else {
-                    err = AphroError.New(AphroError.BizError,"账号密码错误")
+                }  else {
+                    err = Error.NewCustomError(Error.BizError,"账号密码错误")
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -225,15 +239,17 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
         role int
     )
     if err == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "SELECT m.merchant_name,ma.role,ma.name FROM merchant_account AS ma, merchant AS m WHERE ma.merchant_id = ? and ma.ID = ? limit 1"
-                err := m.Query(querySQL,merchantID, uid).FetchRow(&merchantName,&role,&name)
+                err = m.Query(querySQL,merchantID, uid).FetchRow(&merchantName,&role,&name)
                 if err == nil {
                     //制作 令牌
-                    mid ,err := strconv.Atoi(merchantID)
+                    var mid int
+                    mid ,err = strconv.Atoi(merchantID)
                     if err == nil {
                         res,err = Response.NewCommonBizResponseWithCodeWithError(
                             0,
@@ -248,11 +264,11 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
                         )
                     }
                 } else if MySQL.ISErrorNoRows(err) {
-                    err = AphroError.New(AphroError.BizError,"没有商户信息")
+                    err = Error.NewCustomError(Error.BizError,"没有商户信息")
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -275,19 +291,20 @@ func (s *MerchantServiceIMP) MerchantWaiterCreate(ctx context.Context, in *merch
     _, merchantID, err = Session.FetchSessionTokenValue(token)
 
     if err == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "insert into merchant_waiter (`name`,`reserve`,`merchant_id`) values (?,?,?)"
 
-                _,err := m.Query(querySQL,name,reserve,merchantID).LastInsertId()
+                _,err = m.Query(querySQL,name,reserve,merchantID).LastInsertId()
                 if err == nil {
                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantWaiterCreateResponse{true})
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -304,19 +321,20 @@ func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merch
     //验证token合法性
     isVaildate, err := Session.IsSessionTokenVailate(token)
     if isVaildate {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "DELETE FROM merchant_waiter where id = ? "
-                _,err := m.Query(querySQL,waiterid).RowsAffected()
+                _,err = m.Query(querySQL,waiterid).RowsAffected()
                 if err == nil {
                     //制作 令牌
                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantWaiterDeleteResponse{Success:true})
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -329,6 +347,7 @@ func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merch
 }
 
 func (s *MerchantServiceIMP) MerchantVerifyCode(ctx context.Context, in *merchantServicePB.MerchantVerifyCodeRequest) (res *Aphro_CommonBiz.Response, err error) {
+    //var redis *Redis.APSRedis
     redis ,err := Redis.NewAPSRedis(nil)
     if err == nil {
         redis.Connect()
@@ -357,7 +376,6 @@ func (s *MerchantServiceIMP) MerchantVerifyCode(ctx context.Context, in *merchan
 
 func (s *MerchantServiceIMP) MerchantSendCode(ctx context.Context, in *merchantServicePB.MerchantSendCodeRequest) (res *Aphro_CommonBiz.Response, err error) {
     redis ,err := Redis.NewAPSRedis(nil)
-
     if err == nil {
         redis.Connect()
         defer redis.Close()
@@ -366,7 +384,8 @@ func (s *MerchantServiceIMP) MerchantSendCode(ctx context.Context, in *merchantS
         checkKey := "_verify_sms_"+ cellphone + "@" + scene
         smsCodeTmp := Encryption.RandNumberBytesMaskImprSrc(4)
         ttl := uint64(verifyCodeDuration * time.Minute)//60秒过期
-        success,err :=redis.Set(checkKey,smsCodeTmp,int64(ttl))
+        var success bool
+        success,err = redis.Set(checkKey,smsCodeTmp,int64(ttl))
         res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantSendCodeResponse{success})
     }
     if err != nil {
@@ -397,13 +416,13 @@ func (s *MerchantServiceIMP) MerchantAccountCellphoneUnquie(ctx context.Context,
             querySQL := "SELECT 1 FROM `merchant_account` WHERE `cellphone` = ? AND " + roleC
             //fmt.Println(querySQL)
             var bingo uint32 = 0
-            err := m.Query(querySQL,binds...).FetchRow(&bingo)
+            err = m.Query(querySQL,binds...).FetchRow(&bingo)
             if err == nil {
                 res,err  = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantAccountCellphoneUnquieResponse{IsExisted:bingo > 0})
             }
             defer m.Close()
         } else {
-            err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+            err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
         }
     }
     if err != nil {

@@ -33,7 +33,8 @@ func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+
+            	err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -75,7 +76,7 @@ func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -112,7 +113,7 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
                 }
                 defer m.Close()
             } else {
-                err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }
@@ -128,6 +129,7 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
     commdityID := in.Id
     // commodityInfo := in.Goods;
     var goodRes *Aphro_Commodity_pb.CommodityQueryResponse = &Aphro_Commodity_pb.CommodityQueryResponse{}
+
 
     _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
     if sessionTokenError == nil {
@@ -173,7 +175,7 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
                 }
                 defer m.Close()
             } else {
-				err = AphroError.New(AphroError.BizError,"mysql类型断言错误")
+				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
     }

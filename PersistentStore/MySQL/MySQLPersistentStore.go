@@ -7,7 +7,7 @@ import (
 	"strings"
 	"github.com/lampard1014/aphro/PersistentStore"
 	"github.com/go-sql-driver/mysql"
-	"github.com/lampard1014/aphro/Gateway/error"
+	"github.com/lampard1014/aphro/CommonBiz/Error"
 	"bytes"
 	"encoding/binary"
 )
@@ -220,7 +220,7 @@ func (this *APSMySQLResult)LastInsertId() (int64, error) {
 		if  ok {
 			number := e.Number
 			message := e.Message
-			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+			this.lastError = Error.NewCustomError(int(number),message)
 		}
 		return 0,this.lastError
 	} else {
@@ -242,7 +242,7 @@ func (this *APSMySQLResult)RowsAffected() (int64, error) {
 		if  ok {
 			number := e.Number
 			message := e.Message
-			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+			this.lastError = Error.NewCustomError(int(number),message)
 		}
 		return 0,this.lastError
 	} else {
@@ -264,7 +264,7 @@ func (this *APSMySQLResult)FetchRow(dest...interface{})(error) {
 		if  ok {
 			number := e.Number
 			message := e.Message
-			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+			this.lastError = Error.NewCustomError(int(number),message)
 		}
 		return this.lastError
 	} else {
@@ -289,7 +289,7 @@ func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...inte
 		if  ok {
 			number := e.Number
 			message := e.Message
-			this.lastError = AphroError.New(AphroError.CustomCode(number),message)
+			this.lastError = Error.NewCustomError(int(number),message)
 		}
 		return this.lastError
 	} else {
