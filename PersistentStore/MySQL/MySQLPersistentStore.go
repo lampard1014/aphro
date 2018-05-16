@@ -162,6 +162,7 @@ type APSMySQLToken int
 const (
 	_ APSMySQLToken = iota
 	APSMySQLToken_SELECT
+	APSMySQLToken_SELECT_ALL
 	APSMySQLToken_INSERT
 	APSMySQLToken_UPDATE
 	APSMySQLToken_DELETE
@@ -296,7 +297,8 @@ func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...inte
 		d,ok := this.rawResult.(*sql.Rows)
 		if ok {
 			for d.Next() {
-				err := d.Scan(in)
+				err := d.Scan(in...)
+				this.lastError = err
 				if err != nil {
 					break
 				} else {
@@ -304,10 +306,18 @@ func (this *APSMySQLResult)FetchAll(callFunc func(outer...interface{}),in...inte
 						callFunc(in...)
 					}
 				}
-				this.lastError = err
 				if this.lastError == sql.ErrNoRows {
 					this.lastError = nil
 				}
+			}
+		} else if d,ok := this.rawResult.(*sql.Row);ok {
+			if ok {
+				this.lastError = d.Scan(in...)
+				if this.lastError == sql.ErrNoRows {
+					this.lastError = nil
+				}
+			} else {
+				this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
 			}
 		} else {
 			this.lastError = PersistentStore.NewPSErrC(PersistentStore.ResultTypeErr)
@@ -535,7 +545,6 @@ func (this *APSMySQL)Query(querySQL string, bindsValues...interface{})(Persisten
 	this.Reset()
 	this.prepareStatement = querySQL
 	this.bindValues = bindsValues
-
 	checkForToken := strings.Split(strings.ToUpper(strings.TrimSpace(this.prepareStatement))," ")[0]
 	if checkForToken == APSMySQLTokenMap[APSMySQLToken_SELECT]{
 		this.token = APSMySQLToken_SELECT
@@ -550,10 +559,29 @@ func (this *APSMySQL)Query(querySQL string, bindsValues...interface{})(Persisten
 	return this.result
 }
 
+func (this *APSMySQL)QueryAll(querySQL string, bindsValues...interface{})(PersistentStore.IAphroPersistentStoreResult) {
+	this.Reset()
+	this.prepareStatement = querySQL
+	this.bindValues = bindsValues
+
+	checkForToken := strings.Split(strings.ToUpper(strings.TrimSpace(this.prepareStatement))," ")[0]
+	if checkForToken == APSMySQLTokenMap[APSMySQLToken_SELECT]{
+		this.token = APSMySQLToken_SELECT_ALL
+	} else if checkForToken == APSMySQLTokenMap[APSMySQLToken_DELETE] {
+		this.token = APSMySQLToken_DELETE
+	} else if checkForToken == APSMySQLTokenMap[APSMySQLToken_UPDATE] {
+		this.token = APSMySQLToken_UPDATE
+	} else {
+		this.token = APSMySQLToken_INSERT
+	}
+	this.query()
+	return this.result
+}
+
+
 func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPersistentStoreResult){
 
 	var queryStatment string = ""
-
 	//query Token
 	queryToken := APSMySQLTokenMap[this.token]
 	queryStatment += queryToken
@@ -618,6 +646,12 @@ func (this *APSMySQL) query()(*APSMySQL) {
 	if this.token ==  APSMySQLToken_SELECT {
 		this.result = &APSMySQLResult{}
 		rawResult := this.client.mysqlClient.QueryRow(this.prepareStatement,this.bindValues...)
+		this.result.rawResult = rawResult
+	} else if this.token ==  APSMySQLToken_SELECT_ALL {
+		this.result = &APSMySQLResult{}
+		rawResult,err := this.client.mysqlClient.Query(this.prepareStatement,this.bindValues...)
+		this.lastError = err
+		this.result.lastError = err
 		this.result.rawResult = rawResult
 	} else {
 		stmtIns, stmtInsErr := this.client.mysqlClient.Prepare(this.prepareStatement)

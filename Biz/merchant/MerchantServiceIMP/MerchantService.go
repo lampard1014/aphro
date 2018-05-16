@@ -230,7 +230,6 @@ func (s *MerchantServiceIMP) MerchantLogin(ctx context.Context, in *merchantServ
 }
 
 func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServicePB.MerchantInfoRequest) (res *Aphro_CommonBiz.Response, err error) {
-
     uid, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
 
     var (
@@ -266,6 +265,75 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
                 } else if MySQL.ISErrorNoRows(err) {
                     err = Error.NewCustomError(Error.BizError,"没有商户信息")
                 }
+                defer m.Close()
+            } else {
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+            }
+        }
+    }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
+}
+
+
+func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServicePB.MerchantUsersRequest) (res *Aphro_CommonBiz.Response,err error) {
+    _, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
+
+    var (
+        cellphone string
+        name string
+        role int
+    )
+    if err == nil {
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            if ok {
+                querySQL := "SELECT name,cellphone,role FROM merchant_account WHERE merchant_id = ?"
+
+                var queryResult []map[string]interface{}
+                err := m.QueryAll(querySQL,merchantID).FetchAll(func(dest...interface{}){
+
+                    tmp := map[string]interface{}{}
+                    tmp["cellphone"] = cellphone
+                    tmp["name"] = name
+                    tmp["role"] = role
+
+                    queryResult = append(queryResult,tmp)
+
+                },&name,&cellphone,&role)
+
+                var isAdmin bool
+                for _,v := range queryResult  {
+                    if value ,ok := v["cellphone"]; ok && value == cellphone {
+                        isAdmin = true
+                        break
+                    }
+                }
+
+                var  users   []*merchantServicePB.InnerMerchantAccount
+
+                for _,v := range queryResult {
+                    if value, ok := v["cellphone"]; ok {
+                        if isAdmin || ( value == cellphone ){
+                            r, _ := v["role"]
+                            n, _ := v["name"]
+                            name,_ := n.(string)
+                            role,_ := r.(uint32)
+                            merchantAccount := &merchantServicePB.InnerMerchantAccount{role,name}
+                            users = append(users,merchantAccount)
+                        }
+                    }
+                }
+
+                res,err = Response.NewCommonBizResponseWithCodeWithError(
+                    0,
+                    err,
+                    &merchantServicePB.MerchantUsersResponse{true,users})
+
                 defer m.Close()
             } else {
                 err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")

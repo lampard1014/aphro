@@ -54,6 +54,15 @@ service MerchantService {
 			};
 		}
 
+		//查询商户下的所有的用户
+		rpc merchantUsers(MerchantUsersRequest) returns (Aphro.CommonBiz.Response) {
+			option (google.api.http) = {
+				post: "/merchant/users"
+				body:"*"
+			};
+		}
+
+
 		//商户app 信息
 		rpc merchantRoomInfo(MerchantRoomInfoRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
@@ -174,6 +183,15 @@ message MerchantLoginResponse {
 message MerchantInfoRequest {
 	string sessionToken = 1;
 	string merchantID = 2;
+}
+
+message MerchantUsersRequest {
+    string sessionToken = 1;
+}
+
+message MerchantUsersResponse {
+    bool success = 1;
+    repeated InnerMerchantAccount users = 2;
 }
 
 message InnerMerchantAccount {

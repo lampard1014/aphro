@@ -20,20 +20,22 @@ type CommodityServiceImp struct{}
 
 func (s *CommodityServiceImp) CommodityCreate(ctx context.Context, in *Aphro_Commodity_pb.CommodityCreateRequest) (res *Aphro_CommonBiz.Response,err error) {
     commodityInfo := in.Good;
-    _, merchantID ,err := Session.FetchSessionTokenValue(in.SessionToken)
+    var  merchantID string
+    _, merchantID ,err = Session.FetchSessionTokenValue(in.SessionToken)
     if err == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
                 querySQL := "INSERT INTO `merchant_commodity` (`name`,`price`,`merchant_id`) VALUES( ?, ?, ?)"
-                lastInsertID,err := m.Query(querySQL,commodityInfo.Name,commodityInfo.Price,merchantID).LastInsertId()
+                var lastInsertID int64
+                lastInsertID,err = m.Query(querySQL,commodityInfo.Name,commodityInfo.Price,merchantID).LastInsertId()
                 if err == nil {
                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityCreateResponse{true,uint32(lastInsertID)})
                 }
                 defer m.Close()
             } else {
-
             	err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
             }
         }
@@ -53,7 +55,8 @@ func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Com
     _, _ ,err = Session.FetchSessionTokenValue(in.SessionToken)
 
     if err == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
@@ -69,7 +72,7 @@ func (s *CommodityServiceImp) CommodityDelete(ctx context.Context, in *Aphro_Com
                 }
 
                 querySQL := "DELETE FROM  `merchant_commodity` WHERE " + strings.Join(whereCondition," AND ")
-                _,err := m.Query(querySQL,binds...).RowsAffected()
+                _,err = m.Query(querySQL,binds...).RowsAffected()
                 if err == nil {
                     //制作 令牌
                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityDeleteResponse{true})
@@ -97,17 +100,17 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
     price := in.Price
 
     //验证token的合法性
-    _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
+    _, err = Session.IsSessionTokenVailate(sessionToken)
 
-    if sessionTokenError == nil {
-
-        mysql,err := MySQL.NewAPSMySQL(nil)
+    if err == nil {
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
 
                 querySQL := "UPDATE `merchant_commodity` SET `name`= ? AND `price` = ? AND `merchant_id` = ? WHERE ID = ?"
-                _,err := m.Query(querySQL,name,price,merchantID,commodityID).RowsAffected()
+                _,err = m.Query(querySQL,name,price,merchantID,commodityID).RowsAffected()
                 if err == nil {
                     res,err  = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityUpdateResponse{true})
                 }
@@ -130,10 +133,10 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
     // commodityInfo := in.Goods;
     var goodRes *Aphro_Commodity_pb.CommodityQueryResponse = &Aphro_Commodity_pb.CommodityQueryResponse{}
 
-
     _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
     if sessionTokenError == nil {
-        mysql,err := MySQL.NewAPSMySQL(nil)
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
@@ -156,7 +159,7 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
                 )
 
                 querySQL := "SELECT `name`,`ID`,`price`,`merchant_id` FROM  `merchant_commodity` WHERE " + strings.Join(whereCondition," AND ")
-                err := m.Query(querySQL,binds...).FetchAll(func(dest...interface{}){
+                err = m.QueryAll(querySQL,binds...).FetchAll(func(dest...interface{}){
                     if err != nil {
                         return
                     }
