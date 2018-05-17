@@ -11,6 +11,7 @@ import (
     "github.com/lampard1014/aphro/PersistentStore/MySQL"
     "github.com/lampard1014/aphro/CommonBiz/Response"
     "github.com/lampard1014/aphro/CommonBiz/Error"
+	"strconv"
 )
 
 const (
@@ -95,12 +96,17 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
 
     sessionToken := in.SessionToken
     commodityID := in.Id
-    merchantID := in.MerchantID
+    inMerchantID := in.MerchantID
     name := in.Name
     price := in.Price
 
     //验证token的合法性
-    _, err = Session.IsSessionTokenVailate(sessionToken)
+    var merchantID string
+    _, merchantID,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if inMerchantID != 0{
+		merchantID = strconv.Itoa(int(inMerchantID))
+	}
 
     if err == nil {
         var mysql *MySQL.APSMySQL
@@ -109,8 +115,8 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
 
-                querySQL := "UPDATE `merchant_commodity` SET `name`= ? AND `price` = ? AND `merchant_id` = ? WHERE ID = ?"
-                _,err = m.Query(querySQL,name,price,merchantID,commodityID).RowsAffected()
+                querySQL := "UPDATE `merchant_commodity` SET `name`= ? , `price` = ? WHERE ID = ? AND `merchant_id` = ? "
+                _,err = m.Query(querySQL,name,price,commodityID,merchantID).RowsAffected()
                 if err == nil {
                     res,err  = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Commodity_pb.CommodityUpdateResponse{true})
                 }
@@ -128,13 +134,17 @@ func (s *CommodityServiceImp) CommodityUpdate(ctx context.Context, in *Aphro_Com
 
 func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Commodity_pb.CommodityQueryRequest) (res *Aphro_CommonBiz.Response, err error) {
     sessionToken := in.SessionToken
-    merchantID := in.MerchantID
+    inMerchantID := in.MerchantID
     commdityID := in.Id
     // commodityInfo := in.Goods;
     var goodRes *Aphro_Commodity_pb.CommodityQueryResponse = &Aphro_Commodity_pb.CommodityQueryResponse{}
 
-    _, sessionTokenError := Session.IsSessionTokenVailate(sessionToken)
-    if sessionTokenError == nil {
+	var merchantID string
+	_, merchantID,err = Session.FetchSessionTokenValue(sessionToken)
+	if inMerchantID != 0{
+		merchantID = strconv.Itoa(int(inMerchantID))
+	}
+    if err == nil {
         var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -142,7 +152,7 @@ func (s *CommodityServiceImp) CommodityQuery(ctx context.Context, in *Aphro_Comm
             if ok {
                 var whereCondition []string = []string{"1"}
                 var binds []interface{} = []interface{}{}
-                if merchantID != 0 {
+                if merchantID != "" {
                     whereCondition = append(whereCondition, "`merchant_id` =  ?")
                     binds = append(binds,merchantID)
                 }

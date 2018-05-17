@@ -62,12 +62,20 @@ func (s *MerchantServiceIMP) MerchantRegister(ctx context.Context, in *merchantS
     tokenRequest := in.TokenRequest
 
     //step1 验证码检查
-    redis ,returnErr := Redis.NewAPSRedis(nil)
-    checkKey := "_verify_sms_"+ cellphone + "@" + strconv.Itoa(Scene_MerchantRegister)
-    redis.Connect()
-    queryRes, returnErr := redis.Query(checkKey)
+    var redis *Redis.APSRedis
+    var queryRes string
+    var resBingo bool
+    if role == 1 {
+        redis ,returnErr = Redis.NewAPSRedis(nil)
+        checkKey := "_verify_sms_"+ cellphone + "@" + strconv.Itoa(Scene_MerchantRegister)
+        redis.Connect()
+        queryRes, returnErr = redis.Query(checkKey)
+        resBingo = queryRes == verifyCode
+    } else {
+        resBingo = true
+    }
 
-    if returnErr == nil  && queryRes ==  verifyCode {
+    if returnErr == nil  && resBingo {
         m,err1 := MySQL.NewAPSMySQL(nil)
         returnErr = err1
         m,ok := m.Connect().(*MySQL.APSMySQL)
@@ -233,6 +241,8 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
     uid, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
 
     var (
+        _uid uint32
+        cellphone string
         merchantName string
         name string
         role int
@@ -243,8 +253,8 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
-                querySQL := "SELECT m.merchant_name,ma.role,ma.name FROM merchant_account AS ma, merchant AS m WHERE ma.merchant_id = ? and ma.ID = ? limit 1"
-                err = m.Query(querySQL,merchantID, uid).FetchRow(&merchantName,&role,&name)
+                querySQL := "SELECT ma.ID,ma.cellphone, m.merchant_name,ma.role,ma.name FROM merchant_account AS ma, merchant AS m WHERE ma.merchant_id = ? and ma.ID = ? limit 1"
+                err = m.Query(querySQL,merchantID, uid).FetchRow(&_uid,&cellphone,&merchantName,&role,&name)
                 if err == nil {
                     //制作 令牌
                     var mid int
@@ -258,7 +268,9 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
                                 uint32(mid),
                                 &merchantServicePB.InnerMerchantAccount{
                                     uint32(role),
-                                    name},
+                                    name,
+                                    cellphone,
+                                    _uid},
                             },
                         )
                     }
@@ -277,11 +289,70 @@ func (s *MerchantServiceIMP) MerchantInfo(ctx context.Context, in *merchantServi
     return
 }
 
+func (s *MerchantServiceIMP) MerchantUsersDelete(ctx context.Context, in *merchantServicePB.MerchantUsersDeleteRequest) (res *Aphro_CommonBiz.Response,err error) {
+    _, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
+    if err == nil {
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            if ok {
+                querySQL := "DELETE FROM merchant_account WHERE merchant_id = ? AND ID = ?"
 
-func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServicePB.MerchantUsersRequest) (res *Aphro_CommonBiz.Response,err error) {
+                //var affectRow int64
+                _, err = m.Query(querySQL,merchantID,in.Uid).RowsAffected()
+                res,err = Response.NewCommonBizResponseWithCodeWithError(
+                    0,
+                    err,
+                    &merchantServicePB.MerchantUsersDeleteResponse{true})
+                defer m.Close()
+            } else {
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+            }
+        }
+    }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
+}
+
+func (s *MerchantServiceIMP) MerchantUsersCreate(ctx context.Context, in *merchantServicePB.MerchantUsersCreateRequest) (res *Aphro_CommonBiz.Response,err error) {
+    _, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
+    name := in.Name
+    cellphone, psw, err := Encryption.ParseUsernameAndPsw(in.Key)
+    if err == nil {
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            if ok {
+                querySQL := "INSERT INTO `merchant_account` (`name`,`cellphone`,`psw`,`role`,`merchant_id`) VALUES (?,?,?,?,?)"
+
+                var lastInsertID int64
+                lastInsertID, err = m.Query(querySQL,name,cellphone,Encryption.PswEncryption(psw),2, merchantID).LastInsertId()
+                res,err = Response.NewCommonBizResponseWithCodeWithError(
+                    0,
+                    err,
+                    &merchantServicePB.MerchantUsersCreateResponse{true,uint32(lastInsertID)})
+                defer m.Close()
+            } else {
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+            }
+        }
+    }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
+}
+
+
+func (s *MerchantServiceIMP) MerchantUsersQuery(ctx context.Context, in *merchantServicePB.MerchantUsersQueryRequest) (res *Aphro_CommonBiz.Response,err error) {
     _, merchantID, err := Session.FetchSessionTokenValue(in.SessionToken)
 
     var (
+        uid uint32
         cellphone string
         name string
         role int
@@ -292,7 +363,7 @@ func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServ
         if err == nil {
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             if ok {
-                querySQL := "SELECT name,cellphone,role FROM merchant_account WHERE merchant_id = ?"
+                querySQL := "SELECT ID,name,cellphone,role FROM merchant_account WHERE merchant_id = ?"
 
                 var queryResult []map[string]interface{}
                 err := m.QueryAll(querySQL,merchantID).FetchAll(func(dest...interface{}){
@@ -301,10 +372,9 @@ func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServ
                     tmp["cellphone"] = cellphone
                     tmp["name"] = name
                     tmp["role"] = role
-
+                    tmp["uid"] = uid
                     queryResult = append(queryResult,tmp)
-
-                },&name,&cellphone,&role)
+                },&uid,&name,&cellphone,&role)
 
                 var isAdmin bool
                 for _,v := range queryResult  {
@@ -313,17 +383,19 @@ func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServ
                         break
                     }
                 }
-
                 var  users   []*merchantServicePB.InnerMerchantAccount
-
                 for _,v := range queryResult {
                     if value, ok := v["cellphone"]; ok {
                         if isAdmin || ( value == cellphone ){
                             r, _ := v["role"]
                             n, _ := v["name"]
+                            c ,_ := v["cellphone"]
+                            u,_ := v["uid"]
                             name,_ := n.(string)
                             role,_ := r.(uint32)
-                            merchantAccount := &merchantServicePB.InnerMerchantAccount{role,name}
+                            cell,_ := c.(string)
+                            uid, _ := u.(uint32)
+                            merchantAccount := &merchantServicePB.InnerMerchantAccount{role,name,cell,uid}
                             users = append(users,merchantAccount)
                         }
                     }
@@ -332,7 +404,7 @@ func (s *MerchantServiceIMP) MerchantUsers(ctx context.Context, in *merchantServ
                 res,err = Response.NewCommonBizResponseWithCodeWithError(
                     0,
                     err,
-                    &merchantServicePB.MerchantUsersResponse{true,users})
+                    &merchantServicePB.MerchantUsersQueryResponse{true,users})
 
                 defer m.Close()
             } else {

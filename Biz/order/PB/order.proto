@@ -59,11 +59,22 @@ message OSCreateOrderRequest {
 	}
 	E_propersalAccountType propersalAccountType = 10 [default = SYSTEM];
 	repeated InnerComodityInfo commodities = 11;
+
 }
 
 message OSCreateOrderResponse {
     bool success = 1;
     string orderNumber = 2;
+}
+
+
+message PaymentInfo {
+    enum E_PaymentType {
+        UNKNOW = 0;
+   	    ALIPAY  =   1;
+   	    WECHAT = 2;
+   	    CASH = 3;
+   	}
 }
 
 message InnerComodityInfo {

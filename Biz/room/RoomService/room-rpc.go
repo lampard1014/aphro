@@ -47,7 +47,7 @@ func (s *RoomServiceImp) TerminalBind(ctx context.Context, in *Aphro_Room_pb.RST
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                querySQL := "UPDATE `merchant_room` SET terminal_code =? AND longitude = ? AND latitude = ? AND status = " + strconv.Itoa(RoomStatusEnable) + " where roomID = ?"
+                querySQL := "UPDATE `merchant_room` SET terminal_code =? , longitude = ? , latitude = ? , status = " + strconv.Itoa(RoomStatusEnable) + " where roomID = ?"
 
                 _,err = m.Query(querySQL,terminalCode,latitude,longitude,roomID).RowsAffected()
                 if err == nil {
@@ -76,7 +76,7 @@ func (s *RoomServiceImp) TerminalUnbind(ctx context.Context, in *Aphro_Room_pb.R
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                querySQL := "UPDATE `merchant_room` SET terminal_code =\"\" AND status = " + strconv.Itoa(RoomStatusDisable) + " where roomID = ?"
+                querySQL := "UPDATE `merchant_room` SET terminal_code =\"\" , status = " + strconv.Itoa(RoomStatusDisable) + " where roomID = ?"
                 _,err = m.Query(querySQL,roomID).RowsAffected()
                 if err == nil {
                     //制作 令牌
@@ -616,7 +616,7 @@ func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_R
                         binds = append(binds,transactionID)
                     }
 
-                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
+                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? , `status` = ? WHERE " + strings.Join(whereCondition," AND ")
                     _,err = m.Query(querySQL,binds...).RowsAffected()
                     if err == nil {
                         res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionSuspendResponse{true})
@@ -673,7 +673,7 @@ func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_
                         binds = append(binds,transactionID)
                     }
 
-                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? AND `status` = ? WHERE " + strings.Join(whereCondition," AND ")
+                    querySQL := "UPDATE `transaction_room` SET `update_time` = ? , `status` = ? WHERE " + strings.Join(whereCondition," AND ")
                     _,err = m.Query(querySQL,binds...).RowsAffected()
                     if err == nil {
                         querySQL := "UPDATE `merchant_room` SET `status` = ?  WHERE `ID` = ? LIMIT 1"

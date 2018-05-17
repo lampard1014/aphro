@@ -20,10 +20,10 @@ const (
 	vConfigKey_DSN = "root:@tcp(127.0.0.1:3306)/iris_db"
 
 	DELIMITER_COLON = ":"
-	DELIMITER_COMMA = ","
-	DELIMITER_SPACE = " "
-	LEFT_BRACKETS = "("
-	RIGHT_BRACKETS = ")"
+	DelimiterComma  = ","
+	DelimiterSpace  = " "
+	LeftBrackets    = "("
+	RightBrackets   = ")"
 
 	SELECT_ALL = "*"
 	)
@@ -596,14 +596,14 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 			fieldName := cv.filedName
 			fieldToken += fieldName
 			if cv.alias != "" {
-				fieldToken += DELIMITER_SPACE + APSMySQLTokenMap[APSMySQLToken_AS] + DELIMITER_SPACE + cv.alias
+				fieldToken += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_AS] + DelimiterSpace + cv.alias
 			}
 			queryFeildsFormer = append(queryFeildsFormer,fieldToken)
 		}
-		queryFields = strings.Join(queryFeildsFormer,DELIMITER_COMMA)
+		queryFields = strings.Join(queryFeildsFormer, DelimiterComma)
 	}
 
-	queryStatment += DELIMITER_SPACE + queryFields + DELIMITER_SPACE
+	//queryStatment += DelimiterSpace + queryFields + DelimiterSpace
 
 	// From  from a as a innerjoin b as b
 	var fromToken string = APSMySQLTokenMap[APSMySQLToken_FROM]
@@ -614,27 +614,50 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 			entityName := ev.entityName
 			entityToken += entityName
 			if ev.alias != "" {
-				entityToken += DELIMITER_SPACE + APSMySQLTokenMap[APSMySQLToken_AS] + DELIMITER_SPACE + ev.alias
+				entityToken += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_AS] + DelimiterSpace + ev.alias
 			}
 
 			if this.entitiesJoin != nil {
-				entityToken += DELIMITER_SPACE + APSMySQLEntityJoinMap[this.entitiesJoin[ei/2]] + DELIMITER_SPACE
+				entityToken += DelimiterSpace + APSMySQLEntityJoinMap[this.entitiesJoin[ei/2]] + DelimiterSpace
 			}
 
 			entitiesFormer = append(entitiesFormer,entityToken)
 		}
-		fromToken += DELIMITER_SPACE + strings.Join(entitiesFormer,DELIMITER_SPACE)
+		if this.token ==  APSMySQLToken_INSERT || this.token ==  APSMySQLToken_UPDATE {
+			fromToken += DelimiterSpace + strings.Join(entitiesFormer, DelimiterSpace)
+		} else {
+			fromToken = DelimiterSpace + strings.Join(entitiesFormer, DelimiterSpace)
+		}
 	} else {
 		this.lastError = PersistentStore.NewPSErrC(PersistentStore.NoEntitySpecify)
 	}
 
-	queryStatment += DELIMITER_SPACE + fromToken + DELIMITER_SPACE
+	if this.token ==  APSMySQLToken_SELECT || this.token ==  APSMySQLToken_SELECT_ALL {
+		queryStatment += DelimiterSpace + queryFields + DelimiterSpace
+		queryStatment += DelimiterSpace + fromToken + DelimiterSpace
+	} else if this.token == APSMySQLToken_INSERT {
+		queryStatment += DelimiterSpace + fromToken + DelimiterSpace
+		queryStatment +=  LeftBrackets + queryFields + RightBrackets
+		//todo fix
+		//var insertData []string
+
+		//for _,ins := range this.insertValues {
+		//	insertData = append(insertData, LeftBrackets+ strings.Join(ins, DelimiterComma) +RightBrackets)
+		//}
+		//queryStatment += strings.Join(insertData,DelimiterComma)
+	} else if this.token == APSMySQLToken_UPDATE {
+		queryStatment += DelimiterSpace + fromToken + DelimiterSpace
+
+
+	}
+
+	//queryStatment += DelimiterSpace + fromToken + DelimiterSpace
 	// where
-	queryStatment += DELIMITER_SPACE + this.wheres + DELIMITER_SPACE
+	queryStatment += DelimiterSpace + this.wheres + DelimiterSpace
 	//order by
-	queryStatment += DELIMITER_SPACE + this.orderBy + DELIMITER_SPACE
+	queryStatment += DelimiterSpace + this.orderBy + DelimiterSpace
 	//limit
-	queryStatment += DELIMITER_SPACE + APSMySQLTokenMap[APSMySQLToken_LIMIT] + strings.Join(this.limit,DELIMITER_COMMA) + DELIMITER_SPACE
+	queryStatment += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_LIMIT] + strings.Join(this.limit, DelimiterComma) + DelimiterSpace
 	// do query
 	this.prepareStatement = queryStatment
 	this.bindValues = bindsValues
@@ -772,7 +795,7 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 		default:
 			this.lastError = PersistentStore.NewPSErrC(PersistentStore.WhereConditionParseErr)
 		}
-		conditionClause = LEFT_BRACKETS + parseO1+ RIGHT_BRACKETS + DELIMITER_SPACE + string(operator) + DELIMITER_SPACE + LEFT_BRACKETS + parseO2 + RIGHT_BRACKETS
+		conditionClause = LeftBrackets + parseO1+ RightBrackets + DelimiterSpace + string(operator) + DelimiterSpace + LeftBrackets + parseO2 + RightBrackets
 	}
 	return conditionClause
 }

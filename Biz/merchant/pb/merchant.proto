@@ -54,10 +54,26 @@ service MerchantService {
 			};
 		}
 
-		//查询商户下的所有的用户
-		rpc merchantUsers(MerchantUsersRequest) returns (Aphro.CommonBiz.Response) {
+		//添加员工
+		rpc merchantUsersCreate(MerchantUsersCreateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				post: "/merchant/users"
+				post: "/merchant/users/create"
+				body:"*"
+			};
+		}
+
+		//查询商户下的所有的用户
+		rpc merchantUsersQuery(MerchantUsersQueryRequest) returns (Aphro.CommonBiz.Response) {
+			option (google.api.http) = {
+				post: "/merchant/users/query"
+				body:"*"
+			};
+		}
+
+		//删除商户下的指定的用户
+		rpc merchantUsersDelete(MerchantUsersDeleteRequest) returns (Aphro.CommonBiz.Response) {
+			option (google.api.http) = {
+				post: "/merchant/users/delete"
 				body:"*"
 			};
 		}
@@ -185,18 +201,40 @@ message MerchantInfoRequest {
 	string merchantID = 2;
 }
 
-message MerchantUsersRequest {
+message MerchantUsersQueryRequest {
     string sessionToken = 1;
 }
 
-message MerchantUsersResponse {
+message MerchantUsersCreateRequest {
+	string key = 1;
+	string name = 2;
+	string sessionToken = 3;
+}
+
+message MerchantUsersCreateResponse {
+    bool success = 1;
+    uint32 uid = 2;
+}
+
+message MerchantUsersQueryResponse {
     bool success = 1;
     repeated InnerMerchantAccount users = 2;
+}
+
+message MerchantUsersDeleteRequest {
+    string sessionToken = 1;
+    uint32 uid = 2;
+}
+
+message MerchantUsersDeleteResponse {
+    bool success = 1;
 }
 
 message InnerMerchantAccount {
 	uint32 role = 1;
 	string name = 2;
+	string cellphone = 3;
+	uint32 uid =4;
 }
 
 message MerchantInfoResponse {
