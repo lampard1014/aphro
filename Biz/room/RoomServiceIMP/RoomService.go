@@ -1,4 +1,4 @@
-package RoomService
+package RoomServiceIMP
 
 import (
     "golang.org/x/net/context"
@@ -14,6 +14,7 @@ import (
 )
 
 const (
+    Port  = ":10084"
     //房间状态 可用
     RoomStatusEnable = 0
     //房间状态 使用中
@@ -38,9 +39,10 @@ func (s *RoomServiceImp) TerminalBind(ctx context.Context, in *Aphro_Room_pb.RST
     latitude := location.Latitude
     longitude := location.Longitude
     roomID := in.RoomID
-	var isVaild bool
-    isVaild, err = Session.IsSessionTokenVailate(sessionToken)
-    if isVaild {
+	//var isVaild bool
+    //isVaild, err = Session.IsSessionTokenVailate(sessionToken)
+    _,_,err = Session.FetchSessionTokenValue(sessionToken)
+    if err == nil {
         var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -67,9 +69,13 @@ func (s *RoomServiceImp) TerminalBind(ctx context.Context, in *Aphro_Room_pb.RST
 func (s *RoomServiceImp) TerminalUnbind(ctx context.Context, in *Aphro_Room_pb.RSTerminalUnbindRequest) (res *Aphro_CommonBiz.Response,err error) {
     sessionToken := in.SessionToken
     roomID := in.RoomID
-    var isVaild bool
-    isVaild, err = Session.IsSessionTokenVailate(sessionToken)
-    if isVaild {
+
+    //var isVaild bool
+    //isVaild, err = Session.IsSessionTokenVailate(sessionToken)
+
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -197,8 +203,10 @@ func (s *RoomServiceImp) DeleteRoom(ctx context.Context, in *Aphro_Room_pb.RSDel
     sessionToken := in.SessionToken
     roomID := in.RoomID
 
-    _, err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_, err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
 		var mysql *MySQL.APSMySQL
 		mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -509,8 +517,10 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
     roomChargeRuleID := in.RoomChargeRuleID
     roomId := in.RoomID
     sessionToken := in.SessionToken
-    _,  err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_,  err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -584,8 +594,10 @@ func (s *RoomServiceImp) RoomTransactionSuspend(ctx context.Context, in *Aphro_R
     roomId := in.RoomID
     sessionToken := in.SessionToken
     //merchantID := in.MerchantID
-    _,  err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_,  err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -641,8 +653,10 @@ func (s *RoomServiceImp) RoomTransactionEnd(ctx context.Context, in *Aphro_Room_
     roomId := in.RoomID
     sessionToken := in.SessionToken
     //merchantID := in.MerchantID
-    _,  err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_,  err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -707,8 +721,10 @@ func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *A
     roomID := in.RoomID
     transactionID := in.TransactionID
     flag := in.Flag
-    _,  err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_,  err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {
@@ -749,8 +765,10 @@ func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Ap
     sessionToken := in.SessionToken
     transactionRoomFeeID := in.TransactionRoomFeeID
     //merchantID := in.MerchantID
-    _,  err = Session.IsSessionTokenVailate(sessionToken)
-    if err == nil {
+    //_,  err = Session.IsSessionTokenVailate(sessionToken)
+	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+
+	if err == nil {
     	var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {

@@ -4,10 +4,9 @@ import (
 	"math/rand"
 	"strconv"
 	"github.com/lampard1014/aphro/PersistentStore/Redis"
+	"github.com/lampard1014/aphro/Encryption"
 	"strings"
 	"github.com/lampard1014/aphro/CommonBiz/Error"
-
-	"github.com/lampard1014/aphro/Encryption"
 )
 
 const (
@@ -32,9 +31,11 @@ func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string,
 		uidAndMerchantID := strings.Split(splitValue[0],"@")
 		uid = uidAndMerchantID[0]
 		merchantID = uidAndMerchantID[1]
+		_, returnErr = RenewSessionToken(sessionToken)
 	} else {
-		returnErr = Error.NewCustomError(Error.BizError,"session 过期 请重新登录")
+		returnErr = Error.NewCustomError(Error.BizError, "session 过期 请重新登录")
 	}
+
 	return uid,merchantID,returnErr
 }
 

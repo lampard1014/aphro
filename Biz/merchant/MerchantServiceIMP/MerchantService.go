@@ -182,13 +182,12 @@ func (s *MerchantServiceIMP) MerchantLogin(ctx context.Context, in *merchantServ
         merchantID uint32
     )
     if inSessionToken != ""{
-        var ok bool
-        ok,err = Session.IsSessionTokenVailate(inSessionToken)
-
-        if ok {
-           _,err = Session.RenewSessionToken(inSessionToken)
-        }
-        res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantLoginResponse{SessionToken:inSessionToken,Success:ok && err == nil})
+        //var ok bool
+        _,err = Session.IsSessionTokenVailate(inSessionToken)
+        //if ok {
+        //   _,err = Session.RenewSessionToken(inSessionToken)
+        //}
+        res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&merchantServicePB.MerchantLoginResponse{SessionToken:inSessionToken,Success:err == nil})
     } else {
         var (
             cellphone string
@@ -331,10 +330,12 @@ func (s *MerchantServiceIMP) MerchantUsersCreate(ctx context.Context, in *mercha
 
                 var lastInsertID int64
                 lastInsertID, err = m.Query(querySQL,name,cellphone,Encryption.PswEncryption(psw),2, merchantID).LastInsertId()
-                res,err = Response.NewCommonBizResponseWithCodeWithError(
-                    0,
-                    err,
-                    &merchantServicePB.MerchantUsersCreateResponse{true,uint32(lastInsertID)})
+                if err == nil {
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(
+                        0,
+                        err,
+                        &merchantServicePB.MerchantUsersCreateResponse{err == nil,uint32(lastInsertID)})
+                }
                 defer m.Close()
             } else {
                 err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
@@ -355,7 +356,7 @@ func (s *MerchantServiceIMP) MerchantUsersQuery(ctx context.Context, in *merchan
         uid uint32
         cellphone string
         name string
-        role int
+        role uint32
     )
     if err == nil {
         var mysql *MySQL.APSMySQL
@@ -367,7 +368,7 @@ func (s *MerchantServiceIMP) MerchantUsersQuery(ctx context.Context, in *merchan
 
                 var queryResult []map[string]interface{}
                 err := m.QueryAll(querySQL,merchantID).FetchAll(func(dest...interface{}){
-
+                    //dest[4]
                     tmp := map[string]interface{}{}
                     tmp["cellphone"] = cellphone
                     tmp["name"] = name
@@ -459,8 +460,10 @@ func (s *MerchantServiceIMP) MerchantWaiterDelete(ctx context.Context, in *merch
     token := in.Token
     waiterid := in.Waiterid
     //验证token合法性
-    isVaildate, err := Session.IsSessionTokenVailate(token)
-    if isVaildate {
+    //isVaildate, err := Session.IsSessionTokenVailate(token)
+    _, _, err = Session.FetchSessionTokenValue(token)
+
+    if err == nil {
         var mysql *MySQL.APSMySQL
         mysql,err = MySQL.NewAPSMySQL(nil)
         if err == nil {

@@ -12,6 +12,7 @@ import (
   "google.golang.org/grpc"
   merchantPB "github.com/lampard1014/aphro/Biz/merchant/pb"
   commodityPB "github.com/lampard1014/aphro/Biz/commodity/pb"
+  roomPB "github.com/lampard1014/aphro/Biz/room/pb"
 
   "github.com/golang/protobuf/proto"
   "google.golang.org/grpc/status"
@@ -23,7 +24,7 @@ import (
 var (
   merchantRPCEndpoints = flag.String("merchant RPC", "localhost:10089", "merchant RPC Endpoint")
   commodityRPCEndpoints = flag.String("commodity RPC", "localhost:10085", "commodity RPC Endpoint")
-
+  roomRPCEndpoints = flag.String("room RPC", "localhost:10084", "room RPC Endpoint")
 )
 
 type CustomError struct {
@@ -182,6 +183,11 @@ func run() error {
   if err != nil {
     return  err
   }
+  err = roomPB.RegisterRoomServiceHandlerFromEndpoint(ctx,mux, *roomRPCEndpoints,opts)
+  if err != nil {
+    return  err
+  }
+
   return http.ListenAndServe(":8089", mux)
 }
 
