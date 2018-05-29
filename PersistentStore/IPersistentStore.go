@@ -12,7 +12,7 @@ type IAphroSQLPersistentStore interface {
 	IAphroPersistentStore
 	Query(querySQL string, bindsValues...interface{})(IAphroPersistentStoreResult)
 	Select(columnsAs map[string]string)(IAphroSQLPersistentStore)
-	Insert(entity string,columns []string,values [][]interface{})(IAphroSQLPersistentStore)
+	Insert(entity string,columns []string,values [][]string)(IAphroSQLPersistentStore)
 	Update(entity string,columnValues map[string]interface{})(IAphroSQLPersistentStore)
 	Delete()(IAphroSQLPersistentStore)
 	From(entity string, entityAlias string)(IAphroSQLPersistentStore)

@@ -121,16 +121,14 @@ func request_RoomService_DeleteRoom_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-var (
-	filter_RoomService_QueryRoom_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
-
 func request_RoomService_QueryRoom_0(ctx context.Context, marshaler runtime.Marshaler, client RoomServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq RSQueryRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_RoomService_QueryRoom_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	if req.ContentLength > 0 {
+		if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+			return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+		}
 	}
 
 	msg, err := client.QueryRoom(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -149,6 +147,21 @@ func request_RoomService_CreateRoomChargeRule_0(ctx context.Context, marshaler r
 	}
 
 	msg, err := client.CreateRoomChargeRule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_RoomService_BatchCreateRoomChargeRule_0(ctx context.Context, marshaler runtime.Marshaler, client RoomServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq RCRBatchCreateRequest
+	var metadata runtime.ServerMetadata
+
+	if req.ContentLength > 0 {
+		if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+			return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+		}
+	}
+
+	msg, err := client.BatchCreateRoomChargeRule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -456,7 +469,7 @@ func RegisterRoomServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_RoomService_QueryRoom_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_RoomService_QueryRoom_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -511,6 +524,35 @@ func RegisterRoomServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		}
 
 		forward_RoomService_CreateRoomChargeRule_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_RoomService_BatchCreateRoomChargeRule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RoomService_BatchCreateRoomChargeRule_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RoomService_BatchCreateRoomChargeRule_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -764,6 +806,8 @@ var (
 
 	pattern_RoomService_CreateRoomChargeRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "charge_rule", "create"}, ""))
 
+	pattern_RoomService_BatchCreateRoomChargeRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "charge_rule", "batchCreate"}, ""))
+
 	pattern_RoomService_UpdateRoomChargeRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "charge_rule", "update"}, ""))
 
 	pattern_RoomService_QueryRoomChargeRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "charge_rule", "query"}, ""))
@@ -795,6 +839,8 @@ var (
 	forward_RoomService_QueryRoom_0 = runtime.ForwardResponseMessage
 
 	forward_RoomService_CreateRoomChargeRule_0 = runtime.ForwardResponseMessage
+
+	forward_RoomService_BatchCreateRoomChargeRule_0 = runtime.ForwardResponseMessage
 
 	forward_RoomService_UpdateRoomChargeRule_0 = runtime.ForwardResponseMessage
 

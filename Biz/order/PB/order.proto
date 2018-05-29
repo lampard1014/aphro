@@ -40,6 +40,79 @@ service OrderService {
 		}
 }
 
+
+
+enum E_propersalAccountType {
+	    SYSTEM = 0;
+	    C_ENDPOINT  =   1;
+	    B_ENDPOINT = 2;
+}
+
+
+
+
+message OSQueryOrderRequest {
+    string sessionToken = 1;
+    uint32 roomID = 2;
+}
+
+message OSQueryOrderResponse {
+
+    bool success = 1;
+    message InnerOSQueryOrderRequest {
+
+        	uint32 transactionID = 2;
+        	uint32 roomID = 3;
+
+            string order_number = 13;
+            uint32 orderID = 12;
+        	float amount = 4;
+        	string outterTransactionID = 5;
+        	string userAgent = 6;
+        	string comment = 7;
+        	string propersalName = 8;
+        	uint32 propersalID = 9;
+
+        	E_propersalAccountType propersalAccountType = 10;
+        	repeated InnerComodityInfo commodities = 11;
+    }
+    repeated InnerOSQueryOrderRequest orders = 2;
+}
+
+message OSDeleteOrderRequest {
+    string sessionToken = 1;
+    string order_number = 11;
+    uint32 orderID = 12;
+}
+
+message OSDeleteOrderResponse {
+    bool success = 1;
+}
+
+message OSUpdateOrderRequest {
+    string sessionToken = 1;
+	uint32 transactionID = 2;
+	uint32 roomID = 3;
+
+    string order_number = 13;
+    uint32 orderID = 12;
+	float amount = 4;
+	string outterTransactionID = 5;
+	string userAgent = 6;
+	string comment = 7;
+	string propersalName = 8;
+	uint32 propersalID = 9;
+
+
+	E_propersalAccountType propersalAccountType = 10;
+	repeated InnerComodityInfo commodities = 11;
+}
+
+message OSUpdateOrderResponse {
+    bool success = 1;
+}
+
+
 message OSCreateOrderRequest {
 	string sessionToken = 1;
 	uint32 transactionID = 2;
@@ -52,12 +125,7 @@ message OSCreateOrderRequest {
 	string propersalName = 8;
 	uint32 propersalID = 9;
 
-	enum E_propersalAccountType {
-	    SYSTEM = 0;
-	    C_ENDPOINT  =   1;
-	    B_ENDPOINT = 2;
-	}
-	E_propersalAccountType propersalAccountType = 10 [default = SYSTEM];
+	E_propersalAccountType propersalAccountType = 10;
 	repeated InnerComodityInfo commodities = 11;
 
 }
@@ -66,7 +134,6 @@ message OSCreateOrderResponse {
     bool success = 1;
     string orderNumber = 2;
 }
-
 
 message PaymentInfo {
     enum E_PaymentType {

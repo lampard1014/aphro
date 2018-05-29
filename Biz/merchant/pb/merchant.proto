@@ -86,6 +86,14 @@ service MerchantService {
 			};
 		}
 
+        // 查询商户服务信息
+		rpc merchantWaiterQuery(MerchantWaiterQueryRequest) returns (Aphro.CommonBiz.Response) {
+			option (google.api.http) = {
+				post: "/merchant/waiter/query"
+				body: "*"
+			};
+		}
+
 		// 新增商户服务信息
 		rpc merchantWaiterCreate(MerchantWaiterCreateRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
@@ -120,19 +128,39 @@ service MerchantService {
 }
 
 
+message MerchantWaiterQueryRequest {
+    string sessionToken = 1;
+}
+
+message MerchantWaiterQueryResponse {
+
+    bool success = 1;
+    message innerMerchantWaiterQueryResponse {
+            uint32 waiterid = 1;
+            string merchantID = 2;
+            string name = 3;
+            string content = 5;
+            string reserve = 4;
+    }
+    repeated innerMerchantWaiterQueryResponse waiters = 2;
+}
+
+
 message MerchantWaiterCreateRequest {
-	string token = 1;
+	string sessionToken = 1;
 	string merchantID = 2;
 	string name = 3;
+	string content = 5;
     string reserve = 4;
 }
 
 message MerchantWaiterCreateResponse {
 	bool success = 1;
+	uint32 waiterid = 2;
 }
 
 message MerchantWaiterDeleteRequest {
-	string token = 1;
+	string sessionToken = 1;
 	uint64 waiterid = 2;
 }
 

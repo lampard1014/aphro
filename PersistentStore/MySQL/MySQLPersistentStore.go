@@ -338,7 +338,7 @@ type APSMySQL struct {
 	entities []*APSEntity
 	entitiesJoin []APSMySQLEntityJoin
 
-	insertValues[][]interface{}
+	insertValues[][]string
 	updateColumns map[string]interface{}
 
 	token APSMySQLToken
@@ -405,7 +405,7 @@ func (this *APSMySQL)Reset()(PersistentStore.IAphroPersistentStore) {
 	this.entities = []*APSEntity{}
 	this.entitiesJoin = []APSMySQLEntityJoin{}
 
-	this.insertValues = [][]interface{}{}
+	this.insertValues = [][]string{}
 	this.updateColumns = map[string]interface{}{}
 	this.token = 0
 
@@ -454,7 +454,7 @@ func (this *APSMySQL)From(entity string, entityAlias string)(PersistentStore.IAp
 	return this
 }
 
-func (this *APSMySQL)Insert(entity string,columns []string,values [][]interface{})(PersistentStore.IAphroSQLPersistentStore) {
+func (this *APSMySQL)Insert(entity string,columns []string,values [][]string)(PersistentStore.IAphroSQLPersistentStore) {
 	this.Reset()
 	this.token = APSMySQLToken_INSERT
 	//entity
@@ -593,7 +593,7 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 		queryFeildsFormer := []string{}
 		for _,cv := range this.columns {
 			var fieldToken  string = ""
-			fieldName := cv.filedName
+			fieldName := "`" + cv.filedName + "`"
 			fieldToken += fieldName
 			if cv.alias != "" {
 				fieldToken += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_AS] + DelimiterSpace + cv.alias
@@ -617,13 +617,13 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 				entityToken += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_AS] + DelimiterSpace + ev.alias
 			}
 
-			if this.entitiesJoin != nil {
+			if len(this.entitiesJoin) != 0  {
 				entityToken += DelimiterSpace + APSMySQLEntityJoinMap[this.entitiesJoin[ei/2]] + DelimiterSpace
 			}
 
 			entitiesFormer = append(entitiesFormer,entityToken)
 		}
-		if this.token ==  APSMySQLToken_INSERT || this.token ==  APSMySQLToken_UPDATE {
+		if this.token !=  APSMySQLToken_INSERT && this.token != APSMySQLToken_UPDATE {
 			fromToken += DelimiterSpace + strings.Join(entitiesFormer, DelimiterSpace)
 		} else {
 			fromToken = DelimiterSpace + strings.Join(entitiesFormer, DelimiterSpace)
@@ -638,26 +638,37 @@ func (this *APSMySQL)Execute(bindsValues...interface{})(PersistentStore.IAphroPe
 	} else if this.token == APSMySQLToken_INSERT {
 		queryStatment += DelimiterSpace + fromToken + DelimiterSpace
 		queryStatment +=  LeftBrackets + queryFields + RightBrackets
-		//todo fix
-		//var insertData []string
+		var insertData []string
 
-		//for _,ins := range this.insertValues {
-		//	insertData = append(insertData, LeftBrackets+ strings.Join(ins, DelimiterComma) +RightBrackets)
-		//}
-		//queryStatment += strings.Join(insertData,DelimiterComma)
+		for _,iv := range this.insertValues {
+			insertData = append(insertData, LeftBrackets+ strings.Join(iv, DelimiterComma) +RightBrackets)
+		}
+		queryStatment += DelimiterSpace + "VALUES" + DelimiterSpace + strings.Join(insertData,DelimiterComma)
 	} else if this.token == APSMySQLToken_UPDATE {
 		queryStatment += DelimiterSpace + fromToken + DelimiterSpace
 
-
+		updateColumn := []string{}
+		for k,_ := range this.updateColumns {
+			updateFileds := "`" + k + "`=?"
+			updateColumn  = append(updateColumn,updateFileds)
+		}
+		queryStatment += DelimiterSpace + "SET"+ DelimiterSpace + strings.Join(updateColumn,DelimiterComma)
 	}
 
 	//queryStatment += DelimiterSpace + fromToken + DelimiterSpace
 	// where
-	queryStatment += DelimiterSpace + this.wheres + DelimiterSpace
+	if this.wheres != "" {
+		queryStatment += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_WHERE] + DelimiterSpace + this.wheres + DelimiterSpace
+
+	}
 	//order by
-	queryStatment += DelimiterSpace + this.orderBy + DelimiterSpace
+	if this.orderBy != "" {
+		queryStatment += DelimiterSpace + this.orderBy + DelimiterSpace
+	}
 	//limit
-	queryStatment += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_LIMIT] + strings.Join(this.limit, DelimiterComma) + DelimiterSpace
+	if len(this.limit) > 0 {
+		queryStatment += DelimiterSpace + APSMySQLTokenMap[APSMySQLToken_LIMIT] + strings.Join(this.limit, DelimiterComma) + DelimiterSpace
+	}
 	// do query
 	this.prepareStatement = queryStatment
 	this.bindValues = bindsValues
@@ -765,18 +776,24 @@ func (this *APSMySQL)Where(condition interface{}) (PersistentStore.IAphroSQLPers
 func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 	//todo need  complete all where conditions
 	var conditionClause string = "1"
+	//var (
+	//	parse01NeedBrackets bool
+	//	parse02NeedBrackets bool
+	//
+	//)
+
 	if condition != nil {
 		//提取 operator
 		operator := condition.Operator
 		operand1 := condition.Operand1
-		operand2 := condition.Operand1
+		operand2 := condition.Operand2
 
 		var parseO1 string = ""
 		var parseO2 string = ""
 
 		switch  o1:= operand1.(type) {
 		case *APSMySQLCondition:
-			parseO1 = this.parseWhereCondition(o1)
+			parseO1 = LeftBrackets + this.parseWhereCondition(o1)+ RightBrackets
 		case string:
 			parseO1 = o1
 		default:
@@ -785,7 +802,7 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 
 		switch  o2:= operand2.(type) {
 		case *APSMySQLCondition:
-			parseO2 = this.parseWhereCondition(o2)
+			parseO2 = LeftBrackets + this.parseWhereCondition(o2) + RightBrackets
 		case string:
 			parseO2 = o2
 		case int:
@@ -795,7 +812,8 @@ func (this *APSMySQL)parseWhereCondition(condition *APSMySQLCondition) string {
 		default:
 			this.lastError = PersistentStore.NewPSErrC(PersistentStore.WhereConditionParseErr)
 		}
-		conditionClause = LeftBrackets + parseO1+ RightBrackets + DelimiterSpace + string(operator) + DelimiterSpace + LeftBrackets + parseO2 + RightBrackets
+
+		conditionClause =  parseO1+  DelimiterSpace + string(operator) + DelimiterSpace +  parseO2
 	}
 	return conditionClause
 }

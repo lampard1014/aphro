@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
+import "github.com/golang/protobuf/ptypes/wrappers/wrappers.proto";
 import "github.com/lampard1014/aphro/CommonBiz/Response/PB/response.proto";
-
 package Aphro.Room.pb;
 
 service RoomService {
@@ -50,7 +50,9 @@ service RoomService {
 		//查询房间
 		rpc queryRoom(RSQueryRequest) returns (Aphro.CommonBiz.Response) {
 			option (google.api.http) = {
-				get: "/room/query"
+				post: "/room/query"
+				body:"*"
+
 			};
 		}
 
@@ -61,6 +63,14 @@ service RoomService {
         			body:"*"
         		};
         	}
+        	//批量创建计费方式
+        	rpc batchCreateRoomChargeRule(RCRBatchCreateRequest) returns (Aphro.CommonBiz.Response) {
+        		option (google.api.http) = {
+        			post: "/room/charge_rule/batchCreate"
+        			body:"*"
+        		};
+        	}
+
         //更新计费方式
         	rpc updateRoomChargeRule(RCRUpdateRequest) returns (Aphro.CommonBiz.Response) {
         		option (google.api.http) = {
@@ -119,7 +129,7 @@ service RoomService {
             //查询一个房间的房费
          	rpc roomTransactionQueryRoomFee(RSTransactionQueryRoomFeeRequest) returns (Aphro.CommonBiz.Response) {
                  option (google.api.http) = {
-                     post: "/room/transaction/createRoomFee"
+                     post: "/room/transaction/queryRoomFee"
                      body:"*"
                   };
              }
@@ -151,6 +161,7 @@ message RSResult {
 	RSLocation location = 4;
 	uint32 status = 5;
 	string roomName = 6;
+	uint32 flag = 8;
 	repeated RCRResult chargeRules = 7;
 }
 
@@ -172,21 +183,22 @@ message RSCreateRequest {
 	string roomName = 4;
 }
 
+
 message RSCreateResponse {
 	uint32 roomID = 1;
 	bool success = 2;
 }
 
 message RSUpdateRequest {
-	string sessionToken = 1;
-	uint32 roomID = 2;
+	google.protobuf.StringValue sessionToken = 1;
+	google.protobuf.UInt32Value roomID = 2;
 
-	string terminalCode = 3;
+	google.protobuf.StringValue terminalCode = 3;
 	RSLocation location = 4;
-	uint32 status = 5;
-	string roomName = 7;
+	google.protobuf.UInt32Value status = 5;
+	google.protobuf.StringValue roomName = 7;
 
-	repeated RCRCreateRequest chargeRules = 6;
+	//repeated RCRCreateRequest chargeRules = 6;
 }
 
 message RSUpdateResponse {
@@ -230,6 +242,7 @@ message RCRResult {
 	uint32 intervalUnit = 6;
 	uint32 roomID = 8;
 	uint32 flag = 9;
+	string name =10;
 }
 
 message RCRDeleteRequest {
@@ -266,6 +279,7 @@ message RCRUpdateRequest {
 	uint32 interval = 5;
 	uint32 intervalUnit = 6;
 	uint32 roomID = 8;
+	string name = 10;
 
 }
 
@@ -274,14 +288,28 @@ message RCRUpdateResponse {
 }
 
 message RCRCreateRequest {
+    uint32  rcrID = 11;
 	string  sessionToken = 1;
-	float   fee	=	2;
-	string	start	=3;
-	string	end	=	4;
-	uint32 interval = 5;
-	uint32 intervalUnit = 6;
-	uint32 merchantID = 7;
-	uint32 roomID = 8;
+	float   fee	= 2;
+	string	start = 3;
+	string	end	= 4;
+	uint32  interval = 5;
+	uint32  intervalUnit = 6;
+	uint32  merchantID = 7;
+	uint32  roomID = 8;
+	uint32  flag = 9;
+	string  name = 10;
+}
+
+message RCRBatchCreateRequest {
+	string  sessionToken = 1;
+	uint32 merchantID = 2;
+    uint32 roomID = 3;
+	repeated RCRCreateRequest rules = 4;
+}
+
+message RCRBatchCreateResponse {
+    bool success = 1;
 }
 
 message RCRCreateResponse {
@@ -292,12 +320,14 @@ message RCRCreateResponse {
 message RSTransactionBeginRequest {
 	string  sessionToken = 1;
 	uint32  roomID  =   2;
-    uint32  roomChargeRuleID = 3;
+    repeated  RCRCreateRequest roomChargeRules = 3;
 }
 
 message RSTransactionBeginResponse {
     bool success = 1;
     uint32 transactionID = 2;
+    uint64 start = 3;
+    float fee = 4;
 }
 
 message RSTransactionSuspendRequest {

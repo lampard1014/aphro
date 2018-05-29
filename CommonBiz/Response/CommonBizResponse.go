@@ -13,19 +13,6 @@ import (
 )
 
 
-//const (
-//	//NoError
-//	NoError  = iota + 100
-//	//验签错误
-//	AuthError
-//	//业务逻辑错误
-//	BizError
-//	//  common biz error //
-//	//session过期
-//	SessionExpired
-//
-//)
-
 func NewCommonBizResponse(code int64, message string,resultMsg proto.Message )(*Aphro_CommonBiz.Response,error) {
 
 	if resultMsg == nil {

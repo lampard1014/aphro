@@ -11,6 +11,7 @@ import (
     "strconv"
     "strings"
     "time"
+    "github.com/lampard1014/aphro/Biz"
 )
 
 const (
@@ -140,18 +141,62 @@ func (s *RoomServiceImp) CreateRoom(ctx context.Context, in *Aphro_Room_pb.RSCre
 
 func (s *RoomServiceImp) UpdateRoom(ctx context.Context, in *Aphro_Room_pb.RSUpdateRequest) (res *Aphro_CommonBiz.Response, err error) {
 
-    sessionToken := in.SessionToken
-    terminalCode := in.TerminalCode
+    var (
+        st string
+        tc string
+        isSetTerminalCode bool
+        isSetLocation bool
+        rid uint32
+        isSetRoomID bool
+
+        status uint32
+        isSetStatus bool
+
+        rn string
+        isSetRoomName bool
+
+        //isSetChargeRules bool
+        )
+    if in.SessionToken != nil {
+        st = in.SessionToken.Value
+    }
+
+    if in.TerminalCode != nil {
+        tc = in.TerminalCode.Value
+        isSetTerminalCode = true
+    }
+
     location := in.Location
-    latitude := location.Latitude
-    longitude := location.Longitude
-    roomName := in.RoomName
-    roomId := in.RoomID
-    chargeRules := in.ChargeRules
-    status := in.Status
+    var latitude string
+    var longitude string
+    if location != nil {
+        latitude = location.Latitude
+        longitude = location.Longitude
+        isSetLocation = true
+    }
+
+    if in.RoomName != nil {
+        rid = in.RoomID.Value
+        isSetRoomID = true
+    }
+
+    if in.RoomName != nil {
+        rn = in.RoomName.Value
+        isSetRoomName = true
+    }
+
+    if in.Status != nil {
+        status = in.Status.Value
+        isSetStatus = true
+    }
+    //if in.ChargeRules != nil {
+    //    isSetChargeRules = true
+    //}
+	//
+    //chargeRules := in.ChargeRules
 
 	var merchantID string
-    _, merchantID, err = Session.FetchSessionTokenValue(sessionToken)
+    _, merchantID, err = Session.FetchSessionTokenValue(st)
     if err == nil {
 		var mysql *MySQL.APSMySQL
 		mysql,err = MySQL.NewAPSMySQL(nil)
@@ -159,33 +204,65 @@ func (s *RoomServiceImp) UpdateRoom(ctx context.Context, in *Aphro_Room_pb.RSUpd
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                var insertData []string
-                for _,cr := range chargeRules {
-                    r,err1 := s.CreateRoomChargeRule(ctx,cr)
-                    err = err1
-                    if err == nil  {
-                        var crcCreateResponse *Aphro_Room_pb.RCRCreateResponse
-                        err = Response.UnmarshalAny(r.Result,crcCreateResponse)
-                        if err == nil {
-                            insertData = append(insertData,strconv.Itoa(int(crcCreateResponse.RecodeID)))
-                        }
-                    }
+                //var insertData []string
+                //for _,cr := range chargeRules {
+                //    r,err1 := s.CreateRoomChargeRule(ctx,cr)
+                //    err = err1
+                //    if err == nil  {
+                //        var crcCreateResponse *Aphro_Room_pb.RCRCreateResponse
+                //        err = Response.UnmarshalAny(r.Result,crcCreateResponse)
+                //        if err == nil {
+                //            insertData = append(insertData,strconv.Itoa(int(crcCreateResponse.RecodeID)))
+                //        }
+                //    }
+                //}
+
+                var bindValues []interface{} = []interface{}{}
+                var updateMaps map[string]interface{} = map[string]interface{}{}
+
+                updateMaps["merchant_id"] = "?"
+                bindValues = append(bindValues, merchantID)
+
+
+                if isSetLocation {
+                    updateMaps["longitude"] = "?"
+                    bindValues = append(bindValues, longitude)
+                    updateMaps["latitude"] = "?"
+                    bindValues = append(bindValues, latitude)
                 }
-                if len(insertData) > 0 {
-                    _,err = m.Update("merchant_room",map[string]interface{}{
-                        "merchant_id":"?",
-                        "longitude":"?",
-                        "latitude":"?",
-                        "room_name":"?",
-                        "status":"?",
-                        "terminal_code":"?",
-                        "charge_rules":"?",
-                    }).Where(&MySQL.APSMySQLCondition{MySQL.APSMySQLOperator_Equal,"ID","?"}).Execute(merchantID,longitude,latitude,roomName,status,terminalCode,strings.Join(insertData,RCRIDDelimiter),roomId).RowsAffected()
-                    if err == nil {
-                        res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSUpdateResponse{Success:true})
-                    }
+                if isSetRoomName {
+                    updateMaps["room_name"] = "?"
+                    bindValues = append(bindValues, rn)
+                }
+                if isSetStatus {
+                    updateMaps["status"] = "?"
+                    bindValues = append(bindValues, status)
+                }
+
+                if isSetTerminalCode {
+                    updateMaps["staterminal_codetus"] = "?"
+                    bindValues = append(bindValues, tc)
+                }
+
+                if isSetTerminalCode {
+                    updateMaps["staterminal_codetus"] = "?"
+                    bindValues = append(bindValues, tc)
+                }
+
+                //if isSetChargeRules {
+                //    updateMaps["charge_rules"] = "?"
+                //    bindValues = append(bindValues, strings.Join(insertData,RCRIDDelimiter))
+                //}
+
+                if isSetRoomID {
+                    bindValues = append(bindValues, rid)
                 } else {
-					err = Error.NewCustomError(Error.BizError,"计费模式不能为空")
+                    bindValues = append(bindValues, 0)
+                }
+
+                _,err = m.Update("merchant_room",updateMaps).Where(&MySQL.APSMySQLCondition{MySQL.APSMySQLOperator_Equal,"ID","?"}).Execute(bindValues...).RowsAffected()
+                if err == nil {
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSUpdateResponse{Success:true})
                 }
             } else {
 				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
@@ -248,7 +325,7 @@ func (s *RoomServiceImp) QueryRoom(ctx context.Context, in *Aphro_Room_pb.RSQuer
                 } else {
                     whereCondition = " `ID` = ? AND `merchantID` =  " + merchantID
                 }
-                querySQL := "SELECT `ID`,`merchant_id`,`longitude`,`latitude`,`room_name`,`status`,`charge_rules`,`terminal_code` FROM `merchant_room` WHERE " + whereCondition
+                querySQL := "SELECT `ID`,`longitude`,`latitude`,`room_name`,`status`,`charge_rules`,`terminal_code` ,`flag` FROM `merchant_room` WHERE " + whereCondition
                 var (
                     roomID uint32
                     longitude string
@@ -257,19 +334,19 @@ func (s *RoomServiceImp) QueryRoom(ctx context.Context, in *Aphro_Room_pb.RSQuer
                     status int
                     charge_rules string
                     terminal_code string
+                    flag uint32
                     )
 
                 qr := &Aphro_Room_pb.RSQueryResponse{}
                 //var rooms []*Aphro_Room_pb.RSResult
-                err = m.QueryAll(querySQL,roomId).FetchAll(func(dest...interface{}){
+                err = m.QueryAll(querySQL).FetchAll(func(dest...interface{}){
                 	var mid int
                     mid,err = strconv.Atoi(merchantID)
                     if err != nil {
                         return
                     }
                     var ruleList []*Aphro_Room_pb.RCRResult;
-                    rsResult := &Aphro_Room_pb.RSResult{RoomID:roomID,MerchantID:uint32(mid),TerminalCode:terminal_code,Location:&Aphro_Room_pb.RSLocation{Longitude:longitude,Latitude:latitude},Status:uint32(status),RoomName:room_name,ChargeRules:ruleList}
-                    qr.Rooms = append(qr.Rooms, rsResult)
+
                     charge_rule := strings.Split(charge_rules,RCRIDDelimiter)
                     for _,rcrid := range charge_rule {
                         //获取rcr。。
@@ -284,7 +361,7 @@ func (s *RoomServiceImp) QueryRoom(ctx context.Context, in *Aphro_Room_pb.RSQuer
                         if err != nil {
                             return
                         } else {
-                            var r *Aphro_Room_pb.RCRQueryResponse
+                            var r *Aphro_Room_pb.RCRQueryResponse = &Aphro_Room_pb.RCRQueryResponse{}
                             err1 := Response.UnmarshalAny(rcrResponse.Result,r)
                             err = err1
                             if err != nil || !r.Success{
@@ -294,7 +371,9 @@ func (s *RoomServiceImp) QueryRoom(ctx context.Context, in *Aphro_Room_pb.RSQuer
                             }
                         }
                     }
-                },&roomID,&longitude,&latitude,&room_name,&status,&charge_rules,&terminal_code)
+                    rsResult := &Aphro_Room_pb.RSResult{roomID,uint32(mid),terminal_code,&Aphro_Room_pb.RSLocation{longitude,latitude},uint32(status),room_name,flag,ruleList}
+                    qr.Rooms = append(qr.Rooms, rsResult)
+                },&roomID,&longitude,&latitude,&room_name,&status,&charge_rules,&terminal_code,&flag)
                 if err == nil {
                     qr.Success = true
                     res,err = Response.NewCommonBizResponse(0,"",qr)
@@ -310,6 +389,69 @@ func (s *RoomServiceImp) QueryRoom(ctx context.Context, in *Aphro_Room_pb.RSQuer
     return
 }
 
+func (s *RoomServiceImp) BatchCreateRoomChargeRule(ctx context.Context, in *Aphro_Room_pb.RCRBatchCreateRequest) (res *Aphro_CommonBiz.Response,err error) {
+
+    inMerchantID := in.MerchantID
+    roomID := in.RoomID
+    rules := in.Rules
+    sessionToken := in.SessionToken
+
+    _, merchantID, err := Session.FetchSessionTokenValue(sessionToken)
+
+    if inMerchantID != 0{
+        merchantID = strconv.Itoa(int(inMerchantID))
+    }
+
+    if err == nil {
+        var ruleVals []string
+        var binds []interface{}
+        querySQL := "INSERT INTO `merchant_charge_rule` (`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag`,`name`) VALUES "
+
+        for _,rule := range rules {
+            fee := rule.Fee
+            start := rule.Start
+            end := rule.End
+            interval := rule.Interval
+            intervalUnit := rule.IntervalUnit
+            flag := rule.Flag
+            name := rule.Name
+
+            //var (
+            //    startTime time.Time
+            //    endTime time.Time
+            //)
+
+            //startTime, err = time.Parse("2006-01-02 15:04:05",start)
+            //endTime, err = time.Parse("2006-01-02 15:04:05",end)
+            //st := startTime.Format("2006-01-02 15:04:05")
+            //et := endTime.Format("2006-01-02 15:04:05")
+
+            var tmpRule []string = []string{"?","?","?","?","?","?","?","?"}
+            ruleVals = append(ruleVals,MySQL.LeftBrackets + strings.Join(tmpRule,MySQL.DelimiterComma) + MySQL.RightBrackets)
+            binds = append (binds,fee,start,end,interval,intervalUnit,merchantID,roomID,flag,name)
+        }
+        var mysql *MySQL.APSMySQL
+        mysql,err = MySQL.NewAPSMySQL(nil)
+        if err == nil {
+            m, ok := mysql.Connect().(*MySQL.APSMySQL)
+            defer m.Close()
+            if ok {
+                _,err = m.Query(querySQL + strings.Join(ruleVals,MySQL.DelimiterComma) ,binds...).RowsAffected()
+                if err == nil {
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RCRBatchCreateResponse{true,})
+                }
+            } else {
+                err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
+            }
+        }
+    }
+    if err != nil {
+        res,err = Response.NewCommonBizResponseWithError(err,nil)
+    }
+    return
+
+}
+
 func (s *RoomServiceImp) CreateRoomChargeRule(ctx context.Context, in *Aphro_Room_pb.RCRCreateRequest) (res *Aphro_CommonBiz.Response,err error) {
 	fee := in.Fee
     start := in.Start
@@ -318,7 +460,8 @@ func (s *RoomServiceImp) CreateRoomChargeRule(ctx context.Context, in *Aphro_Roo
     intervalUnit := in.IntervalUnit
     roomId := in.RoomID
     sessionToken := in.SessionToken
-
+    flag := in.Flag
+    name := in.Name
     _, merchantID, err := Session.FetchSessionTokenValue(sessionToken)
     if err == nil {
     	var mysql *MySQL.APSMySQL
@@ -327,15 +470,22 @@ func (s *RoomServiceImp) CreateRoomChargeRule(ctx context.Context, in *Aphro_Roo
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                querySQL := "INSERT INTO `merchant_charge_rule` (`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag`) VALUES (?,?,?,?,?,?,?,?)"
-                _,err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,"").RowsAffected()
+
+                //var (
+                //    startTime time.Time
+                //    endTime time.Time
+                // )
+				//
+                //startTime, err = time.Parse("2006-01-02 15:04:05",start)
+                //endTime, err = time.Parse("2006-01-02 15:04:05",end)
+                //st := startTime.Format("2006-01-02 15:04:05")
+                //et := endTime.Format("2006-01-02 15:04:05")
+
+                querySQL := "INSERT INTO `merchant_charge_rule` (`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag`,`name`) VALUES (?,?,?,?,?,?,?,?,?)"
+                var lastInsertId int64
+                lastInsertId,err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,flag,name).LastInsertId()
                 if err == nil {
-                    querySQL := "SELECT `ID` FROM `merchant_charge_rule` WHERE `fee_per` = ? AND `start` = ? AND `end` =? AND `interval` = ? AND `interval_unit` = ? AND `merchant_id`= ? AND `room_id` = ? AND `flag`=? LIMIT 1"
-                    var ID uint32
-                    err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,"").FetchRow(&ID)
-                    if err == nil {
-                        res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RCRCreateResponse{true,ID})
-                    }
+                    res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RCRCreateResponse{true,uint32(lastInsertId)})
                 }
             } else {
 				err = Error.NewCustomError(Error.BizError,"mysql类型断言错误")
@@ -357,6 +507,7 @@ func (s *RoomServiceImp) UpdateRoomChargeRule(ctx context.Context, in *Aphro_Roo
     roomId := in.RoomID
     sessionToken := in.SessionToken
     rcrid := in.RCRID
+    roomName := in.Name
 
     _, merchantID, err := Session.FetchSessionTokenValue(sessionToken)
     if err == nil {
@@ -366,8 +517,19 @@ func (s *RoomServiceImp) UpdateRoomChargeRule(ctx context.Context, in *Aphro_Roo
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                querySQL := "UPDATE `merchant_charge_rule` SET `fee_per` = ? AND `start` = ? AND `end` = ? AND `interval` = ? AND `interval_unit` = ? AND `merchant_id` = ? AND `room_id` = ? WHERE `ID` = ?"
-                _,err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,rcrid).RowsAffected()
+
+                //var (
+                //    startTime time.Time
+                //    endTime time.Time
+                //)
+
+                //startTime, err = time.Parse("2006-01-02 15:04:05",start)
+                //endTime, err = time.Parse("2006-01-02 15:04:05",end)
+                //st := startTime.Format("2006-01-02 15:04:05")
+                //et := endTime.Format("2006-01-02 15:04:05")
+
+                querySQL := "UPDATE `merchant_charge_rule` SET `fee_per` = ? , `start` = ? , `end` = ? , `interval` = ? , `interval_unit` = ? , `merchant_id` = ? , `room_id` = ? ,`name` = ? WHERE `ID` = ? "
+                _,err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,roomName,rcrid).RowsAffected()
                 if err == nil {
                     res,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RCRUpdateResponse{true})
                 }
@@ -414,7 +576,7 @@ func (s *RoomServiceImp) QueryRoomChargeRule(ctx context.Context, in *Aphro_Room
                     whereCondition = append(whereCondition, "`ID` =  ?")
                     binds = append(binds,rcrID)
                 }
-                querySQL := "SELECT `ID`,`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag` FROM `merchant_charge_rule` WHERE " + strings.Join(whereCondition," AND ")
+                querySQL := "SELECT `ID`,`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag`,`name` FROM `merchant_charge_rule` WHERE " + strings.Join(whereCondition," AND ")
                 var (
                     r_ID uint32
                     r_fee float32
@@ -425,6 +587,7 @@ func (s *RoomServiceImp) QueryRoomChargeRule(ctx context.Context, in *Aphro_Room
                     r_merchant_id uint32
                     r_room_id uint32
                     r_flag int
+                    r_name string
                 )
 
                 qr := &Aphro_Room_pb.RCRQueryResponse{}
@@ -443,9 +606,10 @@ func (s *RoomServiceImp) QueryRoomChargeRule(ctx context.Context, in *Aphro_Room
                         IntervalUnit:uint32(r_interval_unit),
                         RoomID:r_room_id,
                         Flag:uint32(r_flag),
+                        Name:r_name,
                     }
                     qr.Results = append(qr.Results, rsResult)
-                },&r_ID,&r_fee,&r_start,&r_end,&r_interval,&r_interval_unit,&r_merchant_id,&r_room_id,&r_flag)
+                },&r_ID,&r_fee,&r_start,&r_end,&r_interval,&r_interval_unit,&r_merchant_id,&r_room_id,&r_flag,&r_name)
 
                 if err == nil {
                     qr.Success = true
@@ -514,10 +678,9 @@ func (s *RoomServiceImp) DeleteRoomChargeRule(ctx context.Context, in *Aphro_Roo
 }
 
 func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Room_pb.RSTransactionBeginRequest) (res *Aphro_CommonBiz.Response,err error) {
-    roomChargeRuleID := in.RoomChargeRuleID
+    roomChargeRules:= in.RoomChargeRules
     roomId := in.RoomID
     sessionToken := in.SessionToken
-    //_,  err = Session.IsSessionTokenVailate(sessionToken)
 	_,_,err = Session.FetchSessionTokenValue(sessionToken)
 
 	if err == nil {
@@ -536,42 +699,57 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
                 )
                 err = m.Query(querySQL,roomId).FetchRow(&room_name,&status,&terminal_code)
                 if err == nil && status == RoomStatusEnable {
-                    //新增一个事务
+                    //新增一个事务,房间快照
                     querySQL := "INSERT  INTO `transaction_room` (`room_id`,`room_name`,`start_time`,`update_time`,`status`,`terminal_code`) VALUES (?,?,?,?,?,?)"
                     startTime := time.Now()
                     var transactionId int64
-                    transactionId,err = m.Query(querySQL,roomId,room_name,startTime,startTime,RoomTransactionBegin,terminal_code).LastInsertId()
+                    transactionId,err = m.Query(querySQL,roomId,room_name,startTime,startTime,RoomStatusInUse,terminal_code).LastInsertId()
                     if err == nil {
-                        rcrRequest := &Aphro_Room_pb.RCRQueryRequest{}
-                        rcrRequest.RCRID = roomChargeRuleID
-                        rcrRequest.SessionToken = sessionToken
-                        rcr,err1 := s.QueryRoomChargeRule(ctx,rcrRequest)
-                        err = err1
+                        //房间规则快照
+                        rulesCount := len(roomChargeRules)
+                        insertValuesPlaceholder := [][]string{}
+                        bv := []interface{}{}
+                        for i := rulesCount -1 ; i >= 0 ; i--  {
+                            insertValuesPlaceholder = append(insertValuesPlaceholder,[]string{"?","?","?","?","?","?","?","?","?","?"})
+                            rule := roomChargeRules[i]
+                            bv = append(bv,rule.Fee)
+                            bv = append(bv,rule.Start)
+                            bv = append(bv,rule.End)
+                            bv = append(bv,rule.Interval)
+                            bv = append(bv,rule.IntervalUnit)
+                            bv = append(bv,rule.MerchantID)
+                            bv = append(bv,rule.RoomID)
+                            bv = append(bv,transactionId)
+                            bv = append(bv,rule.Flag)
+                            bv = append(bv,rule.RcrID)
+                        }
+
+                        insertColumns := []string{
+                                "fee_per_interval",
+                                "start",
+                                "end",
+                                "interval",
+                                "interval_unit",
+                                "merchant_id",
+                                "room_id",
+                                "transaction_id",
+                                "flag",
+                                "rcrID",
+                        }
+
+                        _,err = m.Insert("transaction_room_charge_rules",insertColumns , insertValuesPlaceholder).Execute(bv...).RowsAffected()
                         if err == nil {
-                            var rcrRes *Aphro_Room_pb.RCRQueryResponse
-                            err1 := Response.UnmarshalAny(rcr.Result,rcrRes)
-                            err = err1
-                            if err == nil && rcrRes.Success{
-                                rcr := rcrRes.Results[0]
-                                _,err = s.RoomTransactionCreateRoomFee(ctx,&Aphro_Room_pb.RSTransactionCreateRoomFeeRequest{
-                                    SessionToken:sessionToken,
-                                    Fee:rcr.Fee,
-                                    Start:rcr.Start,
-                                    End:rcr.End,
-                                    IntervalUnit:rcr.IntervalUnit,
-                                    Interval:rcr.Interval,
-                                    MerchantID:rcr.MerchantID,
-                                    RoomID:roomId,
-                                    TransactionID:uint32(transactionId),
-                                    Flag:0,
-                                })
-                                if err == nil {
-                                    querySQL := "UPDATE `merchant_room` SET `status` = ?  WHERE `ID` = ? LIMIT 1"
-                                    _,err = m.Query(querySQL,RoomStatusInUse,roomId).RowsAffected()
-                                    if err == nil {
-                                        res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionBeginResponse{true,uint32(transactionId)})
-                                    }
-                                }
+                            // todo 计费开始
+                            Biz.TransactionCalculator.ScheduleRules(nil)
+
+                            //当前的房间 不支持多个事务
+                            _,err := m.
+                                Update("merchant_room",map[string]interface{}{"status":"?"}).
+                                Where(&MySQL.APSMySQLCondition{MySQL.APSMySQLOperator_Equal,"ID","?"}).
+                                Execute(RoomStatusInUse,roomId).
+                                RowsAffected()
+                            if err == nil {
+                                res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionBeginResponse{true,uint32(transactionId),uint64(time.Now().Unix() * 1000),666})
                             }
                         }
                     }

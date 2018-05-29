@@ -15,25 +15,42 @@ const (
 
 const (
 	//  common biz error //
-	SessionServiceError = iota + 200
+	SessionServiceNoError   = 0
 	//session过期
-	SessionServiceError_SessionExpired
+	SessionServiceError_SessionExpired   = iota + 700
 )
+
+
+var ErrorMap map[int]string = map[int]string{
+	SessionServiceNoError : "",
+	SessionServiceError_SessionExpired:"session expired",
+}
 
 func FetchSessionTokenValue(sessionToken string) (uid string, merchantID string, err error) {
 	var returnErr error = nil
 
-	token,_,err := QuerySessionToken(sessionToken)
-
-	if err == nil && token != "" {
-		sessionTokenValue := token
-		splitValue := strings.Split(sessionTokenValue, "#")
-		uidAndMerchantID := strings.Split(splitValue[0],"@")
-		uid = uidAndMerchantID[0]
-		merchantID = uidAndMerchantID[1]
-		_, returnErr = RenewSessionToken(sessionToken)
-	} else {
+	if sessionToken == "" {
 		returnErr = Error.NewCustomError(Error.BizError, "session 过期 请重新登录")
+
+	} else {
+		token,_,err := QuerySessionToken(sessionToken)
+
+		if err == nil && token != "" {
+			sessionTokenValue := token
+			splitValue := strings.Split(sessionTokenValue, "#")
+			uidAndMerchantID := strings.Split(splitValue[0],"@")
+			var _uid uint64
+			_uid,returnErr = strconv.ParseUint(uidAndMerchantID[0],36,0)
+			uid = strconv.FormatUint(_uid,10)
+
+			var _merchantID uint64
+			_merchantID,returnErr = strconv.ParseUint(uidAndMerchantID[1],36,0)
+			merchantID = strconv.FormatUint(_merchantID,10)
+
+			_, returnErr = RenewSessionToken(sessionToken)
+		} else {
+			returnErr = Error.NewCustomError(Error.BizError, "session 过期 请重新登录")
+		}
 	}
 
 	return uid,merchantID,returnErr
@@ -154,6 +171,9 @@ func IsSessionTokenVailate(sessionToken string) (bool,error) {
 		defer redis.Close()
 		isExists,err := redis.IsExists(sessionToken)
 		//res, err := c.IsExists(ctx, &redisPb.IsExistsRequest{Key:token})
+		if err == nil &&  !isExists {
+			err = Error.NewCustomError(SessionServiceError_SessionExpired,ErrorMap[SessionServiceError_SessionExpired])
+		}
 		return isExists,err
 	}
 }
