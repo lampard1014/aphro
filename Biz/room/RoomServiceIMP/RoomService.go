@@ -189,12 +189,6 @@ func (s *RoomServiceImp) UpdateRoom(ctx context.Context, in *Aphro_Room_pb.RSUpd
         status = in.Status.Value
         isSetStatus = true
     }
-    //if in.ChargeRules != nil {
-    //    isSetChargeRules = true
-    //}
-	//
-    //chargeRules := in.ChargeRules
-
 	var merchantID string
     _, merchantID, err = Session.FetchSessionTokenValue(st)
     if err == nil {
@@ -204,19 +198,6 @@ func (s *RoomServiceImp) UpdateRoom(ctx context.Context, in *Aphro_Room_pb.RSUpd
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                //var insertData []string
-                //for _,cr := range chargeRules {
-                //    r,err1 := s.CreateRoomChargeRule(ctx,cr)
-                //    err = err1
-                //    if err == nil  {
-                //        var crcCreateResponse *Aphro_Room_pb.RCRCreateResponse
-                //        err = Response.UnmarshalAny(r.Result,crcCreateResponse)
-                //        if err == nil {
-                //            insertData = append(insertData,strconv.Itoa(int(crcCreateResponse.RecodeID)))
-                //        }
-                //    }
-                //}
-
                 var bindValues []interface{} = []interface{}{}
                 var updateMaps map[string]interface{} = map[string]interface{}{}
 
@@ -416,16 +397,6 @@ func (s *RoomServiceImp) BatchCreateRoomChargeRule(ctx context.Context, in *Aphr
             flag := rule.Flag
             name := rule.Name
 
-            //var (
-            //    startTime time.Time
-            //    endTime time.Time
-            //)
-
-            //startTime, err = time.Parse("2006-01-02 15:04:05",start)
-            //endTime, err = time.Parse("2006-01-02 15:04:05",end)
-            //st := startTime.Format("2006-01-02 15:04:05")
-            //et := endTime.Format("2006-01-02 15:04:05")
-
             var tmpRule []string = []string{"?","?","?","?","?","?","?","?"}
             ruleVals = append(ruleVals,MySQL.LeftBrackets + strings.Join(tmpRule,MySQL.DelimiterComma) + MySQL.RightBrackets)
             binds = append (binds,fee,start,end,interval,intervalUnit,merchantID,roomID,flag,name)
@@ -517,16 +488,6 @@ func (s *RoomServiceImp) UpdateRoomChargeRule(ctx context.Context, in *Aphro_Roo
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-
-                //var (
-                //    startTime time.Time
-                //    endTime time.Time
-                //)
-
-                //startTime, err = time.Parse("2006-01-02 15:04:05",start)
-                //endTime, err = time.Parse("2006-01-02 15:04:05",end)
-                //st := startTime.Format("2006-01-02 15:04:05")
-                //et := endTime.Format("2006-01-02 15:04:05")
 
                 querySQL := "UPDATE `merchant_charge_rule` SET `fee_per` = ? , `start` = ? , `end` = ? , `interval` = ? , `interval_unit` = ? , `merchant_id` = ? , `room_id` = ? ,`name` = ? WHERE `ID` = ? "
                 _,err = m.Query(querySQL,fee,start,end,interval,intervalUnit,merchantID,roomId,roomName,rcrid).RowsAffected()
@@ -740,7 +701,11 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
                         _,err = m.Insert("transaction_room_charge_rules",insertColumns , insertValuesPlaceholder).Execute(bv...).RowsAffected()
                         if err == nil {
                             // todo 计费开始
-                            Biz.TransactionCalculator.ScheduleRules(nil)
+
+                            t := Biz.TransactionCalculator{}
+                            rs := t.BatchReformerRuleByRCRCreatePB(roomChargeRules)
+                            var fee float64
+                            fee,err = t.ScheduleRulesByRules(rs,startTime)
 
                             //当前的房间 不支持多个事务
                             _,err := m.
@@ -749,7 +714,7 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
                                 Execute(RoomStatusInUse,roomId).
                                 RowsAffected()
                             if err == nil {
-                                res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionBeginResponse{true,uint32(transactionId),uint64(time.Now().Unix() * 1000),666})
+                                res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionBeginResponse{true,uint32(transactionId),uint64(time.Now().Unix() * 1000),float32(fee)})
                             }
                         }
                     }

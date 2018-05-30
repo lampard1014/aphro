@@ -6,6 +6,8 @@ import (
 	"strings"
 	"strconv"
 	"math"
+	"fmt"
+	"github.com/lampard1014/aphro/PersistentStore/MySQL"
 )
 
 type IntervalUnit uint32
@@ -52,13 +54,10 @@ type TCRule  struct {
 	transactionID uint32
 	flag uint32
 	rcrID uint32
-
 }
-
 
 type TransactionCalculator struct {
 	//sema chan struct{}
-
 }
 
 //reformer to standard rule model
@@ -77,16 +76,25 @@ func (static TransactionCalculator)ReformerRuleByRCRCreatePB(in *Aphro_Room_pb.R
 	}
 }
 
-func (static TransactionCalculator)fetchTimerBy(rule *TCRule)(t *time.Timer,err error) {
+func (static TransactionCalculator)BatchReformerRuleByRCRCreatePB(in []*Aphro_Room_pb.RCRCreateRequest) ([]*TCRule) {
+	rules := []*TCRule{}
+
+	for _,v := range in {
+		r := static.ReformerRuleByRCRCreatePB(v)
+		rules = append(rules, r)
+	}
+
+	return rules
+}
+
+
+func (static TransactionCalculator)fetchTickerBy(rule *TCRule)(t *time.Ticker,err error) {
 	//var uint time.Duration
-	uint, err := static.fetchTimeDuration(IntervalUnit(rule.interval))
+	uint, err := static.fetchTimeDuration(IntervalUnit(rule.intervalUnit))
 	if err != nil {
 		return
 	}
-	//create Timer
-	t = func(rule *TCRule) *time.Timer {
-		return time.NewTimer(time.Duration(rule.interval) * uint)
-	}(rule)
+	t = time.NewTicker(time.Duration(rule.interval) * uint)
 	return
 }
 
@@ -120,93 +128,147 @@ func (static TransactionCalculator)fetchSema(cap int)(sema chan struct{}) {
 	return make (chan struct{}, cap)
 }
 
-//func (static TransactionCalculator)ScheduleRules(rules map[*TCRule]func(<-chan time.Time)) (err error) {
-//}
+
+//创建timer
+//timer的业务逻辑放到 goroutine 来处理
+func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin time.Time) (currentFee float64,err error) {
+
+	//biz logical here
+	tickerFunc := func(ticker *time.Ticker, rule *TCRule)(fee float64,err error) {
+
+		for t := range ticker.C {
+			//step 1 get money
+			fee ,err = static.CalculateFee(rule, begin, t)
+			fmt.Println("log ",fee, err,time.Now())
+			//step2 update database
+
+			//step3 checkout need remote Ticker
+			static.stopTicker(ticker,rule,t)
+		}
+		return
+	}
+
+	for _,r := range rules {
+		err = static.ScheduleRulesByRuleAndFunc(r, tickerFunc)
+		err = static.SnapRule(r)
+		//assume calculate
+		func (){
+			f,_ := static.CalculateFee(r,begin,time.Now())
+			currentFee += f
+		}()
+	}
+
+	return
+}
+
+func (static TransactionCalculator)SnapRule(rule *TCRule) (err error) {
+
+	var mysql *MySQL.APSMySQL
+	mysql,err = MySQL.NewAPSMySQL(nil)
+	if err == nil {
+		m, ok := mysql.Connect().(*MySQL.APSMySQL)
+		defer m.Close()
+
+		if ok {
+
+		}
+	}
+	return
+}
 
 //schedule timer
-func (static TransactionCalculator)ScheduleRules(rules map[*TCRule]func(<-chan time.Time)) (err error){
+func (static TransactionCalculator)ScheduleRulesByRuleAndFunc(rule *TCRule,f func( *time.Ticker, *TCRule)(float64,error)) (err error){
 
-	//sema := static.fetchSema(len(rules))
-
-	for r,f := range rules {
-		var t *time.Timer
-		t,err =static.fetchTimerBy(r)
-		if err == nil {
-			go func (){
-				//sema <- struct{}{}
-				f(t.C)
-				//<-sema
-			}()
-		}
-
+	t, err := static.fetchTickerBy(rule)
+	if err == nil {
+		go f(t, rule)
 	}
 	return err
 }
 
+//remove tiker
+func (static TransactionCalculator)stopTicker (ticker *time.Ticker, rule *TCRule, now time.Time) {
+
+
+	var uint time.Duration
+	uint, _ = static.fetchTimeDuration(IntervalUnit(rule.intervalUnit))
+	interval := float64(rule.interval)
+
+	etHour, etMin, etSecond := static.parseLimitTime(rule.end)
+
+	tn := now.Hour() * 3600 + now.Minute() * 60 + now.Second()
+	etTimeValue := etHour * 3600 + etMin * 60 + etSecond
+	overflow := interval * float64(uint / time.Second)
+
+	var beyondTime bool = false
+	if etHour > 24 || etMin > 60 || etSecond > 60 {
+		beyondTime = true
+	}
+
+	//超过一次overflow的时间算是过期
+	if  (tn > etTimeValue + int(overflow)) || (beyondTime && (tn + 24 *3600) > etTimeValue + int(overflow))  {
+		ticker.Stop()
+	}
+}
+
 //计算费用，从begin 到当前时间的完整费用值
-func (static TransactionCalculator)CalculateFee(rule *TCRule,begin time.Time ,c <-chan time.Time) (currentFee float64, err error) {
-
-
+func (static TransactionCalculator)CalculateFee(rule *TCRule,begin time.Time ,now time.Time) (currentFee float64, err error) {
 	if rule == nil {
 		err = static.newTransactionCalculatorError(TransactionCalculatorErrorMsgEntityError)
 	} else {
 		var uint time.Duration
-		uint, err = static.fetchTimeDuration(IntervalUnit(rule.interval))
+		uint, err = static.fetchTimeDuration(IntervalUnit(rule.intervalUnit))
 		if err != nil {
 			return
 		}
 		interval := float64(rule.interval)
 		stHour, stMin, stSecond := static.parseLimitTime(rule.start)
 		etHour, etMin, etSecond := static.parseLimitTime(rule.end)
-		//现在离开始的时间差
-		t := <-c
-		timeDuration := t.Sub(begin)
 
-		//目前只考虑时，分，秒
-		switch uint {
-			case time.Hour:
-				nh := t.Hour()
-				if nh < stHour || ((etHour >=24 && nh > etHour - 24) || nh > etHour) {
-					//还没开始 或者 已经结束
-					err = static.newTransactionCalculatorError(TransactionCalculatorErrorCalcaulateTimeError)
-				} else {
-					//在范围之内
-					calculateInterval := static.ceilTimeInterval(timeDuration.Hours(),interval)
-					currentFee = calculateInterval * float64(rule.fee)
-				}
-			case time.Second:
-				ns := t.Second()
-				if ns < stSecond || ((etSecond >=60 && ns > etSecond - 60) || ns > etSecond) {
-					//还没开始 或者 已经结束
-					err = static.newTransactionCalculatorError(TransactionCalculatorErrorCalcaulateTimeError)
-				} else {
-					//在范围之内
-					calculateInterval := static.ceilTimeInterval(timeDuration.Seconds(),interval)
-					currentFee = calculateInterval * float64(rule.fee)
-				}
-			case time.Minute:
-				ns := t.Minute()
-				if ns < stMin || ((etMin >=60 && ns > etMin - 60) || ns > etMin) {
-					//还没开始 或者 已经结束
-					err = static.newTransactionCalculatorError(TransactionCalculatorErrorCalcaulateTimeError)
-				} else {
-					//在范围之内
-					calculateInterval := static.ceilTimeInterval(timeDuration.Minutes(),interval)
-					currentFee = calculateInterval * float64(rule.fee)
-				}
-			case 0:
-				//无间隔,包场
-				currtentTimeValue := t.Hour() * 3600 + t.Minute() * 60 + t.Second()
-				stTimeValue := stHour * 3600 + stMin * 60 + stSecond
-				etTimeValue := etHour * 3600 + etMin * 60 + etSecond
-				if currtentTimeValue < stTimeValue || currtentTimeValue > etTimeValue {
-					//还没开始 或者 已经结束
-					err = static.newTransactionCalculatorError(TransactionCalculatorErrorCalcaulateTimeError)
-				} else {
-					//在范围之内
-					currentFee = float64(rule.fee)
-				}
+
+		var beyondTime bool = false
+		if etHour > 24 || etMin > 60 || etSecond > 60 {
+			beyondTime = true
 		}
+
+		tn := now.Hour() * 3600 + now.Minute() * 60 + now.Second()
+
+		stTimeValue := stHour * 3600 + stMin * 60 + stSecond
+		etTimeValue := etHour * 3600 + etMin * 60 + etSecond
+
+		overflow := interval * float64(uint / time.Second)
+
+		var isBingo bool
+		if (
+			( tn >= stTimeValue && tn <= etTimeValue + int(overflow)) ||
+			(beyondTime && (tn + 24 *3600) <= etTimeValue + int(overflow) && (tn + 24 *3600) >= stTimeValue) ) {
+			isBingo = true
+		}
+
+		//默认今天 否则是前一天
+		var tmp time.Time = now
+		if tn < stTimeValue {
+			p,_ := time.ParseDuration("-24h")
+			tmp = now.Add(p)
+		}
+		startDateTime := time.Date(tmp.Year(),tmp.Month(),tmp.Day(),stHour,stMin,stSecond,0,tmp.Location())
+
+		fmt.Println("xxxxx", startDateTime)
+		mt := math.Max(float64(startDateTime.Unix()),float64(begin.Unix()))
+		between := now.Unix() - int64(mt) //精确到秒
+
+		if isBingo {
+			calculateInterval := static.ceilTimeInterval(float64(between) *float64(time.Second) ,interval * float64(uint))
+
+			if uint == 0 {
+				currentFee = float64(rule.fee)
+			} else {
+				currentFee = calculateInterval * float64(rule.fee)
+			}
+		} else {
+			err = static.newTransactionCalculatorError(TransactionCalculatorErrorCalcaulateTimeError)
+		}
+
 	}
 
 	return
@@ -224,8 +286,13 @@ func (static TransactionCalculator)parseLimitTime(lt string)(hour int,minute int
 	return
 }
 
-func (static TransactionCalculator)ceilTimeInterval(t float64, uint float64)float64 {
-	return (math.Ceil(t/uint))
+func (static TransactionCalculator)ceilTimeInterval(t float64, uint float64)(v float64) {
+	//起步价一个单位
+	v = (math.Ceil(t/uint))
+	if v == 0 {
+		v = 1
+	}
+	return
 }
 
 

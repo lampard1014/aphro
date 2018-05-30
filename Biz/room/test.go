@@ -6,8 +6,41 @@ import (
 )
 
 func main (){
+
+
+	var tmp time.Time = time.Now()
+	//if tn < stTimeValue {
+		p,_ := time.ParseDuration("-24h")
+		tmp = tmp.Add(p)
+	//}
+
+	y:= tmp.Year()
+	m := tmp.Month()
+	d := tmp.Day()
+	startDateTime := time.Date(tmp.Year(),tmp.Month(),tmp.Day(),0,0,0,0,tmp.Location())
+
+	fmt.Println(y,m,d)
+	fmt.Println(startDateTime)
+
 	//
 	//
+	//sema := make(chan struct{}, 1 *time.Second)
+	//t := time.NewTicker(1 * time.Second)
+	//go func(c <-chan time.Time) {
+	//	for t2 := range t.C {
+	//
+	//		fmt.Println("xxxxx" ,t2)
+	//		fmt.Println("22222")
+	//
+	//	}
+	//	fmt.Println("3333")
+	//
+	//	//	fmt.Println("xxxxx" ,<-c)
+	//
+	//}(t.C)
+	//<-sema
+
+
 
 	//func() {
 	//
@@ -48,27 +81,27 @@ func main (){
 	//
 	//return
 
-
-	sema := make (chan struct{},1)
-	//sema<- struct {}{}
-	c1 := make(chan string, 1)
-	c1<-"s"
-	//<-c1
-	fmt.Println(" get chan")
+	//
+	//sema := make (chan struct{},1)
+	////sema<- struct {}{}
+	//c1 := make(chan string, 1)
 	//c1<-"s"
-
-
-
-	go func() {
-		time.Sleep(time.Second * 2)
-		//c1 <- "result 1"
-		fmt.Println(" in func ")
-		sema <- struct{}{}
-	}()
-	fmt.Println(" in main ")
-
-	<-sema
-	fmt.Println("xxxxxxx")
+	////<-c1
+	//fmt.Println(" get chan")
+	////c1<-"s"
+	//
+	//
+	//
+	//go func() {
+	//	time.Sleep(time.Second * 2)
+	//	//c1 <- "result 1"
+	//	fmt.Println(" in func ")
+	//	sema <- struct{}{}
+	//}()
+	//fmt.Println(" in main ")
+	//
+	//<-sema
+	//fmt.Println("xxxxxxx")
 //	fff := func (x,unit float64) float64 {
 //		return (math.Ceil(x/unit)) * unit
 //	}
