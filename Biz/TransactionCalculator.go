@@ -55,6 +55,7 @@ type TCRule  struct {
 	flag uint32
 	rcrID uint32
 	snapRuleID int64
+	transactionRoomFeeID int64
 }
 
 type TransactionCalculator struct {
@@ -73,9 +74,9 @@ func (static TransactionCalculator)ReformerRuleByRCRCreatePB(in *Aphro_Room_pb.R
 		in.RoomID,
 		0,
 		in.Flag,
+		in.RcrID,
 		0,
 		0,
-
 	}
 }
 
@@ -134,7 +135,7 @@ func (static TransactionCalculator)fetchSema(cap int)(sema chan struct{}) {
 
 //创建timer
 //timer的业务逻辑放到 goroutine 来处理
-func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin time.Time) (currentFee float64,err error) {
+func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin time.Time, now time.Time) (currentFee float64,err error) {
 
 	//biz logical here
 	tickerFunc := func(ticker *time.Ticker, rule *TCRule)(fee float64,err error) {
@@ -144,7 +145,7 @@ func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin t
 			fee ,err = static.CalculateFee(rule, begin, t)
 			fmt.Println("log ",fee, err,time.Now())
 			//step2 update database
-
+			static.UpdateRuleFeeTansaction(rule,fee,t)
 			//step3 checkout need remote Ticker
 			static.stopTicker(ticker,rule,t)
 		}
@@ -153,10 +154,11 @@ func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin t
 
 	for _,r := range rules {
 		err = static.ScheduleRulesByRuleAndFunc(r, tickerFunc)
-		err = static.SnapRule(r)
+		//err = static.SnapRule(r)
 		//assume calculate
 		func (){
-			f,_ := static.CalculateFee(r,begin,time.Now())
+			f,_ := static.CalculateFee(r,begin,now)
+			static.CreateRuleFeeTansaction(r, f, now)
 			currentFee += f
 		}()
 	}
@@ -164,26 +166,72 @@ func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin t
 	return
 }
 
-func (static TransactionCalculator)CreateRuleFee(rule *TCRule)(err error) {
+func (static TransactionCalculator)UpdateRuleFeeTansaction(rule *TCRule,fee float64, now time.Time)(err error) {
 	var mysql *MySQL.APSMySQL
 	mysql,err = MySQL.NewAPSMySQL(nil)
 	if err == nil {
 		m, ok := mysql.Connect().(*MySQL.APSMySQL)
 		defer m.Close()
-
-
 		if ok {
-			var ins int64
-			ins,err = m.Insert("transaction_room_charge_rules",
-				[]string{"fee_per_interval","start","end","interval","interval_unit","merchant_id","room_id","transaction_id","flag"},
-				[][]string{[]string{"?","?","?","?","?","?","?","?","?"}},
-			).
-				Execute([]interface{}{rule.fee,rule.start,rule.end,rule.interval,rule.intervalUnit,rule.merchant,rule.roomID,rule.transactionID,rule.flag}).
-				LastInsertId()
-
-			rule.snapRuleID = ins
+			//var ins int64
+			_,err = m.
+				Update("transaction_roomfee",
+					map[string]interface{}{"fee":"?","update_time":"?"}).
+				Where(&MySQL.APSMySQLCondition{MySQL.APSMySQLOperator_Equal,"ID","?"}).
+				Execute(fee,now.Unix(),rule.transactionRoomFeeID).
+				RowsAffected()
 		}
 	}
+	return
+}
+
+
+func (static TransactionCalculator)CreateRuleFeeTansaction(rule *TCRule,fee float64, now time.Time)(err error) {
+	var mysql *MySQL.APSMySQL
+	mysql,err = MySQL.NewAPSMySQL(nil)
+	if err == nil {
+		m, ok := mysql.Connect().(*MySQL.APSMySQL)
+		defer m.Close()
+		if ok {
+			insertColumns := []string{
+				"fee",
+				"create_time",
+				"update_time",
+				"fee_per_interval",
+				"start",
+				"end",
+				"interval",
+				"interval_unit",
+				"merchant_id",
+				"room_id",
+				"transaction_id",
+				"flag",
+			}
+			var ins int64
+			ins,err = m.Insert(
+				"transaction_roomfee",
+					insertColumns,
+					[][]string{[]string{"?","?","?","?","?","?","?","?","?","?","?","?"}},
+				).
+			Execute([]interface{}{
+					fee,
+					now.Unix(),
+					now.Unix(),
+					rule.fee,
+					rule.start,
+					rule.end,
+					rule.interval,
+					rule.intervalUnit,
+					rule.merchant,
+					rule.roomID,
+					rule.transactionID,
+					rule.flag,
+				}).LastInsertId()
+
+			rule.transactionRoomFeeID = ins
+		}
+	}
+	return
 }
 
 func (static TransactionCalculator)SnapRule(rule *TCRule) (err error) {

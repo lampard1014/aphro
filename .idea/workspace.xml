@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9228a757-b1d2-4ade-9e3c-14e297403ef8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/Biz/TransactionCalculator.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/TransactionCalculator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Biz/room/pb/room.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/room/pb/room.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Biz/room/pb/room.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/room/pb/room.pb.gw.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go" beforeDir="false" afterPath="$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -35,8 +34,8 @@
       <file leaf-file-name="MySQLPersistentStore.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PersistentStore/MySQL/MySQLPersistentStore.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="581" column="24" selection-start-line="581" selection-start-column="21" selection-end-line="581" selection-end-column="28" />
+            <state relative-caret-position="173">
+              <caret line="757" column="17" selection-start-line="757" selection-start-column="17" selection-end-line="757" selection-end-column="17" />
               <folding>
                 <element signature="e#15#257#0" expanded="true" />
               </folding>
@@ -44,20 +43,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RoomService.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="RoomService.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="222">
-              <caret line="656" column="36" lean-forward="true" selection-start-line="656" selection-start-column="36" selection-end-line="656" selection-end-column="36" />
+            <state relative-caret-position="269">
+              <caret line="543" column="27" selection-start-line="543" selection-start-column="27" selection-end-line="543" selection-end-column="27" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionCalculator.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TransactionCalculator.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Biz/TransactionCalculator.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="478">
-              <caret line="185" column="5" selection-start-line="185" selection-start-column="5" selection-end-line="185" selection-end-column="5" />
+            <state relative-caret-position="129">
+              <caret line="147" column="52" lean-forward="true" selection-start-line="147" selection-start-column="52" selection-end-line="147" selection-end-column="52" />
               <folding>
                 <element signature="e#13#75#0" expanded="true" />
               </folding>
@@ -68,8 +67,8 @@
       <file leaf-file-name="room.pb.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.pb.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="988" column="39" selection-start-line="988" selection-start-column="19" selection-end-line="988" selection-end-column="39" />
+            <state relative-caret-position="-3202">
+              <caret line="1029" column="35" selection-start-line="1029" selection-start-column="9" selection-end-line="1029" selection-end-column="35" />
               <folding>
                 <element signature="e#1039#1411#0" expanded="true" />
               </folding>
@@ -77,12 +76,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="time.go" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/local/Cellar/go/1.9.2/libexec/src/time/time.go">
+      <file leaf-file-name="room.pb.gw.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.pb.gw.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="303">
-              <caret line="1310" column="28" lean-forward="true" selection-start-line="1310" selection-start-column="28" selection-end-line="1310" selection-end-column="28" />
-            </state>
+            <state relative-caret-position="-11962" />
           </provider>
         </entry>
       </file>
@@ -101,8 +98,8 @@
       <file leaf-file-name="room.proto" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.proto">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="129" column="43" selection-start-line="129" selection-start-column="16" selection-end-line="129" selection-end-column="43" />
+            <state relative-caret-position="116">
+              <caret line="126" column="13" lean-forward="true" selection-start-line="126" selection-start-column="13" selection-end-line="126" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -110,8 +107,8 @@
       <file leaf-file-name="IPersistentStore.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PersistentStore/IPersistentStore.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="160">
-              <caret line="59" column="9" selection-start-line="59" selection-start-column="4" selection-end-line="59" selection-end-column="16" />
+            <state relative-caret-position="158">
+              <caret line="23" column="6" lean-forward="true" selection-start-line="23" selection-start-column="6" selection-end-line="23" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -151,9 +148,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>merchant/info</find>
-      <find>queryRoom</find>
-      <find>propersalAccountType</find>
       <find>RSResult</find>
       <find>E_propersalAccountType</find>
       <find>empty</find>
@@ -180,7 +174,10 @@
       <find>fetchTimeDuration</find>
       <find>r_interval_unit</find>
       <find>RSTransactionQueryRoomFeeRequest</find>
+      <find>RSTransactionBeginResponse</find>
       <find>roomTransactionQueryRoomFee</find>
+      <find>ScheduleRulesByRules</find>
+      <find>transaction_roomfee</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/Cellar/go/1.9.2/libexec" />
@@ -237,9 +234,9 @@
         <option value="$PROJECT_DIR$/CommonBiz/Session/session.go" />
         <option value="$PROJECT_DIR$/PersistentStore/IPersistentStore.go" />
         <option value="$PROJECT_DIR$/PersistentStore/MySQL/MySQLPersistentStore.go" />
-        <option value="$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go" />
         <option value="$PROJECT_DIR$/Biz/room/test.go" />
         <option value="$PROJECT_DIR$/Biz/room/pb/room.proto" />
+        <option value="$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go" />
         <option value="$PROJECT_DIR$/Biz/TransactionCalculator.go" />
       </list>
     </option>
@@ -662,9 +659,9 @@
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4779087" weight="0.25744048" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32886904" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.22470239" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.46391752" visible="true" weight="0.3110119" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.46391752" weight="0.3110119" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -849,13 +846,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/local/Cellar/go/1.9.2/libexec/src/database/sql/sql.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1860">
-          <caret line="1652" column="5" selection-start-line="1652" selection-start-column="5" selection-end-line="1652" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../golang/protobuf/ptypes/empty/empty.pb.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="155">
@@ -1141,30 +1131,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.proto">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="129" column="43" selection-start-line="129" selection-start-column="16" selection-end-line="129" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.pb.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="988" column="39" selection-start-line="988" selection-start-column="19" selection-end-line="988" selection-end-column="39" />
-          <folding>
-            <element signature="e#1039#1411#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PersistentStore/IPersistentStore.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="59" column="9" selection-start-line="59" selection-start-column="4" selection-end-line="59" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Biz/merchant/MerchantServiceIMP/MerchantService.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="149">
@@ -1185,10 +1151,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.proto">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="126" column="13" lean-forward="true" selection-start-line="126" selection-start-column="13" selection-end-line="126" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.pb.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3202">
+          <caret line="1029" column="35" selection-start-line="1029" selection-start-column="9" selection-end-line="1029" selection-end-column="35" />
+          <folding>
+            <element signature="e#1039#1411#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Biz/room/pb/room.pb.gw.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-11962" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="543" column="27" selection-start-line="543" selection-start-column="27" selection-end-line="543" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PersistentStore/IPersistentStore.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="23" column="6" lean-forward="true" selection-start-line="23" selection-start-column="6" selection-end-line="23" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PersistentStore/MySQL/MySQLPersistentStore.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="581" column="24" selection-start-line="581" selection-start-column="21" selection-end-line="581" selection-end-column="28" />
+        <state relative-caret-position="173">
+          <caret line="757" column="17" selection-start-line="757" selection-start-column="17" selection-end-line="757" selection-end-column="17" />
           <folding>
             <element signature="e#15#257#0" expanded="true" />
           </folding>
@@ -1197,18 +1199,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Biz/TransactionCalculator.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="478">
-          <caret line="185" column="5" selection-start-line="185" selection-start-column="5" selection-end-line="185" selection-end-column="5" />
+        <state relative-caret-position="129">
+          <caret line="147" column="52" lean-forward="true" selection-start-line="147" selection-start-column="52" selection-end-line="147" selection-end-column="52" />
           <folding>
             <element signature="e#13#75#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Biz/room/RoomServiceIMP/RoomService.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="656" column="36" lean-forward="true" selection-start-line="656" selection-start-column="36" selection-end-line="656" selection-end-column="36" />
         </state>
       </provider>
     </entry>

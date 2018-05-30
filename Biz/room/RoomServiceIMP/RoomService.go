@@ -539,16 +539,16 @@ func (s *RoomServiceImp) QueryRoomChargeRule(ctx context.Context, in *Aphro_Room
                 }
                 querySQL := "SELECT `ID`,`fee_per`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`flag`,`name` FROM `merchant_charge_rule` WHERE " + strings.Join(whereCondition," AND ")
                 var (
-                    r_ID uint32
-                    r_fee float32
-                    r_start string
-                    r_end string
-                    r_interval int
+                    r_ID            uint32
+                    r_fee           float32
+                    r_start         string
+                    r_end           string
+                    r_interval      int
                     r_interval_unit int
-                    r_merchant_id uint32
-                    r_room_id uint32
-                    r_flag int
-                    r_name string
+                    r_merchant_id   uint32
+                    r_room_id       uint32
+                    r_flag          int
+                    r_name          string
                 )
 
                 qr := &Aphro_Room_pb.RCRQueryResponse{}
@@ -558,16 +558,16 @@ func (s *RoomServiceImp) QueryRoomChargeRule(ctx context.Context, in *Aphro_Room
                         return
                     }
                     rsResult := &Aphro_Room_pb.RCRResult{
-                        MerchantID:r_merchant_id,
-                        RCRID:r_ID,
-                        Fee:r_fee,
-                        Start:r_start,
-                        End:r_end,
-                        Interval:uint32(r_interval),
-                        IntervalUnit:uint32(r_interval_unit),
-                        RoomID:r_room_id,
-                        Flag:uint32(r_flag),
-                        Name:r_name,
+                        MerchantID:   r_merchant_id,
+                        RCRID:        r_ID,
+                        Fee:          r_fee,
+                        Start:        r_start,
+                        End:          r_end,
+                        Interval:     uint32(r_interval),
+                        IntervalUnit: uint32(r_interval_unit),
+                        RoomID:       r_room_id,
+                        Flag:         uint32(r_flag),
+                        Name:         r_name,
                     }
                     qr.Results = append(qr.Results, rsResult)
                 },&r_ID,&r_fee,&r_start,&r_end,&r_interval,&r_interval_unit,&r_merchant_id,&r_room_id,&r_flag,&r_name)
@@ -700,12 +700,15 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
 
                         _,err = m.Insert("transaction_room_charge_rules",insertColumns , insertValuesPlaceholder).Execute(bv...).RowsAffected()
                         if err == nil {
-                            // todo 计费开始
+                            //todo 计费开始
 
                             t := Biz.TransactionCalculator{}
                             rs := t.BatchReformerRuleByRCRCreatePB(roomChargeRules)
                             var fee float64
-                            fee,err = t.ScheduleRulesByRules(rs,startTime)
+                            fee,err = t.ScheduleRulesByRules(rs,startTime,startTime)
+
+
+
 
                             //当前的房间 不支持多个事务
                             _,err := m.
@@ -875,10 +878,11 @@ func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *A
             defer m.Close()
             if ok {
                 startTime := time.Now()
-                querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`create_time`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+                querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`create_time`,`update_time`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
                 _,err = m.Query(querySQL,
                     0,
                     startTime,
+					startTime,
                     fee,
                     start,
                     end,
@@ -933,32 +937,32 @@ func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Ap
                     whereCondition = append(whereCondition, "`transaction_id` =  ?")
                     binds = append(binds,transactionID)
                 }
-                querySQL := "SELECT `ID`,`fee`,`create_time`,`end_time`,`fee_per_interval`,`start`,`end`, `interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag` FROM `transaction_roomfee` WHERE " + strings.Join(whereCondition," AND ")
+                querySQL := "SELECT `ID`,`fee`,`create_time`,`update_time`,`fee_per_interval`,`start`,`end`, `interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag` FROM `transaction_roomfee` WHERE " + strings.Join(whereCondition," AND ")
                 var (
-                    ID uint32
-                    fee float32
-                    create_time uint32
-                    end_time uint32
+                    ID               uint32
+                    fee              float32
+                    create_time      uint32
+                    update_time      uint32
                     fee_per_interval float32
-                    start string
-                    end string
-                    interval uint32
-                    interval_unit uint32
-                    merchant_id uint32
-                    room_id uint32
-                    transaction_id uint32
-                    flag uint32
+                    start            string
+                    end              string
+                    interval         uint32
+                    interval_unit    uint32
+                    merchant_id      uint32
+                    room_id          uint32
+                    transaction_id   uint32
+                    flag             uint32
                 )
 
                 var roomFeeResultList []*Aphro_Room_pb.RSTransactionRoomFeeResult;
 
                 err = m.QueryAll(querySQL,binds...).FetchAll(func(dest...interface{}){
                     t := &Aphro_Room_pb.RSTransactionRoomFeeResult{
-                        ID,fee,create_time,end_time,fee_per_interval,
-                        start,end,interval,interval_unit,merchant_id,
-                        room_id,transaction_id,flag,}
+						ID, fee, create_time, update_time, fee_per_interval,
+						start, end, interval, interval_unit, merchant_id,
+						room_id, transaction_id, flag,}
                     roomFeeResultList = append(roomFeeResultList,t)
-                },&ID,&fee,&create_time,&end_time,&fee_per_interval,&start,&end,&interval,&interval_unit,&merchant_id,&room_id,&transaction_id,&flag)
+                },&ID,&fee,&create_time,&update_time,&fee_per_interval,&start,&end,&interval,&interval_unit,&merchant_id,&room_id,&transaction_id,&flag)
                 if err == nil {
                     res ,err = Response.NewCommonBizResponseWithCodeWithError(0,err,&Aphro_Room_pb.RSTransactionQueryRoomFeeResponse{true,roomFeeResultList})
                 }
