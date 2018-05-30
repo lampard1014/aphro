@@ -54,6 +54,7 @@ type TCRule  struct {
 	transactionID uint32
 	flag uint32
 	rcrID uint32
+	snapRuleID int64
 }
 
 type TransactionCalculator struct {
@@ -73,6 +74,8 @@ func (static TransactionCalculator)ReformerRuleByRCRCreatePB(in *Aphro_Room_pb.R
 		0,
 		in.Flag,
 		0,
+		0,
+
 	}
 }
 
@@ -161,6 +164,28 @@ func (static TransactionCalculator)ScheduleRulesByRules(rules []*TCRule, begin t
 	return
 }
 
+func (static TransactionCalculator)CreateRuleFee(rule *TCRule)(err error) {
+	var mysql *MySQL.APSMySQL
+	mysql,err = MySQL.NewAPSMySQL(nil)
+	if err == nil {
+		m, ok := mysql.Connect().(*MySQL.APSMySQL)
+		defer m.Close()
+
+
+		if ok {
+			var ins int64
+			ins,err = m.Insert("transaction_room_charge_rules",
+				[]string{"fee_per_interval","start","end","interval","interval_unit","merchant_id","room_id","transaction_id","flag"},
+				[][]string{[]string{"?","?","?","?","?","?","?","?","?"}},
+			).
+				Execute([]interface{}{rule.fee,rule.start,rule.end,rule.interval,rule.intervalUnit,rule.merchant,rule.roomID,rule.transactionID,rule.flag}).
+				LastInsertId()
+
+			rule.snapRuleID = ins
+		}
+	}
+}
+
 func (static TransactionCalculator)SnapRule(rule *TCRule) (err error) {
 
 	var mysql *MySQL.APSMySQL
@@ -169,8 +194,17 @@ func (static TransactionCalculator)SnapRule(rule *TCRule) (err error) {
 		m, ok := mysql.Connect().(*MySQL.APSMySQL)
 		defer m.Close()
 
-		if ok {
 
+		if ok {
+			var ins int64
+			ins,err = m.Insert("transaction_room_charge_rules",
+				[]string{"fee_per_interval","start","end","interval","interval_unit","merchant_id","room_id","transaction_id","flag"},
+				[][]string{[]string{"?","?","?","?","?","?","?","?","?"}},
+				).
+				Execute([]interface{}{rule.fee,rule.start,rule.end,rule.interval,rule.intervalUnit,rule.merchant,rule.roomID,rule.transactionID,rule.flag}).
+				LastInsertId()
+
+			rule.snapRuleID = ins
 		}
 	}
 	return

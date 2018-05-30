@@ -822,7 +822,7 @@ var (
 
 	pattern_RoomService_RoomTransactionCreateRoomFee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "transaction", "createRoomFee"}, ""))
 
-	pattern_RoomService_RoomTransactionQueryRoomFee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "transaction", "createRoomFee"}, ""))
+	pattern_RoomService_RoomTransactionQueryRoomFee_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"room", "transaction", "queryRoomFee"}, ""))
 )
 
 var (
