@@ -642,7 +642,8 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
     roomChargeRules:= in.RoomChargeRules
     roomId := in.RoomID
     sessionToken := in.SessionToken
-	_,_,err = Session.FetchSessionTokenValue(sessionToken)
+    var mid string
+	_,mid,err = Session.FetchSessionTokenValue(sessionToken)
 
 	if err == nil {
     	var mysql *MySQL.APSMySQL
@@ -678,8 +679,8 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
                             bv = append(bv,rule.End)
                             bv = append(bv,rule.Interval)
                             bv = append(bv,rule.IntervalUnit)
-                            bv = append(bv,rule.MerchantID)
-                            bv = append(bv,rule.RoomID)
+                            bv = append(bv,mid)
+                            bv = append(bv,roomId)
                             bv = append(bv,transactionId)
                             bv = append(bv,rule.Flag)
                             bv = append(bv,rule.RcrID)
@@ -703,7 +704,7 @@ func (s *RoomServiceImp) RoomTransactionBegin(ctx context.Context, in *Aphro_Roo
                             //todo 计费开始
 
                             t := Biz.TransactionCalculator{}
-                            rs := t.BatchReformerRuleByRCRCreatePB(roomChargeRules)
+                            rs := t.BatchReformerRuleByRCRCreatePB(roomChargeRules, mid)
                             var fee float64
                             fee,err = t.ScheduleRulesByRules(rs,startTime,startTime)
 
@@ -877,12 +878,10 @@ func (s *RoomServiceImp) RoomTransactionCreateRoomFee(ctx context.Context, in *A
             m, ok := mysql.Connect().(*MySQL.APSMySQL)
             defer m.Close()
             if ok {
-                startTime := time.Now()
-                querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`create_time`,`update_time`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+                //startTime := time.Now()
+                querySQL := "INSERT  INTO `transaction_roomfee` (`fee`,`fee_per_interval`,`start`,`end`,`interval`,`interval_unit`,`merchant_id`,`room_id`,`transaction_id`,`flag`) VALUES (?,?,?,?,?,?,?,?,?,?)"
                 _,err = m.Query(querySQL,
                     0,
-                    startTime,
-					startTime,
                     fee,
                     start,
                     end,
@@ -941,8 +940,8 @@ func (s *RoomServiceImp) RoomTransactionQueryRoomFee(ctx context.Context, in *Ap
                 var (
                     ID               uint32
                     fee              float32
-                    create_time      uint32
-                    update_time      uint32
+                    create_time      string
+                    update_time      string
                     fee_per_interval float32
                     start            string
                     end              string

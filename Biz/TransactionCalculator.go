@@ -80,10 +80,13 @@ func (static TransactionCalculator)ReformerRuleByRCRCreatePB(in *Aphro_Room_pb.R
 	}
 }
 
-func (static TransactionCalculator)BatchReformerRuleByRCRCreatePB(in []*Aphro_Room_pb.RCRCreateRequest) ([]*TCRule) {
+func (static TransactionCalculator)BatchReformerRuleByRCRCreatePB(in []*Aphro_Room_pb.RCRCreateRequest, mid string) ([]*TCRule) {
 	rules := []*TCRule{}
 
 	for _,v := range in {
+
+		_mid,_ := strconv.Atoi(mid)
+		v.MerchantID = uint32(_mid)
 		r := static.ReformerRuleByRCRCreatePB(v)
 		rules = append(rules, r)
 	}
@@ -176,9 +179,9 @@ func (static TransactionCalculator)UpdateRuleFeeTansaction(rule *TCRule,fee floa
 			//var ins int64
 			_,err = m.
 				Update("transaction_roomfee",
-					map[string]interface{}{"fee":"?","update_time":"?"}).
+					map[string]interface{}{"fee":"?"}).
 				Where(&MySQL.APSMySQLCondition{MySQL.APSMySQLOperator_Equal,"ID","?"}).
-				Execute(fee,now.Unix(),rule.transactionRoomFeeID).
+				Execute(fee,rule.transactionRoomFeeID).
 				RowsAffected()
 		}
 	}
@@ -195,8 +198,6 @@ func (static TransactionCalculator)CreateRuleFeeTansaction(rule *TCRule,fee floa
 		if ok {
 			insertColumns := []string{
 				"fee",
-				"create_time",
-				"update_time",
 				"fee_per_interval",
 				"start",
 				"end",
@@ -211,12 +212,12 @@ func (static TransactionCalculator)CreateRuleFeeTansaction(rule *TCRule,fee floa
 			ins,err = m.Insert(
 				"transaction_roomfee",
 					insertColumns,
-					[][]string{[]string{"?","?","?","?","?","?","?","?","?","?","?","?"}},
+					[][]string{[]string{"?","?","?","?","?","?","?","?","?","?"}},
 				).
 			Execute([]interface{}{
 					fee,
-					now.Unix(),
-					now.Unix(),
+					//now.Unix(),
+					//now.Unix(),
 					rule.fee,
 					rule.start,
 					rule.end,
@@ -226,7 +227,7 @@ func (static TransactionCalculator)CreateRuleFeeTansaction(rule *TCRule,fee floa
 					rule.roomID,
 					rule.transactionID,
 					rule.flag,
-				}).LastInsertId()
+				}...).LastInsertId()
 
 			rule.transactionRoomFeeID = ins
 		}

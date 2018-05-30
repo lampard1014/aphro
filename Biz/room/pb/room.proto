@@ -385,9 +385,9 @@ message RSTransactionQueryRoomFeeResponse {
 message RSTransactionRoomFeeResult {
 	uint32  transactionRoomFeeID = 1;
 	float   fee	=	2;
-	uint32  createTime = 12;
-	uint32  endTime = 13;
-		float   feePerInterval = 11;
+	string  createTime = 12;
+	string  endTime = 13;
+	float   feePerInterval = 11;
 	string	start	=3;
 	string	end	=	4;
 	uint32 interval = 5;
